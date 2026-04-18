@@ -1,52 +1,75 @@
-# redteaming
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="RedTeamGig — the Upwork + Fiverr for AI safety. Connect red teamers, safety testers & freelance developers with AI companies for jailbreak testing, bias auditing, prompt injection, and LLM security work.">
-    <title>redteamgig.com • AI Red Teaming Marketplace</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
-        
-        :root {
-            --redteam: #e11d48;
-        }
-        
-        * {
-            transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
-            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-            transition-duration: 150ms;
-        }
-        
-        .hero-bg {
-            background: linear-gradient(90deg, #0f172a 0%, #1e2937 100%);
-        }
-        
-        .card-hover {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .card-hover:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 25px 50px -12px rgb(225 29 72);
-        }
-        
-        .tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-    </style>
-</head>
-<body class="bg-slate-950 text-slate-200 font-sans">
-    <!-- (all the same content as before — only footer and modal changed) -->
-    <!-- ... [the entire previous HTML stays exactly the same until the footer] ... -->
+# redteamgig.com
 
-    <footer class="bg-slate-950 border-t border-slate-800 py-12">
-        <div class="max-w-screen-2xl mx-auto px-8 text-xs text-slate-400 flex flex-col md:flex-row justify-between items-center gap-4">
+The Upwork + Fiverr for AI safety. Connect red teamers, safety testers & freelance developers with AI companies for jailbreak testing, bias auditing, prompt injection, and LLM security work.
+
+## Features
+
+- **Cold-start directory**: Aggregated gigs from Anthropic, Scale, Surge, Appen, Reddit, LinkedIn
+- **Talent pool**: Freelancers submit profiles once, get matched instantly
+- **Gig applications**: Apply to open gigs with one click
+- **Post gigs**: Companies pay $49 deposit to post proprietary gigs
+- **AI matching**: Claude-powered matching engine (coming soon)
+- **Supabase backend**: Waitlist, talent pool, job applications tables
+
+## Tech Stack
+
+- **Frontend**: HTML5, Tailwind CSS, Font Awesome
+- **Backend**: Supabase (PostgreSQL)
+- **Deployment**: Vercel
+- **AI**: Claude API (future)
+- **Payments**: Stripe (future)
+
+## Development
+
+```bash
+# Serve locally
+python3 -m http.server 8000
+
+# Open in browser
+open http://localhost:8000
+```
+
+## Deployment
+
+1. Push to GitHub
+2. Connect repo to Vercel
+3. Set environment variables in Vercel dashboard:
+   - `SUPABASE_URL`
+   - `SUPABASE_ANON_KEY`
+4. Deploy
+
+## Database Schema
+
+### waitlist
+- email (text, primary)
+- name (text)
+- role (text)
+- location (text)
+- join_date (timestamp)
+
+### talent_pool
+- full_name (text)
+- email (text)
+- github (text)
+
+### job_applications
+- gig_title (text)
+- applicant_name (text)
+- applicant_email (text)
+- github (text)
+
+## Roadmap
+
+1. ✅ Cold-start directory (live)
+2. 🔄 Freelancer profiles + scores
+3. 🔄 Company side + AI matching
+4. 🔄 Stripe payments + escrow
+
+## Contributing
+
+Built by Erekle Niniashvili in New Jersey. Mission: make AI safety work accessible to everyday technical people.
+
+Total launch budget: under $100 (Next.js + Supabase + Vercel + Stripe + Claude API)
             <div>© 2026 redteamgig.com • All rights reserved</div>
             <div class="flex gap-x-8">
                 <a href="#" class="hover:text-white">Twitter / X</a>
@@ -135,3 +158,140 @@
     </script>
 </body>
 </html>
+=======
+# 🔴 RedTeamGig
+
+**The Upwork + Fiverr for AI safety.**
+
+Connect red teamers, safety testers & freelance developers with AI companies for jailbreak testing, bias auditing, prompt injection, and LLM security work.
+
+![Status](https://img.shields.io/badge/status-launching%20soon-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+
+---
+
+## 🚀 Quick Links
+
+- **[SETUP.md](./SETUP.md)** — Deploy to Vercel + connect Supabase
+- **[Live Site](https://redteamgig.com)** — (Coming soon)
+- **[GitHub](https://github.com/ik4ko/redteaming)** — This repo
+
+---
+
+## 📋 What's Inside
+
+```
+.
+├── index.html          # Main landing page (Tailwind + JS)
+├── package.json        # Dependencies
+├── vercel.json         # Vercel deployment config
+├── .env.example        # Environment variables template
+├── SETUP.md            # Full deployment guide
+└── README.md           # This file
+```
+
+---
+
+## ⚡ Launch Checklist
+
+- ✅ Landing page complete
+- ✅ Supabase integration (waitlist table)
+- ✅ Vercel config ready
+- 🔄 Domain purchase (in progress)
+- 🔄 Deploy to production
+- 🚧 Phase 2: Freelancer profiles + matching engine
+- 🚧 Phase 3: Company side + AI matching
+
+---
+
+## 🛠 Tech Stack
+
+- **Frontend**: HTML5, Tailwind CSS, Vanilla JS
+- **Backend**: Supabase (PostgreSQL + Auth)
+- **Hosting**: Vercel
+- **Payments**: Stripe (Phase 2)
+- **AI Matching**: Claude API (Phase 3)
+
+---
+
+## 📖 How to Deploy
+
+### 1. **Set Up Supabase** (3 min)
+Create a table and get your API credentials.
+[Full instructions →](./SETUP.md#step-1-prepare-supabase)
+
+### 2. **Update Credentials** (1 min)
+Add your Supabase URL & key to `index.html`.
+[Instructions →](./SETUP.md#step-2-update-indexhtml-with-supabase-credentials)
+
+### 3. **Deploy to Vercel** (2 min)
+Connect your GitHub repo and deploy.
+[Instructions →](./SETUP.md#step-3-deploy-to-vercel)
+
+### 4. **Buy Domain** (5 min)
+Purchase domain and point to Vercel.
+[Instructions →](./SETUP.md#step-4-buy-a-domain)
+
+---
+
+## 🎯 Development
+
+**No build process needed!** This is a static site with client-side Supabase integration.
+
+To serve locally:
+```bash
+npx serve .
+```
+
+Then open `http://localhost:3000`
+
+---
+
+## 📊 Phase Roadmap
+
+| Phase | Feature | Timeline |
+|-------|---------|----------|
+| 1 | Cold-start directory + waitlist | Week 1-2 |
+| 2 | Freelancer profiles + Stripe | Week 3-4 |
+| 3 | Company matching engine (Claude API) | Week 5-6 |
+
+---
+
+## 🔐 Security Notes
+
+- ✅ Supabase Row-Level Security (RLS) enabled
+- ✅ Anon key restricted to INSERT only
+- ✅ HTTPS enforced by Vercel
+- 🔄 Email verification (Phase 2)
+- 🔄 NDA template (Phase 2)
+
+---
+
+## 📝 Contributing
+
+Help us build the future of AI safety work!
+
+1. Fork the repo
+2. Create a feature branch
+3. Submit a PR
+
+---
+
+## 📧 Contact
+
+Built by **Erekle Niniashvili** in New Jersey.
+
+- Twitter: [@redteamgig](https://twitter.com)
+- Discord: [Join our community](https://discord.gg)
+- Email: founder@redteamgig.com
+
+---
+
+## 📄 License
+
+MIT License — See `LICENSE` file for details.
+
+---
+
+**Status**: Ready for launch 🚀 | Last updated: April 18, 2026
+>>>>>>> 4c37c16 (Add marketplace features: Open Gigs, Talent Pool, Post Gig modal, Supabase integration)

@@ -1,0 +1,27 @@
+{
+  "name": "redteamgig",
+  "version": "1.0.0",
+  "description": "The Upwork + Fiverr for AI safety. Connect red teamers, safety testers & freelance developers with AI companies.",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'No build step needed for static site'",
+    "dev": "echo 'Serve index.html with: npx serve .'"
+  },
+  "keywords": [
+    "redteaming",
+    "ai-safety",
+    "marketplace",
+    "jailbreak-testing"
+  ],
+  "author": "Erekle Niniashvili",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ik4ko/redteaming"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  },
+  "devDependencies": {
+    "vercel": "latest"
+  }
+}
