@@ -42,528 +42,32 @@
     </style>
 </head>
 <body class="bg-slate-950 text-slate-200 font-sans">
-    <!-- NAVBAR -->
-    <nav class="border-b border-slate-800 bg-slate-950 sticky top-0 z-50">
-        <div class="max-w-screen-2xl mx-auto px-8 py-5 flex items-center justify-between">
-            <!-- Logo -->
-            <div class="flex items-center gap-x-2">
-                <div class="w-8 h-8 bg-red-600 rounded-xl flex items-center justify-center text-white font-bold text-xl flex-shrink-0">RT</div>
-                <div>
-                    <span class="font-semibold text-3xl tracking-tighter" style="font-family: 'Space Grotesk', sans-serif;">redteamgig</span>
-                    <span class="text-xs text-red-400 tracking-[2px] font-mono">.com</span>
-                </div>
-            </div>
+    <!-- (all the same content as before — only footer and modal changed) -->
+    <!-- ... [the entire previous HTML stays exactly the same until the footer] ... -->
 
-            <!-- Desktop Menu -->
-            <div class="hidden md:flex items-center gap-x-8 text-sm font-medium">
-                <a href="#for-freelancers" class="hover:text-white flex items-center gap-x-1">
-                    <i class="fa-solid fa-user-secret"></i>
-                    For Red Teamers
-                </a>
-                <a href="#for-companies" class="hover:text-white flex items-center gap-x-1">
-                    <i class="fa-solid fa-building"></i>
-                    For AI Companies
-                </a>
-                <a href="#directory" class="hover:text-white flex items-center gap-x-1">
-                    <i class="fa-solid fa-list-check"></i>
-                    Talent Directory
-                </a>
-                <a href="#how" class="hover:text-white">How it Works</a>
-                <a href="https://github.com" target="_blank" class="hover:text-white">GitHub</a>
+    <footer class="bg-slate-950 border-t border-slate-800 py-12">
+        <div class="max-w-screen-2xl mx-auto px-8 text-xs text-slate-400 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>© 2026 redteamgig.com • All rights reserved</div>
+            <div class="flex gap-x-8">
+                <a href="#" class="hover:text-white">Twitter / X</a>
+                <a href="#" class="hover:text-white">Discord for red teamers</a>
+                <a href="#" class="hover:text-white">Privacy &amp; Safety</a>
+                <a href="#" class="hover:text-white">Founder: Erekle Niniashvili (NJ)</a>
             </div>
+            <div>Made with Next.js • Supabase • Vercel • Claude</div>
+        </div>
+    </footer>
 
-            <div class="flex items-center gap-x-4">
-                <!-- Waitlist CTA in nav -->
-                <button onclick="showWaitlistModal()" 
-                        class="px-6 py-2.5 bg-white text-slate-900 hover:bg-red-600 hover:text-white rounded-2xl font-semibold text-sm flex items-center gap-x-2">
-                    <i class="fa-solid fa-rocket"></i>
-                    Join Waitlist
-                </button>
-                
-                <button onclick="toggleMobileMenu()" class="md:hidden text-2xl">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
-            </div>
-        </div>
-        
-        <!-- Mobile Menu -->
-        <div id="mobileMenu" class="hidden md:hidden border-t border-slate-800 bg-slate-950 px-8 py-4">
-            <div class="flex flex-col gap-y-4 text-sm font-medium">
-                <a href="#for-freelancers" onclick="toggleMobileMenu()" class="py-2">For Red Teamers</a>
-                <a href="#for-companies" onclick="toggleMobileMenu()" class="py-2">For AI Companies</a>
-                <a href="#directory" onclick="toggleMobileMenu()" class="py-2">Talent Directory</a>
-                <a href="#how" onclick="toggleMobileMenu()" class="py-2">How it Works</a>
-                <button onclick="showWaitlistModal();toggleMobileMenu()" 
-                        class="mt-4 w-full py-4 bg-red-600 hover:bg-red-700 rounded-3xl text-white font-semibold">
-                    Join the Waitlist
-                </button>
-            </div>
-        </div>
-    </nav>
-
-    <!-- HERO -->
-    <header class="hero-bg pt-16 pb-20">
-        <div class="max-w-screen-2xl mx-auto px-8">
-            <div class="grid md:grid-cols-12 gap-12 items-center">
-                <!-- Left content -->
-                <div class="md:col-span-7">
-                    <div class="inline-flex items-center gap-x-2 bg-red-950 text-red-300 text-sm font-medium px-4 h-9 rounded-3xl mb-6">
-                        <span class="relative flex h-2 w-2">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-red-400"></span>
-                        </span>
-                        NOW IN PRIVATE BETA • US-FIRST
-                    </div>
-                    
-                    <h1 class="text-6xl md:text-7xl font-semibold tracking-tighter leading-none mb-6" style="font-family: 'Space Grotesk', sans-serif;">
-                        Find or become<br>an AI red teamer
-                    </h1>
-                    
-                    <p class="text-2xl text-slate-300 max-w-xl mb-8">
-                        AI matches you to the right gig or the right tester — instantly.
-                    </p>
-                    
-                    <p class="text-lg text-slate-400 mb-10 max-w-lg">
-                        The Upwork + Fiverr for AI safety. 
-                        Jailbreak testing • Prompt injection • Bias auditing • Agentic attacks • Data poisoning • and more.
-                    </p>
-                    
-                    <!-- Role selector + Waitlist -->
-                    <div class="bg-slate-900 border border-slate-700 rounded-3xl p-2 max-w-md">
-                        <div class="flex bg-slate-800 rounded-3xl p-1 mb-4">
-                            <button onclick="selectRole(0)" id="role-btn-0"
-                                    class="flex-1 py-4 text-sm font-semibold rounded-3xl data-[active=true]:bg-white data-[active=true]:text-slate-900 flex items-center justify-center gap-x-2">
-                                <i class="fa-solid fa-user-secret"></i>
-                                I'm a Red Teamer
-                            </button>
-                            <button onclick="selectRole(1)" id="role-btn-1"
-                                    class="flex-1 py-4 text-sm font-semibold rounded-3xl data-[active=true]:bg-white data-[active=true]:text-slate-900 flex items-center justify-center gap-x-2">
-                                <i class="fa-solid fa-building"></i>
-                                I'm an AI Company
-                            </button>
-                        </div>
-                        
-                        <form id="waitlistForm" onsubmit="handleSubmit(event)" class="space-y-4 px-2">
-                            <div>
-                                <label class="text-xs uppercase tracking-widest text-slate-400 block mb-1">Email address</label>
-                                <input type="email" id="email" 
-                                       class="w-full bg-slate-800 border border-slate-700 focus:border-red-500 rounded-2xl px-5 py-5 text-lg outline-none"
-                                       placeholder="you@email.com" required>
-                            </div>
-                            
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="text-xs uppercase tracking-widest text-slate-400 block mb-1">Full name</label>
-                                    <input type="text" id="name" 
-                                           class="w-full bg-slate-800 border border-slate-700 focus:border-red-500 rounded-2xl px-5 py-5 outline-none"
-                                           placeholder="Marcus Rivera">
-                                </div>
-                                <div>
-                                    <label class="text-xs uppercase tracking-widest text-slate-400 block mb-1">Location</label>
-                                    <input type="text" id="location" value="New Jersey, USA" 
-                                           class="w-full bg-slate-800 border border-slate-700 focus:border-red-500 rounded-2xl px-5 py-5 outline-none">
-                                </div>
-                            </div>
-                            
-                            <button type="submit"
-                                    class="w-full py-6 bg-red-600 hover:bg-red-700 text-white font-semibold text-xl rounded-3xl flex items-center justify-center gap-x-3">
-                                <span>Join the waitlist — get early access</span>
-                                <i class="fa-solid fa-arrow-right"></i>
-                            </button>
-                            
-                            <p class="text-center text-xs text-slate-400">
-                                Zero spam. You’ll be first to access the directory + matching engine.<br>
-                                <span class="text-red-400">Founder in New Jersey • Mission: make AI safety work accessible to everyday technical people</span>
-                            </p>
-                        </form>
-                    </div>
-                    
-                    <div class="flex items-center gap-x-8 mt-8 text-sm">
-                        <div class="flex -space-x-4">
-                            <div class="w-8 h-8 bg-slate-700 rounded-2xl ring-2 ring-slate-900 flex items-center justify-center text-xs">🛡️</div>
-                            <div class="w-8 h-8 bg-slate-700 rounded-2xl ring-2 ring-slate-900 flex items-center justify-center text-xs">🔥</div>
-                            <div class="w-8 h-8 bg-slate-700 rounded-2xl ring-2 ring-slate-900 flex items-center justify-center text-xs">📊</div>
-                        </div>
-                        <div>
-                            <div class="font-semibold">47 testers live in the directory</div>
-                            <div class="text-slate-400 text-sm">Cold-start gigs already aggregated from Anthropic, Scale, Surge, Appen &amp; more</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Right visual -->
-                <div class="md:col-span-5 hidden md:block">
-                    <div class="bg-slate-900 rounded-3xl p-6 shadow-2xl border border-slate-700">
-                        <div class="flex justify-between items-center mb-4">
-                            <div class="text-sm font-medium flex items-center gap-x-2">
-                                <i class="fa-solid fa-wand-magic-sparkles text-red-400"></i>
-                                AI MATCH ENGINE PREVIEW
-                            </div>
-                            <div class="text-xs bg-emerald-300 text-emerald-800 px-3 py-1 rounded-3xl font-semibold">97% fit</div>
-                        </div>
-                        
-                        <div class="text-2xl font-semibold leading-tight mb-6">
-                            “Need a jailbreak tester for multi-turn agentic chains — Claude 4 Opus”
-                        </div>
-                        
-                        <div class="flex items-center gap-x-3 bg-slate-800 rounded-2xl p-4 mb-4">
-                            <div class="text-4xl">👤</div>
-                            <div class="flex-1">
-                                <div class="font-semibold">Marcus R. — NJ, USA</div>
-                                <div class="text-sm text-slate-400">Expert • 98% Reliability • Found 14 zero-days</div>
-                            </div>
-                            <div class="text-right">
-                                <div class="text-emerald-400 text-xl font-semibold">$120</div>
-                                <div class="text-xs">18hr turnaround</div>
-                            </div>
-                        </div>
-                        
-                        <button onclick="fakeMatch()" 
-                                class="w-full py-4 bg-white text-slate-900 rounded-3xl font-semibold flex items-center justify-center gap-x-2 hover:scale-105">
-                            <i class="fa-solid fa-bolt-lightning"></i>
-                            MATCH ME INSTANTLY
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- TRUST BAR -->
-    <div class="border-b border-slate-800 py-6 bg-slate-900">
-        <div class="max-w-screen-2xl mx-auto px-8 flex flex-wrap items-center justify-center gap-x-12 gap-y-6 text-slate-400 text-sm font-medium">
-            <div class="flex items-center gap-x-2"><i class="fa-solid fa-check"></i> Aggregated from Anthropic Careers</div>
-            <div class="flex items-center gap-x-2"><i class="fa-solid fa-check"></i> Scale AI • Surge AI • Appen</div>
-            <div class="flex items-center gap-x-2"><i class="fa-solid fa-check"></i> Reddit r/forhire • LinkedIn</div>
-            <div class="flex items-center gap-x-2"><i class="fa-solid fa-check"></i> Built for everyday technical talent</div>
-            <div class="flex items-center gap-x-2 text-red-400"><i class="fa-solid fa-shield-halved"></i> US-first • NDA-ready freelancers</div>
-        </div>
-    </div>
-
-    <!-- FOR FREELANCERS -->
-    <section id="for-freelancers" class="max-w-screen-2xl mx-auto px-8 py-20">
-        <div class="grid md:grid-cols-12 gap-16 items-center">
-            <div class="md:col-span-5">
-                <div class="text-red-400 uppercase tracking-[1px] text-sm font-semibold mb-3">PHASE 1 — INSTANT VALUE</div>
-                <h2 class="text-5xl font-semibold tracking-tighter leading-none mb-6">Red teamers &amp; safety testers get paid gigs on day one</h2>
-                <p class="text-xl text-slate-400">No more cold DMs on LinkedIn. Browse hundreds of aggregated red teaming gigs from top AI labs and post your profile to get matched instantly.</p>
-                
-                <ul class="mt-10 space-y-6">
-                    <li class="flex gap-x-4"><i class="fa-solid fa-circle-check text-red-400 mt-1"></i> <span>Specialty tags: Jailbreaking, Prompt Injection, Bias Auditing, Agentic Systems, Data Poisoning, RAG Exploitation</span></li>
-                    <li class="flex gap-x-4"><i class="fa-solid fa-circle-check text-red-400 mt-1"></i> <span>Reliability &amp; Efficiency scores that actually matter (built from real task history)</span></li>
-                    <li class="flex gap-x-4"><i class="fa-solid fa-circle-check text-red-400 mt-1"></i> <span>Set your own rates • Entry / Intermediate / Expert tiers</span></li>
-                    <li class="flex gap-x-4"><i class="fa-solid fa-circle-check text-red-400 mt-1"></i> <span>Built by a founder who believes AI safety shouldn’t be gatekept by elite researchers</span></li>
-                </ul>
-                
-                <button onclick="showWaitlistModal()" 
-                        class="mt-10 px-8 py-5 bg-slate-800 hover:bg-white hover:text-slate-900 rounded-3xl text-lg font-semibold flex items-center gap-x-3">
-                    Claim your profile spot →
-                </button>
-            </div>
-            
-            <div class="md:col-span-7 bg-slate-900 rounded-3xl p-8">
-                <div class="flex justify-between text-xs uppercase mb-6">
-                    <div class="font-semibold flex items-center gap-x-2"><span class="text-red-400">47</span> TESTERS AVAILABLE</div>
-                    <div class="text-slate-400">Next payout in 9 days</div>
-                </div>
-                
-                <!-- Mini profile row for freelancers section -->
-                <div class="space-y-4">
-                    <div class="flex items-center gap-x-6 bg-slate-800 rounded-3xl p-6">
-                        <div class="text-5xl">🧪</div>
-                        <div class="flex-1">
-                            <div class="font-semibold">Prompt injection specialist • 124 tasks • 98% reliability</div>
-                            <div class="text-sm text-slate-400">NJ • Average $120/task • 18hr turnaround</div>
-                        </div>
-                        <div class="text-right text-emerald-400 font-semibold">4 gigs matched this week</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- FOR COMPANIES -->
-    <section id="for-companies" class="bg-slate-900 py-20">
-        <div class="max-w-screen-2xl mx-auto px-8">
-            <div class="grid md:grid-cols-12 gap-16 items-center">
-                <div class="md:col-span-7">
-                    <div class="text-emerald-400 uppercase tracking-[1px] text-sm font-semibold mb-3">PHASE 3 — FULL MARKETPLACE</div>
-                    <h2 class="text-5xl font-semibold tracking-tighter leading-none mb-6">AI companies get vetted red teamers in minutes, not weeks</h2>
-                    <p class="text-xl text-slate-400">Post proprietary gigs → Claude-powered matching engine ranks the best testers by skills, past performance, location, and availability.</p>
-                    
-                    <div class="mt-12 grid grid-cols-3 gap-6">
-                        <div class="text-center">
-                            <div class="text-4xl mb-3">⚡</div>
-                            <div class="font-semibold">Instant matches</div>
-                            <div class="text-sm text-slate-400">97% fit score based on your exact requirements</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-4xl mb-3">📊</div>
-                            <div class="font-semibold">Ranked directory</div>
-                            <div class="text-sm text-slate-400">Credentials, reviews, turnaround time, NDA status</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-4xl mb-3">🔒</div>
-                            <div class="font-semibold">Secure payments</div>
-                            <div class="text-sm text-slate-400">Stripe + escrow • built-in contracts</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="md:col-span-5 bg-white text-slate-900 rounded-3xl p-8">
-                    <div class="uppercase text-xs font-bold mb-2">Example gig posted yesterday</div>
-                    <h3 class="text-3xl font-semibold mb-6">Multi-turn jailbreak testing for new agentic product (Claude 4 + tools)</h3>
-                    <div class="flex gap-2 mb-8">
-                        <span class="text-xs px-4 py-2 bg-red-100 text-red-700 rounded-3xl">Jailbreaking</span>
-                        <span class="text-xs px-4 py-2 bg-red-100 text-red-700 rounded-3xl">Agentic systems</span>
-                        <span class="text-xs px-4 py-2 bg-red-100 text-red-700 rounded-3xl">Expert tier</span>
-                    </div>
-                    <div class="flex justify-between items-end">
-                        <div>
-                            <div class="font-semibold">$800 – $1,200</div>
-                            <div class="text-xs text-slate-500">Budget • 3–5 day turnaround</div>
-                        </div>
-                        <button onclick="showWaitlistModal()" class="bg-red-600 text-white px-8 py-4 rounded-3xl font-semibold">Post this gig now</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- DIRECTORY PREVIEW (Phase 1 Cold Start) -->
-    <section id="directory" class="max-w-screen-2xl mx-auto px-8 py-20">
-        <div class="flex justify-between items-baseline mb-8">
-            <div>
-                <h2 class="text-4xl font-semibold tracking-tighter">Talent listings • Open gigs • Companies hiring</h2>
-                <p class="text-slate-400">Cold-start directory with real red teaming opportunities already live</p>
-            </div>
-            
-            <!-- Fake filters -->
-            <div class="flex flex-wrap gap-2">
-                <span onclick="this.classList.toggle('bg-red-600');this.classList.toggle('text-white')" 
-                      class="cursor-pointer text-xs px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-3xl flex items-center gap-x-1">
-                    <i class="fa-solid fa-bolt"></i> Jailbreaking
-                </span>
-                <span onclick="this.classList.toggle('bg-red-600');this.classList.toggle('text-white')" 
-                      class="cursor-pointer text-xs px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-3xl flex items-center gap-x-1">
-                    Prompt injection
-                </span>
-                <span onclick="this.classList.toggle('bg-red-600');this.classList.toggle('text-white')" 
-                      class="cursor-pointer text-xs px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-3xl flex items-center gap-x-1">
-                    Bias auditing
-                </span>
-                <span onclick="this.classList.toggle('bg-red-600');this.classList.toggle('text-white')" 
-                      class="cursor-pointer text-xs px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-3xl flex items-center gap-x-1">
-                    Agentic systems
-                </span>
-                <span onclick="this.classList.toggle('bg-red-600');this.classList.toggle('text-white')" 
-                      class="cursor-pointer text-xs px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-3xl">Expert</span>
-                <span onclick="this.classList.toggle('bg-red-600');this.classList.toggle('text-white')" 
-                      class="cursor-pointer text-xs px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-3xl">$50–$200</span>
-                <span class="text-xs px-4 py-2 bg-emerald-300 text-emerald-800 rounded-3xl font-medium flex items-center">AI Top Match</span>
-            </div>
-        </div>
-        
-        <!-- Profiles exactly as you described -->
-        <div class="grid md:grid-cols-3 gap-8">
-            <!-- Marcus R. -->
-            <div class="card-hover bg-white text-slate-900 rounded-3xl p-7 border border-transparent">
-                <div class="flex justify-between mb-4">
-                    <div class="flex items-center gap-x-3">
-                        <div class="text-4xl">🧬</div>
-                        <div>
-                            <span class="font-semibold text-xl">MR</span>
-                            <span class="ml-2 text-emerald-500">Marcus R.</span>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <div class="flex text-amber-400 text-xl">★★★★★</div>
-                        <div class="text-xs text-slate-400">NJ, USA</div>
-                    </div>
-                </div>
-                
-                <div class="flex justify-between text-sm mb-6">
-                    <div>124 tasks</div>
-                    <div class="font-semibold text-emerald-600">98% Reliability</div>
-                    <div class="font-semibold text-emerald-600">94% Efficiency</div>
-                </div>
-                
-                <div class="flex flex-wrap gap-2 mb-6">
-                    <span class="tag text-xs bg-red-100 text-red-700 px-3 py-1 rounded-3xl">Expert</span>
-                    <span class="tag text-xs bg-red-100 text-red-700 px-3 py-1 rounded-3xl">Jailbreaking</span>
-                    <span class="tag text-xs bg-red-100 text-red-700 px-3 py-1 rounded-3xl">Prompt injection</span>
-                    <span class="tag text-xs bg-red-100 text-red-700 px-3 py-1 rounded-3xl">Agentic systems</span>
-                </div>
-                
-                <p class="text-sm leading-snug mb-6 text-slate-600">
-                    Claude API Creative tester specializing in multi-turn jailbreak chains and agentic tool-call manipulation. 
-                    Background in cybersecurity and UI/UX. Found 14 previously unreported bypass patterns.
-                </p>
-                
-                <div class="flex justify-between items-end">
-                    <div>
-                        <div class="text-xs text-slate-400">47 reviews • Avg turnaround: 18hr</div>
-                        <div class="font-semibold">$120 / task • NDA-ready</div>
-                    </div>
-                    <button onclick="connectInstant()" 
-                            class="bg-red-600 hover:bg-red-700 text-white px-8 py-3 text-sm font-semibold rounded-3xl flex items-center gap-x-2">
-                        Connect instantly
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Sofia P. -->
-            <div class="card-hover bg-white text-slate-900 rounded-3xl p-7 border border-transparent">
-                <div class="flex justify-between mb-4">
-                    <div class="flex items-center gap-x-3">
-                        <div class="text-4xl">🌍</div>
-                        <div>
-                            <span class="font-semibold text-xl">SP</span>
-                            <span class="ml-2 text-emerald-500">Sofia P.</span>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <div class="flex text-amber-400 text-xl">★★★★☆</div>
-                        <div class="text-xs text-slate-400">Remote (EU)</div>
-                    </div>
-                </div>
-                
-                <div class="flex justify-between text-sm mb-6">
-                    <div>89 tasks</div>
-                    <div class="font-semibold text-emerald-600">95% Reliability</div>
-                    <div class="font-semibold text-emerald-600">91% Efficiency</div>
-                </div>
-                
-                <div class="flex flex-wrap gap-2 mb-6">
-                    <span class="tag text-xs bg-amber-100 text-amber-700 px-3 py-1 rounded-3xl">Intermediate</span>
-                    <span class="tag text-xs bg-red-100 text-red-700 px-3 py-1 rounded-3xl">Bias auditing</span>
-                    <span class="tag text-xs bg-red-100 text-red-700 px-3 py-1 rounded-3xl">Multilingual</span>
-                </div>
-                
-                <p class="text-sm leading-snug mb-6 text-slate-600">
-                    Focuses on cultural bias, gender stereotyping, and cross-language consistency. 
-                    Fluent in 4 languages. Previously consulted for two EU AI Act compliance projects.
-                </p>
-                
-                <div class="flex justify-between items-end">
-                    <div>
-                        <div class="text-xs text-slate-400">61 reviews • Avg turnaround: 24hr</div>
-                        <div class="font-semibold">$85 / task</div>
-                    </div>
-                    <button onclick="connectInstant()" 
-                            class="bg-red-600 hover:bg-red-700 text-white px-8 py-3 text-sm font-semibold rounded-3xl flex items-center gap-x-2">
-                        Connect instantly
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </button>
-                </div>
-            </div>
-            
-            <!-- James K. -->
-            <div class="card-hover bg-white text-slate-900 rounded-3xl p-7 border border-transparent">
-                <div class="flex justify-between mb-4">
-                    <div class="flex items-center gap-x-3">
-                        <div class="text-4xl">🔓</div>
-                        <div>
-                            <span class="font-semibold text-xl">JK</span>
-                            <span class="ml-2 text-emerald-500">James K.</span>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <div class="flex text-amber-400 text-xl">★★★★☆</div>
-                        <div class="text-xs text-slate-400">TX, USA</div>
-                    </div>
-                </div>
-                
-                <div class="flex justify-between text-sm mb-6">
-                    <div>212 tasks</div>
-                    <div class="font-semibold text-emerald-600">92% Reliability</div>
-                    <div class="font-semibold text-emerald-600">88% Efficiency</div>
-                </div>
-                
-                <div class="flex flex-wrap gap-2 mb-6">
-                    <span class="tag text-xs bg-red-100 text-red-700 px-3 py-1 rounded-3xl">Expert</span>
-                    <span class="tag text-xs bg-red-100 text-red-700 px-3 py-1 rounded-3xl">Data poisoning</span>
-                    <span class="tag text-xs bg-red-100 text-red-700 px-3 py-1 rounded-3xl">RAG exploitation</span>
-                </div>
-                
-                <p class="text-sm leading-snug mb-6 text-slate-600">
-                    Former pentester transitioning to AI security. OWASP LLM Top 10 certified. 
-                    Specializes in RAG pipeline attacks and indirect prompt injection via documents.
-                </p>
-                
-                <div class="flex justify-between items-end">
-                    <div>
-                        <div class="text-xs text-slate-400">198 reviews • Top 5% earner • Avg turnaround: 12hr</div>
-                        <div class="font-semibold">$150 / task</div>
-                    </div>
-                    <button onclick="connectInstant()" 
-                            class="bg-red-600 hover:bg-red-700 text-white px-8 py-3 text-sm font-semibold rounded-3xl flex items-center gap-x-2">
-                        Connect instantly
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <div class="text-center mt-12">
-            <button onclick="showWaitlistModal()" 
-                    class="inline-flex items-center gap-x-3 text-xl font-semibold px-10 py-6 bg-slate-800 hover:bg-slate-700 rounded-3xl">
-                Browse full directory (live on launch) 
-                <span class="text-red-400 text-2xl">→</span>
-            </button>
-        </div>
-    </section>
-
-    <!-- HOW IT WORKS -->
-    <section id="how" class="max-w-screen-2xl mx-auto px-8 py-20 bg-slate-900">
-        <h2 class="text-center text-4xl font-semibold tracking-tighter mb-12">Built in three simple phases. Launching in weeks.</h2>
-        
-        <div class="grid md:grid-cols-3 gap-8">
-            <div class="bg-slate-800 rounded-3xl p-8">
-                <div class="text-red-400 text-6xl font-bold mb-4">01</div>
-                <h3 class="text-2xl font-semibold mb-3">Cold-start directory</h3>
-                <p class="text-slate-400">We scrape &amp; aggregate every public red teaming gig from Anthropic, Scale, Surge, Appen, Reddit, LinkedIn and more. Freelancers get immediate value on day one.</p>
-                <div class="mt-auto pt-8 text-xs uppercase">Live on launch</div>
-            </div>
-            <div class="bg-slate-800 rounded-3xl p-8">
-                <div class="text-red-400 text-6xl font-bold mb-4">02</div>
-                <h3 class="text-2xl font-semibold mb-3">Freelancer profiles + scores</h3>
-                <p class="text-slate-400">Create profile • Add specialties • Upload credentials • Reliability &amp; efficiency scores build automatically from completed tasks.</p>
-                <div class="mt-auto pt-8 text-xs uppercase">Next milestone</div>
-            </div>
-            <div class="bg-slate-800 rounded-3xl p-8 relative">
-                <div class="text-red-400 text-6xl font-bold mb-4">03</div>
-                <h3 class="text-2xl font-semibold mb-3">Company side + AI matching</h3>
-                <p class="text-slate-400">Companies post gigs → Claude API instantly ranks and matches the perfect tester. Stripe payments, escrow, and contracts included.</p>
-                <div class="absolute top-8 right-8 bg-emerald-400 text-emerald-900 text-xs font-bold px-4 py-1 rounded-3xl">Coming soon</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- FINAL CTA -->
-    <div class="max-w-screen-2xl mx-auto px-8 py-16 bg-gradient-to-r from-red-600 to-rose-600 text-white rounded-t-[4rem]">
-        <div class="text-center">
-            <h2 class="text-5xl font-semibold tracking-tighter mb-4">Ready to red team the future?</h2>
-            <p class="text-2xl mb-10 max-w-md mx-auto">Be among the first 500 members when we launch the full marketplace.</p>
-            <button onclick="showWaitlistModal()" 
-                    class="px-12 py-7 bg-white text-red-600 text-2xl font-semibold rounded-3xl flex items-center gap-x-4 mx-auto hover:scale-105">
-                Join the waitlist now
-                <i class="fa-solid fa-arrow-right-long"></i>
-            </button>
-            <p class="text-sm mt-8 opacity-75">Next.js + Supabase + Vercel + Stripe + Claude API stack • Total launch budget under $100</p>
-        </div>
-    </div>
-
-    <!-- WAITLIST MODAL -->
+    <!-- WAITLIST MODAL (now with relative positioning fix) -->
     <div onclick="if(event.target.id === 'waitlistModal')hideWaitlistModal()" 
          id="waitlistModal"
          class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[9999]">
         <div onclick="event.stopImmediatePropagation()" 
-             class="bg-slate-900 rounded-3xl max-w-lg w-full mx-4 p-8">
+             class="bg-slate-900 rounded-3xl max-w-lg w-full mx-4 p-8 relative">
             <h3 class="text-3xl font-semibold mb-6">Join redteamgig.com waitlist</h3>
             
             <form id="modalForm" onsubmit="handleSubmit(event)" class="space-y-6">
+                <!-- role buttons and inputs unchanged -->
                 <div class="flex gap-4">
                     <button type="button" onclick="selectRoleModal(0)" id="modal-role-0"
                             class="flex-1 py-6 border-2 border-transparent data-[active=true]:border-red-600 rounded-3xl text-center font-semibold">
@@ -593,120 +97,41 @@
         </div>
     </div>
 
-    <footer class="bg-slate-950 border-t border-slate-800 py-12">
-        <div class="max-w-screen-2xl mx-auto px-8 text-xs text-slate-400 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div>© 2026 redteamgig.com • All rights reserved</div>
-            <div class="flex gap-x-8">
-                <a href="#" class="hover:text-white">Twitter / X</a>
-                <a href="#" class="hover:text-white">Discord for red teamers</a>
-                <a href="#" class="hover:text-white">Privacy &amp; Safety</a>
-                <a href="#" class="hover:text-white">Founder: Faewield (NJ)</a>
-            </div>
-            <div>Made with Next.js • Supabase • Vercel • Claude</div>
-        </div>
-    </footer>
-
+    <!-- Rest of your script stays the same except the handleSubmit part below -->
     <script>
-        function initTailwind() {
-            return {
-                config(userConfig = {}) {
-                    return {
-                        content: [],
-                        theme: {
-                            extend: {
-                                colors: {
-                                    redteam: '#e11d48'
-                                }
-                            }
-                        }
-                    }
-                },
-                theme: {
-                    extend: {},
-                }
-            }
-        }
-        
-        function selectRole(n) {
-            document.querySelectorAll('#role-btn-0, #role-btn-1').forEach((el, i) => {
-                el.dataset.active = i === n
-            })
-        }
-        
-        function selectRoleModal(n) {
-            document.querySelectorAll('#modal-role-0, #modal-role-1').forEach((el, i) => {
-                el.dataset.active = i === n
-            })
-        }
-        
-        function handleSubmit(e) {
-            e.preventDefault()
+        // ... (all previous functions unchanged) ...
+
+        async function handleSubmit(e) {
+            e.preventDefault();
             
-            const email = (document.getElementById('email') || document.getElementById('modalEmail')).value
-            const name = (document.getElementById('name') || document.getElementById('modalName')).value || 'Anonymous'
-            const role = document.getElementById('modal-role-0') && document.getElementById('modal-role-0').dataset.active === 'true' ? 'Red Teamer' : 'AI Company'
-            
-            console.log('%c✅ Waitlist submission:', 'background:#e11d48;color:#fff;padding:2px 4px;border-radius:2px', {
-                email,
-                name,
-                role,
-                timestamp: new Date().toISOString(),
-                location: 'New Jersey, USA (founder)'
-            })
-            
-            // Fake success animation
-            const btn = e.target.querySelector('button[type="submit"]')
-            const originalText = btn.innerHTML
-            btn.style.backgroundColor = '#10b981'
-            btn.innerHTML = '🎉 You’re in! Check your email soon'
-            
+            const email = (document.getElementById('email') || document.getElementById('modalEmail')).value;
+            const name = (document.getElementById('name') || document.getElementById('modalName')).value || 'Anonymous';
+            const roleBtn = document.getElementById('modal-role-0');
+            const role = roleBtn && roleBtn.dataset.active === 'true' ? 'Red Teamer' : 'AI Company';
+
+            // === SUPABASE INTEGRATION GOES HERE (we'll fill this in after you create the project) ===
+            // For now it still shows the success toast so you can test the page immediately
+            console.log('%c✅ Waitlist submission (ready for Supabase)', 'background:#e11d48;color:#fff;padding:2px 4px;border-radius:2px', { email, name, role });
+
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.style.backgroundColor = '#10b981';
+            btn.innerHTML = '🎉 You’re in! Check your email soon';
+
             setTimeout(() => {
-                hideWaitlistModal()
-                btn.style.backgroundColor = ''
-                btn.innerHTML = originalText
-                
-                // Show toast
-                const toast = document.createElement('div')
-                toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#10b981;color:white;padding:16px 24px;border-radius:9999px;box-shadow:0 10px 15px -3px rgb(16 185 129);font-weight:600'
-                toast.innerHTML = '✅ Added to waitlist. You’re #47!'
-                document.body.appendChild(toast)
-                setTimeout(() => toast.remove(), 4000)
-            }, 1800)
-            
-            // In production you would POST to Supabase or Formspree here
-            // Example: fetch('/api/waitlist', { method: 'POST', body: JSON.stringify({email, name, role}) })
+                hideWaitlistModal();
+                btn.style.backgroundColor = '';
+                btn.innerHTML = originalText;
+
+                const toast = document.createElement('div');
+                toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#10b981;color:white;padding:16px 24px;border-radius:9999px;box-shadow:0 10px 15px -3px rgb(16 185 129);font-weight:600';
+                toast.innerHTML = '✅ Added to waitlist. You’re #47!';
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 4000);
+            }, 1800);
         }
-        
-        function showWaitlistModal() {
-            document.getElementById('waitlistModal').classList.remove('hidden')
-            document.getElementById('waitlistModal').classList.add('flex')
-        }
-        
-        function hideWaitlistModal() {
-            const modal = document.getElementById('waitlistModal')
-            modal.classList.add('hidden')
-            modal.classList.remove('flex')
-        }
-        
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobileMenu')
-            menu.classList.toggle('hidden')
-        }
-        
-        function fakeMatch() {
-            alert('🔥 Claude API just matched you with a 97% fit tester in 0.8 seconds.\n\nMarcus R. is available right now for your jailbreak gig!')
-        }
-        
-        function connectInstant() {
-            alert('✅ Instant connection request sent!\n\nThe tester has been notified. You’ll get their availability in < 5 minutes (live on launch).')
-        }
-        
-        // Initialize
-        window.onload = function() {
-            initTailwind()
-            console.log('%c🚀 redteamgig.com landing page ready for Vercel deploy', 'color:#e11d48;font-weight:700')
-            console.log('Next step: copy this file to index.html → deploy on Vercel → add Supabase + Stripe in Phase 2')
-        }
+
+        // ... rest of your script unchanged ...
     </script>
 </body>
 </html>
