@@ -46,57 +46,30 @@
     <!-- NAVBAR -->
     <nav class="border-b border-slate-800 bg-slate-950 sticky top-0 z-50">
         <div class="max-w-screen-2xl mx-auto px-8 py-5 flex items-center justify-between">
-            <!-- Logo -->
             <div class="flex items-center gap-x-2">
                 <div class="w-8 h-8 bg-red-600 rounded-xl flex items-center justify-center text-white font-bold text-xl flex-shrink-0">RT</div>
-                <div>
-                    <span class="font-semibold text-3xl tracking-tighter" style="font-family: 'Space Grotesk', sans-serif;">redteamgig</span>
-                    <span class="text-xs text-red-400 tracking-[2px] font-mono">.com</span>
-                </div>
+                <span class="font-semibold text-3xl tracking-tighter" style="font-family: 'Space Grotesk', sans-serif;">redteamgig</span>
             </div>
 
-            <!-- Desktop Menu -->
+            <!-- NEW ORDER: Focus on Action -->
             <div class="hidden md:flex items-center gap-x-8 text-sm font-medium">
-                <a href="#gigs" class="hover:text-white">Open Gigs</a>
-                <a href="#for-freelancers" class="hover:text-white flex items-center gap-x-1">
-                    <i class="fa-solid fa-user-secret"></i>
-                    For Red Teamers
-                </a>
-                <a href="#for-companies" class="hover:text-white flex items-center gap-x-1">
-                    <i class="fa-solid fa-building"></i>
-                    For AI Companies
-                </a>
-                <a href="#directory" class="hover:text-white flex items-center gap-x-1">
-                    <i class="fa-solid fa-list-check"></i>
-                    Talent Directory
-                </a>
-                <a href="#how" class="hover:text-white">How it Works</a>
-                <a href="https://github.com" target="_blank" class="hover:text-white">GitHub</a>
+                <a href="#gigs" class="text-white hover:text-red-500 font-bold">Open Gigs</a>
+                <a href="#for-companies" class="text-slate-400 hover:text-white">Post a Gig</a>
+                <a href="#how" class="text-slate-400 hover:text-white">How it Works</a>
             </div>
 
-            <div class="flex items-center gap-x-4">
-                <!-- Waitlist CTA in nav -->
-                <button onclick="showWaitlistModal()" 
-                        class="px-6 py-2.5 bg-white text-slate-900 hover:bg-red-600 hover:text-white rounded-2xl font-semibold text-sm flex items-center gap-x-2">
-                    <i class="fa-solid fa-rocket"></i>
-                    Join Waitlist
-                </button>
-                
-                <button onclick="toggleMobileMenu()" class="md:hidden text-2xl">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
-            </div>
+            <button onclick="showWaitlistModal()" class="px-6 py-2.5 bg-red-600 text-white hover:bg-red-700 rounded-2xl font-semibold text-sm">
+                Join Waitlist
+            </button>
         </div>
-        
+
         <!-- Mobile Menu -->
         <div id="mobileMenu" class="hidden md:hidden border-t border-slate-800 bg-slate-950 px-8 py-4">
             <div class="flex flex-col gap-y-4 text-sm font-medium">
                 <a href="#gigs" onclick="toggleMobileMenu()" class="py-2">Open Gigs</a>
-                <a href="#for-freelancers" onclick="toggleMobileMenu()" class="py-2">For Red Teamers</a>
-                <a href="#for-companies" onclick="toggleMobileMenu()" class="py-2">For AI Companies</a>
-                <a href="#directory" onclick="toggleMobileMenu()" class="py-2">Talent Directory</a>
+                <a href="#for-companies" onclick="toggleMobileMenu()" class="py-2">Post a Gig</a>
                 <a href="#how" onclick="toggleMobileMenu()" class="py-2">How it Works</a>
-                <button onclick="showPostGigModal();toggleMobileMenu()" class="mt-4 w-full py-4 bg-red-600 rounded-3xl text-white font-semibold">Post a Gig • $49</button>
+                <button onclick="showWaitlistModal();toggleMobileMenu()" class="mt-4 w-full py-4 bg-red-600 rounded-3xl text-white font-semibold">Join Waitlist</button>
             </div>
         </div>
     </nav>
@@ -515,15 +488,17 @@
         </div>
     </section>
 
-<!-- OPEN GIGS SECTION - Dynamic Red Teaming Jobs -->
-<section id="gigs" class="max-w-screen-2xl mx-auto px-8 py-20 bg-slate-900">
-    <div class="flex justify-between items-baseline mb-8">
-        <h2 class="text-4xl font-semibold tracking-tighter">Open Gigs • AI Red Teaming & Safety</h2>
-        <p class="text-slate-400">From Mercor, Scale AI, Outlier, Mindrift & more</p>
-    </div>
-    
-    <div id="gigs-container" class="grid md:grid-cols-3 gap-8">
-        <div class="col-span-3 text-center py-12 text-slate-400">Loading red teaming gigs...</div>
+<!-- CLEANER GIGS SECTION -->
+<section id="gigs" class="py-20 bg-slate-950">
+    <div class="max-w-screen-3xl mx-auto px-8">
+        <h2 class="text-5xl font-bold tracking-tight text-white mb-10" style="font-family: 'Space Grotesk', sans-serif;">
+            Marketplace <span class="text-red-600">Gigs</span>
+        </h2>
+        
+        <!-- Grid layout that feels like a professional marketplace -->
+        <div id="mercor-gigs-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <p class="text-slate-500 italic">Syncing live safety opportunities...</p>
+        </div>
     </div>
 </section>
 
@@ -782,57 +757,44 @@
         }
 
         // Initialize
-        window.onload = function() {
+        window.addEventListener('load', () => {
             console.log('%c🚀 redteamgig.com ready — Supabase connected', 'color:#e11d48;font-weight:700');
-        }
-
-// Load Red Teaming gigs dynamically from Supabase
-async function loadRedTeamingGigs() {
-    const container = document.getElementById('gigs-container');
-    
-    try {
-        const { data, error } = await supabase
-            .from('external_gigs')
-            .select('*')
-            .order('posted_at', { ascending: false })
-            .limit(12);
-
-        if (error) throw error;
-
-        if (!data || data.length === 0) {
-            container.innerHTML = `
-                <div class="col-span-3 text-center py-12 text-slate-400">
-                    No red teaming gigs yet.<br>
-                    Run the scraper to import jobs from Mercor and other platforms.
-                </div>`;
-            return;
-        }
-
-        let html = '';
-        data.forEach(job => {
-            html += `
-            <div class="card-hover bg-white text-slate-900 rounded-3xl p-7">
-                <div class="flex justify-between mb-4">
-                    <div class="font-semibold text-xl line-clamp-2">${job.title}</div>
-                    <span class="text-xs bg-red-100 text-red-700 px-3 py-1 rounded-3xl">${job.source.toUpperCase()}</span>
-                </div>
-                <p class="text-sm text-slate-600 mb-6 line-clamp-3">${job.description || 'No description available'}</p>
-                <a href="${job.referral_url}" target="_blank" 
-                   class="block w-full py-3 bg-red-600 hover:bg-red-700 text-white text-center rounded-3xl text-sm font-semibold">
-                    Apply Now →
-                </a>
-            </div>`;
+            loadGigs();
         });
 
-        container.innerHTML = html;
-    } catch (err) {
-        console.error(err);
-        container.innerHTML = `<div class="col-span-3 text-center py-12 text-red-400">Failed to load gigs. Please try again later.</div>`;
-    }
-}
+        async function loadGigs() {
+            const { data, error } = await supabase.from('mercor_jobs').select('*');
+            const container = document.getElementById('mercor-gigs-list');
 
-// Run when page loads
-window.addEventListener('load', loadRedTeamingGigs);
+            if (error) {
+                console.error(error);
+                container.innerHTML = `<div class="col-span-3 text-center py-12 text-red-400">Failed to load live Mercor gigs.</div>`;
+                return;
+            }
+
+            if (!data || data.length === 0) {
+                container.innerHTML = `<div class="col-span-3 text-center py-12 text-slate-400">No live Mercor gigs available yet.</div>`;
+                return;
+            }
+
+            container.innerHTML = data.map(job => `
+                <div class="bg-slate-900/50 border border-slate-800 p-8 rounded-[2rem] hover:border-red-600 transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-2xl font-bold text-white leading-tight">${job.title}</h3>
+                        </div>
+                        <p class="text-slate-400 text-sm mb-6">${job.description || 'AI Red Teaming & Security Audit.'}</p>
+                    </div>
+                    <div class="flex items-center justify-between mt-auto">
+                        <span class="text-green-400 font-mono font-bold">$Varies/Project</span>
+                        <a href="${job.referral_url}" target="_blank" 
+                           class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-sm">
+                            Apply Now
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+        }
     </script>
 </body>
 </html>
