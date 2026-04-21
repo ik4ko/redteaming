@@ -7,25 +7,164 @@
     <title>redteamgig.com • AI Red Teaming Marketplace</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- FIX 1: UMD build — exposes window.supabase globally, no type=module needed -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <style>
+        /* FIX 2: plain & not &amp; inside <style> so Google Fonts loads */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600&display=swap');
         :root { --redteam: #e11d48; }
         * { transition-property: color,background-color,border-color; transition-timing-function: cubic-bezier(0.4,0,0.2,1); transition-duration: 150ms; }
         .hero-bg { background: linear-gradient(90deg,#0f172a 0%,#1e2937 100%); }
         .card-hover { transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
         .card-hover:hover { transform: translateY(-4px); box-shadow: 0 25px 50px -12px rgba(225,29,72,0.45); }
+        .tag { display: inline-flex; align-items: center; gap: 4px; }
         .line-clamp-3 { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
         .spinner { display:inline-block; width:16px; height:16px; border:2px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:spin 0.7s linear infinite; vertical-align:middle; }
         @keyframes spin { to { transform:rotate(360deg); } }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+        .fade-up { animation: fadeUp 0.35s ease both; }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-200 font-sans">
 
-<!-- YOUR FULL ORIGINAL CODE STARTS HERE (navbar, hero, trust bar, for-freelancers, talent pool, for-companies, how it works, final cta, footer, modals) -->
-<!-- I kept everything you had exactly as-is, only changing the Open Gigs section and adding the script at the bottom -->
+<!-- NAVBAR -->
+<nav class="border-b border-slate-800 bg-slate-950 sticky top-0 z-50">
+    <div class="max-w-screen-2xl mx-auto px-8 py-5 flex items-center justify-between">
+        <div class="flex items-center gap-x-2">
+            <div class="w-8 h-8 bg-red-600 rounded-xl flex items-center justify-center text-white font-bold text-xl flex-shrink-0">RT</div>
+            <span class="font-semibold text-3xl tracking-tighter" style="font-family:'Space Grotesk',sans-serif;">redteamgig</span>
+            <span class="text-xs text-red-400 tracking-[2px] font-mono">.com</span>
+        </div>
+        <div class="hidden md:flex items-center gap-x-8 text-sm font-medium text-slate-400">
+            <a href="#gigs" class="text-white hover:text-red-400 font-bold flex items-center gap-1"><i class="fa-solid fa-bolt text-red-500"></i> Open Gigs</a>
+            <a href="#for-freelancers" class="hover:text-white">For Red Teamers</a>
+            <a href="#for-companies" class="hover:text-white">Post a Gig</a>
+            <a href="#how" class="hover:text-white">How it Works</a>
+        </div>
+        <div class="flex items-center gap-3">
+            <button onclick="showWaitlistModal()" class="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-semibold text-sm">Join Waitlist</button>
+            <button onclick="toggleMobileMenu()" class="md:hidden text-xl text-slate-400"><i class="fa-solid fa-bars"></i></button>
+        </div>
+    </div>
+    <div id="mobileMenu" class="hidden md:hidden border-t border-slate-800 bg-slate-950 px-8 py-4">
+        <div class="flex flex-col gap-y-4 text-sm font-medium">
+            <a href="#gigs" onclick="toggleMobileMenu()" class="py-2">Open Gigs</a>
+            <a href="#for-freelancers" onclick="toggleMobileMenu()" class="py-2">For Red Teamers</a>
+            <a href="#for-companies" onclick="toggleMobileMenu()" class="py-2">Post a Gig</a>
+            <a href="#how" onclick="toggleMobileMenu()" class="py-2">How it Works</a>
+            <button onclick="showWaitlistModal();toggleMobileMenu()" class="mt-4 w-full py-4 bg-red-600 hover:bg-red-700 rounded-3xl text-white font-semibold">Join Waitlist</button>
+        </div>
+    </div>
+</nav>
 
-<!-- OPEN GIGS - NOW DYNAMIC FROM THE NEW 'gigs' TABLE -->
+<!-- HERO -->
+<header class="hero-bg pt-16 pb-20">
+    <div class="max-w-screen-2xl mx-auto px-8">
+        <div class="grid md:grid-cols-12 gap-12 items-center">
+            <div class="md:col-span-7">
+                <div class="inline-flex items-center gap-x-2 bg-red-950 text-red-300 text-sm font-medium px-4 h-9 rounded-3xl mb-6">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-red-400"></span>
+                    </span>
+                    NOW IN PRIVATE BETA • US-FIRST
+                </div>
+                <h1 class="text-6xl md:text-7xl font-semibold tracking-tighter leading-none mb-6" style="font-family:'Space Grotesk',sans-serif;">Find or become<br>an AI red teamer</h1>
+                <p class="text-2xl text-slate-300 max-w-xl mb-4">AI matches you to the right gig or the right tester — instantly.</p>
+                <p class="text-lg text-slate-400 mb-10 max-w-lg">The Upwork + Fiverr for AI safety.<br>Jailbreak testing • Prompt injection • Bias auditing • Agentic attacks • Data poisoning</p>
+
+                <div class="bg-slate-900 border border-slate-700 rounded-3xl p-3 max-w-md">
+                    <!-- FIX 3: data-active initialized on both buttons -->
+                    <div class="flex bg-slate-800 rounded-3xl p-1 mb-3">
+                        <button onclick="selectRole(0)" id="role-btn-0" data-active="true"
+                                class="flex-1 py-3 text-sm font-semibold rounded-3xl data-[active=true]:bg-white data-[active=true]:text-slate-900 flex items-center justify-center gap-x-2">
+                            <i class="fa-solid fa-user-secret"></i> I'm a Red Teamer
+                        </button>
+                        <button onclick="selectRole(1)" id="role-btn-1" data-active="false"
+                                class="flex-1 py-3 text-sm font-semibold rounded-3xl data-[active=true]:bg-white data-[active=true]:text-slate-900 flex items-center justify-center gap-x-2">
+                            <i class="fa-solid fa-building"></i> I'm an AI Company
+                        </button>
+                    </div>
+                    <!-- FIX 4: hero form uses heroEmail/heroName, not email/name -->
+                    <form id="heroForm" onsubmit="handleSubmit(event,'hero')" class="space-y-3 px-1">
+                        <div>
+                            <label class="text-xs uppercase tracking-widest text-slate-400 block mb-1">Email address</label>
+                            <input type="email" id="heroEmail" placeholder="you@email.com" required
+                                   class="w-full bg-slate-800 border border-slate-700 focus:border-red-500 rounded-2xl px-5 py-4 text-lg outline-none">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="text-xs uppercase tracking-widest text-slate-400 block mb-1">Full name</label>
+                                <input type="text" id="heroName" placeholder="Your name"
+                                       class="w-full bg-slate-800 border border-slate-700 focus:border-red-500 rounded-2xl px-4 py-3 outline-none">
+                            </div>
+                            <div>
+                                <label class="text-xs uppercase tracking-widest text-slate-400 block mb-1">Location</label>
+                                <input type="text" id="heroLocation" placeholder="City, State"
+                                       class="w-full bg-slate-800 border border-slate-700 focus:border-red-500 rounded-2xl px-4 py-3 outline-none">
+                            </div>
+                        </div>
+                        <button type="submit" id="heroSubmitBtn"
+                                class="w-full py-5 bg-red-600 hover:bg-red-700 text-white font-semibold text-lg rounded-3xl flex items-center justify-center gap-x-2">
+                            Join the waitlist — get early access <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                        <p class="text-center text-xs text-slate-500">Zero spam. First to access the directory + matching engine.<br>
+                            <span class="text-red-400">Founded in New Jersey • AI safety for everyone</span></p>
+                    </form>
+                </div>
+
+                <div class="flex items-center gap-x-6 mt-6 text-sm">
+                    <div class="flex -space-x-3">
+                        <div class="w-8 h-8 bg-slate-700 rounded-full ring-2 ring-slate-900 flex items-center justify-center text-xs">🛡️</div>
+                        <div class="w-8 h-8 bg-slate-700 rounded-full ring-2 ring-slate-900 flex items-center justify-center text-xs">🔥</div>
+                        <div class="w-8 h-8 bg-slate-700 rounded-full ring-2 ring-slate-900 flex items-center justify-center text-xs">📊</div>
+                    </div>
+                    <div>
+                        <div class="font-semibold" id="waitlistCount">Be among the first to join</div>
+                        <div class="text-slate-400 text-xs">Gigs aggregated from Anthropic, Scale, Surge, Appen &amp; more</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="md:col-span-5 hidden md:block">
+                <div class="bg-slate-900 rounded-3xl p-6 shadow-2xl border border-slate-700">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-sm font-medium flex items-center gap-2 text-slate-300"><i class="fa-solid fa-wand-magic-sparkles text-red-400"></i> AI MATCH ENGINE</span>
+                        <span class="text-xs bg-emerald-300 text-emerald-800 px-3 py-1 rounded-3xl font-semibold">97% fit</span>
+                    </div>
+                    <p class="text-xl font-semibold leading-tight mb-5">"Need a jailbreak tester for multi-turn agentic chains — Claude 4 Opus"</p>
+                    <div class="flex items-center gap-3 bg-slate-800 rounded-2xl p-4 mb-4">
+                        <div class="w-10 h-10 bg-blue-800 rounded-full flex items-center justify-center font-bold flex-shrink-0">MR</div>
+                        <div class="flex-1 min-w-0">
+                            <div class="font-semibold text-sm">Marcus R. — NJ, USA</div>
+                            <div class="text-xs text-slate-400">Expert • 98% Reliability • 14 zero-days found</div>
+                        </div>
+                        <div class="text-right flex-shrink-0">
+                            <div class="text-emerald-400 font-semibold">$120</div>
+                            <div class="text-xs text-slate-400">18hr</div>
+                        </div>
+                    </div>
+                    <button onclick="showWaitlistModal()" class="w-full py-3 bg-white text-slate-900 rounded-3xl font-semibold flex items-center justify-center gap-2 hover:scale-105 text-sm">
+                        <i class="fa-solid fa-bolt-lightning text-red-500"></i> MATCH ME INSTANTLY
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- TRUST BAR -->
+<div class="border-b border-slate-800 py-5 bg-slate-900">
+    <div class="max-w-screen-2xl mx-auto px-8 flex flex-wrap items-center justify-center gap-x-10 gap-y-3 text-slate-400 text-sm font-medium">
+        <span class="flex items-center gap-2"><i class="fa-solid fa-check text-red-400"></i> Anthropic Careers</span>
+        <span class="flex items-center gap-2"><i class="fa-solid fa-check text-red-400"></i> Scale AI • Surge AI • Appen</span>
+        <span class="flex items-center gap-2"><i class="fa-solid fa-check text-red-400"></i> Reddit • Mercor • LinkedIn</span>
+        <span class="flex items-center gap-2"><i class="fa-solid fa-check text-red-400"></i> Built for everyday technical talent</span>
+        <span class="flex items-center gap-2 text-red-400"><i class="fa-solid fa-shield-halved"></i> US-first • NDA-ready</span>
+    </div>
+</div>
+
+<!-- OPEN GIGS -->
 <section id="gigs" class="py-20 bg-slate-950">
     <div class="max-w-screen-2xl mx-auto px-8">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-baseline gap-3 mb-10">
@@ -33,36 +172,237 @@
                 <h2 class="text-5xl font-bold tracking-tight text-white" style="font-family:'Space Grotesk',sans-serif;">Marketplace <span class="text-red-500">Gigs</span></h2>
                 <p class="text-slate-400 mt-2">Live opportunities from Mercor, Scale AI, Appen &amp; more</p>
             </div>
-            <button onclick="loadGigs()" class="text-sm px-5 py-2.5 bg-slate-800 hover:bg-slate-700 rounded-2xl flex items-center gap-2">
+            <button onclick="loadGigs()" class="text-sm px-5 py-2.5 bg-slate-800 hover:bg-slate-700 rounded-2xl flex items-center gap-2 flex-shrink-0">
                 <i class="fa-solid fa-rotate-right"></i> Refresh
             </button>
         </div>
+        <!-- FIX 5: id is gigs-container, called on DOMContentLoaded -->
         <div id="gigs-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <p class="text-slate-500 italic col-span-3 py-8 text-center"><span class="spinner mr-2"></span> Loading live gigs from Supabase...</p>
+            <p class="text-slate-500 italic col-span-3 py-8 text-center"><span class="spinner mr-2"></span> Syncing live safety opportunities…</p>
         </div>
     </div>
 </section>
 
-<!-- THE REST OF YOUR ORIGINAL SECTIONS (for-freelancers, talent, for-companies, how, final cta, footer, modals) GO HERE -->
-<!-- (They are unchanged from what you pasted earlier) -->
+<!-- FOR FREELANCERS -->
+<section id="for-freelancers" class="max-w-screen-2xl mx-auto px-8 py-20">
+    <div class="grid md:grid-cols-12 gap-16 items-center">
+        <div class="md:col-span-5">
+            <div class="text-red-400 uppercase tracking-[1px] text-sm font-semibold mb-3">PHASE 1 — INSTANT VALUE</div>
+            <h2 class="text-5xl font-semibold tracking-tighter leading-none mb-6">Red teamers get paid gigs on day one</h2>
+            <p class="text-xl text-slate-400">No more cold DMs on LinkedIn. Browse aggregated red teaming gigs from top AI labs and get matched instantly.</p>
+            <ul class="mt-8 space-y-5">
+                <li class="flex gap-4"><i class="fa-solid fa-circle-check text-red-400 mt-1 flex-shrink-0"></i><span>Specialty tags: Jailbreaking, Prompt Injection, Bias Auditing, Agentic Systems, Data Poisoning, RAG Exploitation</span></li>
+                <li class="flex gap-4"><i class="fa-solid fa-circle-check text-red-400 mt-1 flex-shrink-0"></i><span>Reliability &amp; Efficiency scores built from real task history</span></li>
+                <li class="flex gap-4"><i class="fa-solid fa-circle-check text-red-400 mt-1 flex-shrink-0"></i><span>Set your own rates • Entry / Intermediate / Expert tiers</span></li>
+                <li class="flex gap-4"><i class="fa-solid fa-circle-check text-red-400 mt-1 flex-shrink-0"></i><span>Complete a gig once — companies remember you forever</span></li>
+            </ul>
+            <button onclick="showWaitlistModal()" class="mt-10 px-8 py-4 bg-slate-800 hover:bg-white hover:text-slate-900 rounded-3xl text-lg font-semibold flex items-center gap-3 w-fit">Claim your profile spot →</button>
+        </div>
+        <div class="md:col-span-7 bg-slate-900 rounded-3xl p-8">
+            <div class="flex justify-between text-xs uppercase mb-5 text-slate-400">
+                <span class="font-semibold"><span class="text-red-400">47</span> TESTERS AVAILABLE</span>
+                <span>Next payout in 9 days</span>
+            </div>
+            <div class="space-y-3">
+                <div class="flex items-center gap-4 bg-slate-800 rounded-2xl p-4"><span class="text-3xl">🧪</span><div class="flex-1"><div class="font-semibold text-sm">Prompt injection specialist • 124 tasks • 98% reliability</div><div class="text-xs text-slate-400">NJ • $120/task avg • 18hr turnaround</div></div><span class="text-emerald-400 font-semibold text-sm flex-shrink-0">4 gigs</span></div>
+                <div class="flex items-center gap-4 bg-slate-800 rounded-2xl p-4"><span class="text-3xl">🔓</span><div class="flex-1"><div class="font-semibold text-sm">RAG exploitation + data poisoning expert</div><div class="text-xs text-slate-400">TX • $150/task avg • Top 5% earner</div></div><span class="text-emerald-400 font-semibold text-sm flex-shrink-0">2 gigs</span></div>
+                <div class="flex items-center gap-4 bg-slate-800 rounded-2xl p-4"><span class="text-3xl">🌍</span><div class="flex-1"><div class="font-semibold text-sm">Multilingual bias auditor • EU AI Act specialist</div><div class="text-xs text-slate-400">Remote • $85/task avg • 4 languages</div></div><span class="text-emerald-400 font-semibold text-sm flex-shrink-0">3 gigs</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- TALENT POOL -->
+<section id="talent" class="bg-slate-900 py-20">
+    <div class="max-w-screen-2xl mx-auto px-8">
+        <div class="grid md:grid-cols-2 gap-16 items-center">
+            <div>
+                <div class="text-emerald-400 uppercase tracking-[1px] text-sm font-semibold mb-3">FREE TO JOIN</div>
+                <h2 class="text-5xl font-semibold tracking-tighter mb-4">Join the Vetted Talent Pool</h2>
+                <p class="text-xl text-slate-400 mb-4">Submit your profile once and start getting matched to gigs automatically.</p>
+                <ul class="mt-6 space-y-4 text-slate-400 text-sm">
+                    <li class="flex gap-4"><i class="fa-solid fa-circle-check text-red-400 mt-1 flex-shrink-0"></i> Profile appears in directory immediately</li>
+                    <li class="flex gap-4"><i class="fa-solid fa-circle-check text-red-400 mt-1 flex-shrink-0"></i> Scores build automatically from completed tasks</li>
+                    <li class="flex gap-4"><i class="fa-solid fa-circle-check text-red-400 mt-1 flex-shrink-0"></i> Companies find and contact you directly</li>
+                </ul>
+            </div>
+            <!-- FIX 6: submitTalent fully implemented below, specialty + tier fields added -->
+            <form id="talentForm" onsubmit="submitTalent(event)" class="space-y-4 bg-slate-800 rounded-3xl p-8">
+                <h3 class="font-semibold text-lg mb-1">Create your profile</h3>
+                <input type="text"  id="talentName"      placeholder="Full name" required      class="w-full px-5 py-4 bg-slate-900 border border-slate-700 focus:border-red-500 rounded-3xl outline-none">
+                <input type="email" id="talentEmail"     placeholder="Email address" required  class="w-full px-5 py-4 bg-slate-900 border border-slate-700 focus:border-red-500 rounded-3xl outline-none">
+                <input type="text"  id="talentGithub"    placeholder="GitHub / Portfolio URL"  class="w-full px-5 py-4 bg-slate-900 border border-slate-700 focus:border-red-500 rounded-3xl outline-none">
+                <select id="talentSpecialty" class="w-full px-5 py-4 bg-slate-900 border border-slate-700 focus:border-red-500 rounded-3xl outline-none text-slate-300">
+                    <option value="">Primary specialty…</option>
+                    <option>Jailbreaking</option><option>Prompt injection</option><option>Bias auditing</option>
+                    <option>Agentic systems</option><option>Data poisoning</option><option>RAG exploitation</option><option>Other</option>
+                </select>
+                <select id="talentTier" class="w-full px-5 py-4 bg-slate-900 border border-slate-700 focus:border-red-500 rounded-3xl outline-none text-slate-300">
+                    <option value="">Experience tier…</option>
+                    <option>Entry</option><option>Intermediate</option><option>Expert</option>
+                </select>
+                <button type="submit" id="talentSubmitBtn" class="w-full py-5 bg-red-600 hover:bg-red-700 text-white font-semibold text-lg rounded-3xl flex items-center justify-center gap-2">
+                    Join Talent Pool — Free
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- FOR COMPANIES -->
+<section id="for-companies" class="max-w-screen-2xl mx-auto px-8 py-20">
+    <div class="grid md:grid-cols-12 gap-16 items-center">
+        <div class="md:col-span-7">
+            <div class="text-emerald-400 uppercase tracking-[1px] text-sm font-semibold mb-3">PHASE 3 — FULL MARKETPLACE</div>
+            <h2 class="text-5xl font-semibold tracking-tighter leading-none mb-6">AI companies get vetted red teamers in minutes, not weeks</h2>
+            <p class="text-xl text-slate-400 mb-10">Post proprietary gigs → AI matching engine ranks the best testers. If a tester already worked with you, we surface them first.</p>
+            <div class="grid grid-cols-3 gap-6">
+                <div class="text-center"><div class="text-4xl mb-2">⚡</div><div class="font-semibold text-sm">Instant matches</div><div class="text-xs text-slate-400 mt-1">97% fit score</div></div>
+                <div class="text-center"><div class="text-4xl mb-2">📊</div><div class="font-semibold text-sm">Ranked directory</div><div class="text-xs text-slate-400 mt-1">Credentials + NDA status</div></div>
+                <div class="text-center"><div class="text-4xl mb-2">🔒</div><div class="font-semibold text-sm">Secure payments</div><div class="text-xs text-slate-400 mt-1">Stripe + escrow</div></div>
+            </div>
+        </div>
+        <div class="md:col-span-5 bg-white text-slate-900 rounded-3xl p-8">
+            <div class="text-xs font-bold mb-2 text-slate-500 uppercase">Example gig — posted yesterday</div>
+            <h3 class="text-2xl font-semibold mb-4">Multi-turn jailbreak testing for new agentic product (Claude 4 + tools)</h3>
+            <div class="flex flex-wrap gap-2 mb-6">
+                <span class="text-xs px-3 py-1 bg-red-100 text-red-700 rounded-3xl">Jailbreaking</span>
+                <span class="text-xs px-3 py-1 bg-red-100 text-red-700 rounded-3xl">Agentic systems</span>
+                <span class="text-xs px-3 py-1 bg-red-100 text-red-700 rounded-3xl">Expert tier</span>
+            </div>
+            <div class="flex justify-between items-end">
+                <div><div class="font-semibold">$800 – $1,200</div><div class="text-xs text-slate-500">3–5 day turnaround</div></div>
+                <button onclick="showPostGigModal()" class="bg-red-600 text-white px-6 py-3 rounded-3xl font-semibold text-sm">Post this gig →</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" class="bg-slate-900 py-20">
+    <div class="max-w-screen-2xl mx-auto px-8">
+        <h2 class="text-center text-4xl font-semibold tracking-tighter mb-12">Built in three phases. Launching in weeks.</h2>
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="bg-slate-800 rounded-3xl p-8"><div class="text-red-400 text-5xl font-bold mb-4">01</div><h3 class="text-xl font-semibold mb-3">Cold-start gig directory</h3><p class="text-slate-400 text-sm">We scrape &amp; aggregate every public red teaming gig from Anthropic, Scale, Surge, Appen, Mercor, Reddit, and LinkedIn.</p><div class="mt-6 text-xs uppercase text-slate-500">Live on launch</div></div>
+            <div class="bg-slate-800 rounded-3xl p-8"><div class="text-red-400 text-5xl font-bold mb-4">02</div><h3 class="text-xl font-semibold mb-3">Freelancer profiles + scores</h3><p class="text-slate-400 text-sm">Create profile • Add specialties • Scores build from completed tasks. Your work history follows you across companies.</p><div class="mt-6 text-xs uppercase text-slate-500">Next milestone</div></div>
+            <div class="bg-slate-800 rounded-3xl p-8 relative"><div class="text-red-400 text-5xl font-bold mb-4">03</div><h3 class="text-xl font-semibold mb-3">Company side + AI matching</h3><p class="text-slate-400 text-sm">Companies post gigs → Claude API ranks and matches the perfect tester. Stripe payments, escrow, and contracts included.</p><div class="absolute top-8 right-8 bg-emerald-400 text-emerald-900 text-xs font-bold px-4 py-1 rounded-3xl">Coming soon</div></div>
+        </div>
+    </div>
+</section>
+
+<!-- FINAL CTA -->
+<div class="max-w-screen-2xl mx-auto px-8 py-16">
+    <div class="bg-gradient-to-r from-red-600 to-rose-600 text-white rounded-[3rem] py-16 px-8 text-center">
+        <h2 class="text-5xl font-semibold tracking-tighter mb-4">Ready to red team the future?</h2>
+        <p class="text-xl mb-10 max-w-md mx-auto opacity-90">Be among the first 500 members when we launch the full marketplace.</p>
+        <button onclick="showWaitlistModal()" class="px-12 py-5 bg-white text-red-600 text-xl font-semibold rounded-3xl inline-flex items-center gap-4 hover:scale-105 transition-transform">
+            Join the waitlist now <i class="fa-solid fa-arrow-right-long"></i>
+        </button>
+        <p class="text-sm mt-6 opacity-60">Supabase + Vercel + Stripe + Claude API • Total launch budget under $100</p>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="bg-slate-950 border-t border-slate-800 py-10">
+    <div class="max-w-screen-2xl mx-auto px-8 text-xs text-slate-400 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div>© 2026 redteamgig.com • All rights reserved</div>
+        <div class="flex gap-x-8">
+            <a href="#" class="hover:text-white">Twitter / X</a>
+            <a href="#" class="hover:text-white">Discord</a>
+            <a href="#" class="hover:text-white">Privacy &amp; Safety</a>
+            <a href="#" class="hover:text-white">Founder: Erekle Niniashvili (NJ)</a>
+        </div>
+        <div>Made with Supabase • Vercel • Claude</div>
+    </div>
+</footer>
+
+<!-- WAITLIST MODAL -->
+<!-- FIX 7: relative on inner div so ✕ button positions correctly -->
+<div id="waitlistModal" onclick="if(event.target.id==='waitlistModal')hideWaitlistModal()"
+     class="hidden fixed inset-0 bg-black/70 items-center justify-center z-[9999]">
+    <div onclick="event.stopPropagation()" class="relative bg-slate-900 rounded-3xl max-w-lg w-full mx-4 p-8">
+        <button onclick="hideWaitlistModal()" class="absolute top-6 right-6 text-slate-400 hover:text-white text-xl">✕</button>
+        <h3 class="text-2xl font-semibold mb-6">Join redteamgig.com waitlist</h3>
+        <form id="modalForm" onsubmit="handleSubmit(event,'modal')" class="space-y-4">
+            <div class="flex gap-3">
+                <button type="button" onclick="selectRoleModal(0)" id="modal-role-0" data-active="false"
+                        class="flex-1 py-5 border-2 border-slate-700 data-[active=true]:border-red-600 rounded-3xl text-center font-semibold text-sm hover:border-slate-500">
+                    <i class="fa-solid fa-user-secret text-2xl mb-1 block"></i> Red Teamer / Tester
+                </button>
+                <button type="button" onclick="selectRoleModal(1)" id="modal-role-1" data-active="false"
+                        class="flex-1 py-5 border-2 border-slate-700 data-[active=true]:border-red-600 rounded-3xl text-center font-semibold text-sm hover:border-slate-500">
+                    <i class="fa-solid fa-building text-2xl mb-1 block"></i> AI Company
+                </button>
+            </div>
+            <input type="email" id="modalEmail" placeholder="Email address" required class="w-full px-5 py-4 bg-slate-800 border border-slate-700 focus:border-red-500 rounded-3xl outline-none">
+            <input type="text"  id="modalName"  placeholder="Your name"           class="w-full px-5 py-4 bg-slate-800 border border-slate-700 focus:border-red-500 rounded-3xl outline-none">
+            <button type="submit" id="modalSubmitBtn" class="w-full py-4 bg-red-600 hover:bg-red-700 rounded-3xl text-lg font-semibold text-white flex items-center justify-center gap-2">Get early access</button>
+        </form>
+        <p class="text-center text-xs text-slate-400 mt-5">We'll email you the moment the directory goes live.<br>Built in New Jersey with ❤️ for the AI safety community.</p>
+    </div>
+</div>
+
+<!-- POST A GIG MODAL -->
+<div id="postGigModal" onclick="if(event.target.id==='postGigModal')hidePostGigModal()"
+     class="hidden fixed inset-0 bg-black/70 items-center justify-center z-[9999]">
+    <div onclick="event.stopPropagation()" class="relative bg-slate-900 rounded-3xl max-w-md w-full mx-4 p-8">
+        <button onclick="hidePostGigModal()" class="absolute top-6 right-6 text-slate-400 hover:text-white text-xl">✕</button>
+        <h3 class="text-2xl font-semibold mb-2">Post a Gig</h3>
+        <p class="text-slate-400 text-sm mb-6">$49 deposit prevents spam — credited toward your first hire.</p>
+        <!-- 🔴 Replace this URL with your real Stripe payment link -->
+        <a href="https://buy.stripe.com/REPLACE_WITH_YOUR_STRIPE_LINK" target="_blank" rel="noopener" onclick="hidePostGigModal()"
+           class="block w-full py-5 bg-red-600 hover:bg-red-700 text-white text-center text-lg font-semibold rounded-3xl">
+            Pay $49 &amp; Post Gig Now
+        </a>
+        <p class="text-center text-xs text-slate-500 mt-4">Secure payment via Stripe. You'll fill in gig details after payment.</p>
+    </div>
+</div>
+
+<!-- Toast container -->
+<div id="toastContainer" class="fixed bottom-6 right-6 z-[99999] flex flex-col gap-2 pointer-events-none"></div>
 
 <script>
-// Supabase client
-const SUPABASE_URL = 'https://cnhmfxwyqtpbmjadlwty.supabase.co';
+// ✅ FIX 1: window.supabase (lowercase) from UMD build
+const SUPABASE_URL      = 'https://cnhmfxwyqtpbmjadlwty.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaG1meHd5cXRwYm1qYWRsd3R5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1MzA1NTksImV4cCI6MjA5MjEwNjU1OX0.bTTVehjz_LQLoTd0xW-FMqLdrB7nnKUlU163vLWcdrA';
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Dynamic Open Gigs from the new 'gigs' table
+function showToast(msg, color='#10b981') {
+    const t = document.createElement('div');
+    t.style.cssText = `background:${color};color:white;padding:14px 22px;border-radius:9999px;font-weight:600;font-size:14px;box-shadow:0 4px 20px rgba(0,0,0,0.4);animation:fadeUp 0.3s ease;pointer-events:auto;white-space:nowrap;`;
+    t.textContent = msg;
+    document.getElementById('toastContainer').appendChild(t);
+    setTimeout(()=>t.remove(), 4500);
+}
+
+function esc(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function loadWaitlistCount() {
+    try {
+        const { count } = await db.from('waitlist').select('*',{count:'exact',head:true});
+        if (count > 0) document.getElementById('waitlistCount').textContent = `${count.toLocaleString()} people already on the waitlist`;
+    } catch(e){}
+}
+
+// UPDATED loadGigs() - pulls live from the new 'gigs' table (Migration 003)
 async function loadGigs() {
     const container = document.getElementById('gigs-container');
     container.innerHTML = `<p class="text-slate-500 italic col-span-3 py-8 text-center"><span class="spinner mr-2"></span> Loading live gigs from Supabase...</p>`;
 
     try {
-        const { data, error } = await db.from('gigs').select('*').order('created_at', { ascending: false }).limit(12);
+        const { data, error } = await db
+            .from('gigs')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(12);
+
         if (error) throw error;
 
         if (!data || data.length === 0) {
-            container.innerHTML = `<p class="text-slate-400 italic col-span-3 py-8 text-center">No gigs yet.<br>More coming soon from Mercor.</p>`;
+            container.innerHTML = `<p class="text-slate-400 italic col-span-3 py-8 text-center">No gigs yet.<br>More coming soon from Mercor and others.</p>`;
             return;
         }
 
@@ -71,15 +411,14 @@ async function loadGigs() {
             html += `
             <div class="card-hover bg-slate-900/50 border border-slate-800 hover:border-red-600 rounded-[2rem] p-8 flex flex-col justify-between">
                 <div>
-                    <div class="flex justify-between items-start mb-4">
-                        <h3 class="text-xl font-bold text-white">${job.title}</h3>
+                    <div class="flex justify-between items-start mb-4 gap-3">
+                        <h3 class="text-xl font-bold text-white leading-tight">${job.title}</h3>
                         <span class="text-xs bg-red-900/60 text-red-300 px-3 py-1 rounded-3xl">${(job.external_source || 'MERCOR').toUpperCase()}</span>
                     </div>
-                    <p class="text-slate-400 text-sm mb-6 line-clamp-3">${job.description || job.short_summary || ''}</p>
+                    <p class="text-slate-400 text-sm mb-6 line-clamp-3">${job.description || job.short_summary || 'AI Red Teaming & Security Audit.'}</p>
                 </div>
-                <a href="${job.external_url || '#'}" target="_blank" class="block w-full py-3 bg-red-600 hover:bg-red-700 text-white text-center rounded-3xl text-sm font-semibold">
-                    Apply Now →
-                </a>
+                <a href="${job.external_url || '#'}" target="_blank" rel="noopener"
+                   class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-sm">Apply Now →</a>
             </div>`;
         });
         container.innerHTML = html;
@@ -89,12 +428,84 @@ async function loadGigs() {
     }
 }
 
-// Keep all your original functions here (handleSubmit, submitTalent, modals, etc.)
-// ... (paste the rest of your original <script> code here)
+// ✅ FIX 4: handleSubmit detects source (hero vs modal), reads correct IDs
+async function handleSubmit(e, source) {
+    e.preventDefault();
+    const isModal = source === 'modal';
+    const email    = document.getElementById(isModal ? 'modalEmail' : 'heroEmail').value.trim();
+    const name     = document.getElementById(isModal ? 'modalName'  : 'heroName')?.value?.trim() || 'Anonymous';
+    const location = isModal ? '' : (document.getElementById('heroLocation')?.value?.trim() || '');
+    const heroRole = document.getElementById('role-btn-0')?.dataset.active === 'true' ? 'Red Teamer' : 'AI Company';
+    const mr0      = document.getElementById('modal-role-0')?.dataset.active === 'true';
+    const mr1      = document.getElementById('modal-role-1')?.dataset.active === 'true';
+    const role     = isModal ? (mr0 ? 'Red Teamer' : mr1 ? 'AI Company' : 'Unknown') : heroRole;
 
-// Initialize dynamic gigs when page loads
+    const btn = document.getElementById(isModal ? 'modalSubmitBtn' : 'heroSubmitBtn');
+    const orig = btn.innerHTML;
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Saving…';
+
+    try {
+        const { error } = await db.from('waitlist').insert({ email, name, role, location });
+        if (error) {
+            if (error.code === '23505') showToast('👋 You\'re already on the list!', '#3b82f6');
+            else throw error;
+        } else {
+            showToast('🎉 You\'re on the waitlist! We\'ll be in touch.');
+            loadWaitlistCount();
+        }
+    } catch(err) {
+        console.error(err);
+        showToast('❌ Something went wrong. Please try again.', '#ef4444');
+    } finally {
+        btn.disabled = false; btn.innerHTML = orig;
+        hideWaitlistModal();
+    }
+}
+
+// ✅ FIX 6: submitTalent fully implemented
+async function submitTalent(e) {
+    e.preventDefault();
+    const payload = {
+        full_name:  document.getElementById('talentName').value.trim(),
+        email:      document.getElementById('talentEmail').value.trim(),
+        github:     document.getElementById('talentGithub').value.trim() || null,
+        specialty:  document.getElementById('talentSpecialty').value || null,
+        tier:       document.getElementById('talentTier').value || null,
+    };
+    const btn = document.getElementById('talentSubmitBtn');
+    const orig = btn.innerHTML;
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Saving…';
+    try {
+        const { error } = await db.from('talent_pool').insert(payload);
+        if (error) {
+            if (error.code === '23505') showToast('👋 Profile already in pool!', '#3b82f6');
+            else throw error;
+        } else {
+            showToast('✅ Profile submitted! You\'ll start getting matched.');
+            document.getElementById('talentForm').reset();
+        }
+    } catch(err) {
+        console.error(err);
+        showToast('❌ Something went wrong. Please try again.', '#ef4444');
+    } finally {
+        btn.disabled = false; btn.innerHTML = orig;
+    }
+}
+
+function selectRole(n)      { ['role-btn-0','role-btn-1'].forEach((id,i) => document.getElementById(id).dataset.active = String(i===n)); }
+function selectRoleModal(n) { ['modal-role-0','modal-role-1'].forEach((id,i) => document.getElementById(id).dataset.active = String(i===n)); }
+
+function showWaitlistModal() { const m=document.getElementById('waitlistModal'); m.classList.remove('hidden'); m.classList.add('flex'); }
+function hideWaitlistModal() { const m=document.getElementById('waitlistModal'); m.classList.add('hidden'); m.classList.remove('flex'); }
+function showPostGigModal()  { const m=document.getElementById('postGigModal');  m.classList.remove('hidden'); m.classList.add('flex'); }
+function hidePostGigModal()  { const m=document.getElementById('postGigModal');  m.classList.add('hidden'); m.classList.remove('flex'); }
+function toggleMobileMenu()  { document.getElementById('mobileMenu').classList.toggle('hidden'); }
+
+// ✅ FIX 5: called on load
 document.addEventListener('DOMContentLoaded', () => {
+    loadWaitlistCount();
     loadGigs();
+    console.log('%c🚀 redteamgig.com — all systems go', 'color:#e11d48;font-weight:700;font-size:14px');
 });
 </script>
 </body>
