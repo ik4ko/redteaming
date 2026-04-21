@@ -27,32 +27,36 @@
 </head>
 <body class="bg-slate-950 text-slate-200 font-sans">
 
-<!-- NAVBAR -->
+<!-- NAVBAR WITH ROLE TOGGLE -->
 <nav class="border-b border-slate-800 bg-slate-950 sticky top-0 z-50">
     <div class="max-w-screen-2xl mx-auto px-8 py-5 flex items-center justify-between">
         <div class="flex items-center gap-x-2">
             <div class="w-8 h-8 bg-red-600 rounded-xl flex items-center justify-center text-white font-bold text-xl flex-shrink-0">RT</div>
             <span class="font-semibold text-3xl tracking-tighter" style="font-family:'Space Grotesk',sans-serif;">redteamgig</span>
-            <span class="text-xs text-red-400 tracking-[2px] font-mono">.com</span>
         </div>
+
         <div class="hidden md:flex items-center gap-x-8 text-sm font-medium text-slate-400">
             <a href="#gigs" class="text-white hover:text-red-400 font-bold flex items-center gap-1"><i class="fa-solid fa-bolt text-red-500"></i> Open Gigs</a>
             <a href="#for-freelancers" class="hover:text-white">For Red Teamers</a>
             <a href="#for-companies" class="hover:text-white">Post a Gig</a>
             <a href="#how" class="hover:text-white">How it Works</a>
         </div>
-        <div class="flex items-center gap-3">
+
+        <div class="flex items-center gap-4">
+            <!-- Role Toggle -->
+            <div class="flex bg-slate-800 rounded-3xl p-1 text-sm">
+                <button onclick="switchRole(0)" id="role-redteamer"
+                        class="px-5 py-2 rounded-3xl data-[active=true]:bg-white data-[active=true]:text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-user-secret"></i> Red Teamer
+                </button>
+                <button onclick="switchRole(1)" id="role-company"
+                        class="px-5 py-2 rounded-3xl data-[active=true]:bg-white data-[active=true]:text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-building"></i> Company
+                </button>
+            </div>
+
             <button onclick="showWaitlistModal()" class="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-semibold text-sm">Join Waitlist</button>
             <button onclick="toggleMobileMenu()" class="md:hidden text-xl text-slate-400"><i class="fa-solid fa-bars"></i></button>
-        </div>
-    </div>
-    <div id="mobileMenu" class="hidden md:hidden border-t border-slate-800 bg-slate-950 px-8 py-4">
-        <div class="flex flex-col gap-y-4 text-sm font-medium">
-            <a href="#gigs" onclick="toggleMobileMenu()" class="py-2">Open Gigs</a>
-            <a href="#for-freelancers" onclick="toggleMobileMenu()" class="py-2">For Red Teamers</a>
-            <a href="#for-companies" onclick="toggleMobileMenu()" class="py-2">Post a Gig</a>
-            <a href="#how" onclick="toggleMobileMenu()" class="py-2">How it Works</a>
-            <button onclick="showWaitlistModal();toggleMobileMenu()" class="mt-4 w-full py-4 bg-red-600 hover:bg-red-700 rounded-3xl text-white font-semibold">Join Waitlist</button>
         </div>
     </div>
 </nav>
@@ -387,7 +391,7 @@ async function loadWaitlistCount() {
     } catch(e){}
 }
 
-// UPDATED loadGigs() - pulls live from the new 'gigs' table (Migration 003)
+// UPDATED loadGigs() - now pulls from the new 'gigs' table (Migration 003)
 async function loadGigs() {
     const container = document.getElementById('gigs-container');
     container.innerHTML = `<p class="text-slate-500 italic col-span-3 py-8 text-center"><span class="spinner mr-2"></span> Loading live gigs from Supabase...</p>`;
@@ -507,6 +511,28 @@ document.addEventListener('DOMContentLoaded', () => {
     loadGigs();
     console.log('%c🚀 redteamgig.com — all systems go', 'color:#e11d48;font-weight:700;font-size:14px');
 });
+    // Role Toggle for Demo
+let currentRole = 0; // 0 = Red Teamer, 1 = Company
+
+function switchRole(role) {
+    currentRole = role;
+    document.getElementById('role-redteamer').dataset.active = role === 0;
+    document.getElementById('role-company').dataset.active = role === 1;
+
+    if (role === 0) {
+        // Red Teamer View
+        document.getElementById('for-freelancers').style.display = 'block';
+        document.getElementById('talent').style.display = 'block';
+        document.getElementById('for-companies').style.display = 'none';
+        showToast('👤 Switched to Red Teamer view', '#10b981');
+    } else {
+        // Company View
+        document.getElementById('for-freelancers').style.display = 'none';
+        document.getElementById('talent').style.display = 'none';
+        document.getElementById('for-companies').style.display = 'block';
+        showToast('🏢 Switched to Company view', '#10b981');
+    }
+}
 </script>
 </body>
 </html>
