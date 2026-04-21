@@ -25,7 +25,7 @@
 
 <!-- [YOUR ENTIRE NAVBAR, HERO, TRUST BAR, FOR FREELANCERS, TALENT POOL, FOR COMPANIES, HOW IT WORKS, FINAL CTA, FOOTER, MODALS — all kept exactly as you had them] -->
 
-<!-- OPEN GIGS SECTION — UPDATED TO USE THE NEW 'gigs' TABLE -->
+<!-- OPEN GIGS (now dynamic from new 'gigs' table) -->
 <section id="gigs" class="py-20 bg-slate-950">
     <div class="max-w-screen-2xl mx-auto px-8">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-baseline gap-3 mb-10">
@@ -39,7 +39,7 @@
         </div>
 
         <div id="gigs-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <p class="text-slate-500 italic col-span-3 py-8 text-center"><span class="spinner mr-2"></span> Syncing live safety opportunities…</p>
+            <p class="text-slate-500 italic col-span-3 py-8 text-center"><span class="spinner mr-2"></span> Loading live gigs from Supabase...</p>
         </div>
     </div>
 </section>
@@ -47,15 +47,15 @@
 <!-- [THE REST OF YOUR CODE — FOR FREELANCERS, TALENT POOL, FOR COMPANIES, HOW IT WORKS, etc. — remains unchanged] -->
 
 <script>
-// Supabase client (UMD version you already have)
+// Supabase client
 const SUPABASE_URL = 'https://cnhmfxwyqtpbmjadlwty.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaG1meHd5cXRwYm1qYWRsd3R5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1MzA1NTksImV4cCI6MjA5MjEwNjU1OX0.bTTVehjz_LQLoTd0xW-FMqLdrB7nnKUlU163vLWcdrA';
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// NEW: Load gigs from the new 'gigs' table (Migration 003)
+// Dynamic gigs from the new 'gigs' table
 async function loadGigs() {
     const container = document.getElementById('gigs-container');
-    container.innerHTML = `<p class="text-slate-500 italic col-span-3 py-8 text-center"><span class="spinner mr-2"></span> Syncing live safety opportunities…</p>`;
+    container.innerHTML = `<p class="text-slate-500 italic col-span-3 py-8 text-center"><span class="spinner mr-2"></span> Loading live gigs from Supabase...</p>`;
 
     try {
         const { data, error } = await db
@@ -67,7 +67,7 @@ async function loadGigs() {
         if (error) throw error;
 
         if (!data || data.length === 0) {
-            container.innerHTML = `<p class="text-slate-400 italic col-span-3 py-8 text-center">No gigs yet.<br>More coming soon from Mercor and others.</p>`;
+            container.innerHTML = `<p class="text-slate-400 italic col-span-3 py-8 text-center">No gigs yet.<br>More coming soon.</p>`;
             return;
         }
 
@@ -78,7 +78,7 @@ async function loadGigs() {
                 <div>
                     <div class="flex justify-between items-start mb-4">
                         <h3 class="text-xl font-bold text-white">${job.title}</h3>
-                        <span class="text-xs bg-red-900/60 text-red-300 px-3 py-1 rounded-3xl">${(job.external_source || job.source_type || 'MERCOR').toUpperCase()}</span>
+                        <span class="text-xs bg-red-900/60 text-red-300 px-3 py-1 rounded-3xl">${(job.external_source || 'MERCOR').toUpperCase()}</span>
                     </div>
                     <p class="text-slate-400 text-sm mb-6 line-clamp-3">${job.description || job.short_summary || ''}</p>
                 </div>
@@ -96,13 +96,11 @@ async function loadGigs() {
     }
 }
 
-// Keep all your existing functions (handleSubmit, submitTalent, modals, etc.)
-// ... (your original script code remains unchanged below this line)
+// Keep ALL your original functions below (handleSubmit, submitTalent, modals, etc.)
+// ... (your existing script code stays here - just add the line below at the very end)
 
-// Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    loadGigs();           // ← This now loads your real Mercor job
-    // your other initializations...
+    loadGigs();           // ← This loads your real Mercor job from the new table
     console.log('%c🚀 redteamgig.com — now using new gigs table', 'color:#e11d48');
 });
 </script>
