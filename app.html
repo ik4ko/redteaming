@@ -678,37 +678,42 @@ textarea.f-input { resize: vertical; min-height: 80px; }
 <script>
 const SUPABASE_URL = 'https://YOUR_URL.supabase.co'; 
 const SUPABASE_KEY = 'YOUR_ANON_KEY';
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseApp = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-supabaseClient.auth.onAuthStateChange(async (event, session) => {
-    const isAtAppPath = window.location.pathname === '/app' || window.location.pathname === '/app.html';
+async function init() {
+    const { data: { session } } = await supabaseApp.auth.getSession();
+    const isAtDashboard = window.location.pathname.includes('app');
 
     if (session) {
-        // --- THE FIX: If we are already in the app, STOP EVERYTHING and show the UI ---
-        if (isAtAppPath) {
-            const { data: profile } = await supabaseClient
-                .from('profiles')
-                .select('*')
-                .eq('id', session.user.id)
-                .single();
-
-            if (profile) {
-                // Kill the spinner immediately
-                document.getElementById('loading-screen').style.display = 'none';
-                document.getElementById('app').style.display = 'flex';
-                
-                // Set the role
-                const viewId = profile.role === 'company_client' ? 'company-view' : 'freelancer-view';
-                document.getElementById(viewId).classList.add('active');
-            }
-            return; // EXIT the function so no more redirects happen
+        if (!isAtDashboard) {
+            window.location.href = '/app';
+            return;
         }
 
-        // Only redirect if we are NOT at the app path
-        window.location.href = '/app';
-    } else {
-        if (isAtAppPath) window.location.href = '/';
+        // Logic for when we are safely on the dashboard
+        const { data: profile } = await supabaseApp
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+
+        if (profile) {
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('app').style.display = 'flex';
+            const roleView = profile.role === 'company_client' ? 'company-view' : 'freelancer-view';
+            document.getElementById(roleView).classList.add('active');
+        }
+    } else if (isAtDashboard) {
+        window.location.href = '/';
     }
+}
+
+// Run the check once on load
+init();
+
+// Only listen for signs out to avoid redirect loops on login
+supabaseApp.auth.onAuthStateChange((event) => {
+    if (event === 'SIGNED_OUT') window.location.href = '/';
 });
 </script>
 </body>
