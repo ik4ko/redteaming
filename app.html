@@ -676,54 +676,40 @@ textarea.f-input { resize: vertical; min-height: 80px; }
 <div class="toast-wrap" id="toasts"></div>
 
 <script>
-// 1. Connection (Only once!)
 const SUPABASE_URL = 'https://YOUR_URL.supabase.co'; 
 const SUPABASE_KEY = 'YOUR_ANON_KEY';
-const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); 
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// 2. The Auth Listener
-client.auth.onAuthStateChange(async (event, session) => {
-    const isAtApp = window.location.pathname.includes('app');
+supabaseClient.auth.onAuthStateChange(async (event, session) => {
+    const isAtAppPath = window.location.pathname === '/app' || window.location.pathname === '/app.html';
 
     if (session) {
-        // --- THE FIX: Only redirect if we are NOT already on the app page ---
-        if (!isAtApp) {
-            window.location.href = '/app';
-            return; // Stop this function here
-        }
+        // --- THE FIX: If we are already in the app, STOP EVERYTHING and show the UI ---
+        if (isAtAppPath) {
+            const { data: profile } = await supabaseClient
+                .from('profiles')
+                .select('*')
+                .eq('id', session.user.id)
+                .single();
 
-        // We are safely on the app page. Now load the data.
-        const { data: profile } = await client
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .single();
-
-        if (profile) {
-            // Update UI IDs from your Part 3 code
-            if(document.getElementById('sb-name')) document.getElementById('sb-name').innerText = profile.display_name || 'User';
-            
-            // Activate views based on your Supabase Role Enum
-            if (profile.role === 'red_teamer') {
-                document.getElementById('freelancer-view')?.classList.add('active');
-            } else if (profile.role === 'company_client') {
-                document.getElementById('company-view')?.classList.add('active');
+            if (profile) {
+                // Kill the spinner immediately
+                document.getElementById('loading-screen').style.display = 'none';
+                document.getElementById('app').style.display = 'flex';
+                
+                // Set the role
+                const viewId = profile.role === 'company_client' ? 'company-view' : 'freelancer-view';
+                document.getElementById(viewId).classList.add('active');
             }
-
-            // KILL THE SPINNER AND SHOW THE APP
-            document.getElementById('loading-screen').style.display = 'none';
-            document.getElementById('app').style.display = 'flex';
-            if(document.getElementById('ai-panel')) document.getElementById('ai-panel').style.display = 'block';
+            return; // EXIT the function so no more redirects happen
         }
+
+        // Only redirect if we are NOT at the app path
+        window.location.href = '/app';
     } else {
-        // If logged out and trying to see the app, send to home
-        if (isAtApp) window.location.href = '/';
+        if (isAtAppPath) window.location.href = '/';
     }
 });
-
-async function signOut() {
-    await client.auth.signOut();
-}
 </script>
 </body>
 </html>
