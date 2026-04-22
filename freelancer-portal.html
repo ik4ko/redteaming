@@ -1,0 +1,2344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RedTeamGig — Freelancer Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+/* ── RESET & TOKENS ──────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #080a0f;
+  --bg2:       #0d1117;
+  --bg3:       #111827;
+  --border:    rgba(255,255,255,0.07);
+  --border2:   rgba(255,255,255,0.12);
+  --red:       #f03e3e;
+  --red2:      #ff6b6b;
+  --red-dim:   rgba(240,62,62,0.12);
+  --green:     #22c55e;
+  --green-dim: rgba(34,197,94,0.1);
+  --amber:     #f59e0b;
+  --blue:      #3b82f6;
+  --blue-dim:  rgba(59,130,246,0.1);
+  --text:      #f1f5f9;
+  --text2:     #94a3b8;
+  --text3:     #475569;
+  --font-head: 'Syne', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+  --font-body: 'Inter', sans-serif;
+  --radius:    14px;
+  --radius-sm: 8px;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── NOISE OVERLAY ───────────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 9999; opacity: 0.4;
+}
+
+/* ── SCROLL ──────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+/* ── GRID BG ─────────────────────────────────────────────── */
+.grid-bg {
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ── GLOW ────────────────────────────────────────────────── */
+.glow-red  { box-shadow: 0 0 30px rgba(240,62,62,0.15); }
+.glow-text { text-shadow: 0 0 40px rgba(240,62,62,0.4); }
+
+/* ── BUTTONS ─────────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 20px; border-radius: var(--radius-sm);
+  font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  cursor: pointer; border: none; transition: all 0.2s;
+  text-decoration: none; white-space: nowrap;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--red); color: #fff; }
+.btn-primary:hover { background: var(--red2); box-shadow: 0 0 20px rgba(240,62,62,0.3); }
+.btn-ghost {
+  background: transparent; color: var(--text2);
+  border: 1px solid var(--border2);
+}
+.btn-ghost:hover { border-color: var(--red); color: var(--text); }
+.btn-green { background: var(--green); color: #000; font-weight: 700; }
+.btn-green:hover { opacity: 0.9; box-shadow: 0 0 20px rgba(34,197,94,0.3); }
+
+/* ── INPUTS ──────────────────────────────────────────────── */
+.input {
+  width: 100%; background: var(--bg3);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--text); font-family: var(--font-body); font-size: 14px;
+  padding: 12px 16px; outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.input:focus { border-color: var(--red); box-shadow: 0 0 0 3px var(--red-dim); }
+.input::placeholder { color: var(--text3); }
+select.input { cursor: pointer; }
+textarea.input { resize: vertical; min-height: 80px; }
+
+/* ── CARDS ───────────────────────────────────────────────── */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.card-hover {
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+.card-hover:hover {
+  border-color: rgba(240,62,62,0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+}
+
+/* ── BADGES ──────────────────────────────────────────────── */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 4px;
+  font-family: var(--font-mono); font-size: 10px;
+  font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.badge-red    { background: var(--red-dim);   color: var(--red2);  border: 1px solid rgba(240,62,62,0.2); }
+.badge-green  { background: var(--green-dim); color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
+.badge-blue   { background: var(--blue-dim);  color: var(--blue);  border: 1px solid rgba(59,130,246,0.2); }
+.badge-amber  { background: rgba(245,158,11,0.1); color: var(--amber); border: 1px solid rgba(245,158,11,0.2); }
+.badge-gray   { background: rgba(255,255,255,0.05); color: var(--text2); border: 1px solid var(--border); }
+.badge-partner { background: rgba(59,130,246,0.1); color: #60a5fa; border: 1px solid rgba(59,130,246,0.2); }
+
+/* ── TAG PILLS ───────────────────────────────────────────── */
+.tag {
+  display: inline-flex; padding: 4px 10px; border-radius: 4px;
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+  font-family: var(--font-mono); font-size: 10px; color: var(--text2);
+  letter-spacing: 0.05em;
+}
+.tag-sel {
+  background: var(--red-dim); border-color: rgba(240,62,62,0.4);
+  color: var(--red2); cursor: pointer;
+}
+.tag.clickable { cursor: pointer; transition: all 0.15s; }
+.tag.clickable:hover { border-color: var(--red); color: var(--text); }
+
+/* ── LABEL ───────────────────────────────────────────────── */
+.label {
+  display: block; font-family: var(--font-mono);
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--text3); margin-bottom: 8px;
+}
+
+/* ── MONO TEXT ───────────────────────────────────────────── */
+.mono { font-family: var(--font-mono); }
+
+/* ── ANIMATIONS ──────────────────────────────────────────── */
+@keyframes fadeUp   { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeIn   { from { opacity:0; } to { opacity:1; } }
+@keyframes pulse    { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+@keyframes spin     { to { transform:rotate(360deg); } }
+@keyframes slide-in { from { transform:translateX(100%); opacity:0; } to { transform:translateX(0); opacity:1; } }
+@keyframes shimmer  { 0% { background-position:-200% 0; } 100% { background-position:200% 0; } }
+@keyframes scanline { 0% { top:-10%; } 100% { top:110%; } }
+
+.fade-up   { animation: fadeUp   0.4s ease both; }
+.fade-in   { animation: fadeIn   0.3s ease both; }
+
+/* ── SCREEN MANAGER ──────────────────────────────────────── */
+.screen { display: none; }
+.screen.active { display: flex; }
+
+/* ══════════════════════════════════════════════════════════ */
+/*  SCREEN 1: AUTH                                           */
+/* ══════════════════════════════════════════════════════════ */
+#screen-auth {
+  min-height: 100vh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  position: relative;
+}
+
+.auth-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+}
+
+.auth-glow {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-60%);
+  width: 600px; height: 400px;
+  background: radial-gradient(ellipse, rgba(240,62,62,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.auth-box {
+  position: relative; z-index: 1;
+  width: 100%; max-width: 420px;
+}
+
+.auth-logo {
+  text-align: center; margin-bottom: 40px;
+}
+.auth-logo-mark {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 48px; height: 48px;
+  background: var(--red-dim); border: 1px solid rgba(240,62,62,0.3);
+  border-radius: 12px; margin-bottom: 16px;
+}
+.auth-logo-mark svg { width: 24px; height: 24px; color: var(--red); }
+.auth-logo h1 {
+  font-family: var(--font-head); font-size: 28px; font-weight: 800;
+  letter-spacing: -0.03em; color: var(--text);
+}
+.auth-logo p { color: var(--text3); font-size: 13px; margin-top: 4px; }
+
+.auth-tabs {
+  display: flex; background: var(--bg3);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 4px; margin-bottom: 24px; gap: 4px;
+}
+.auth-tab {
+  flex: 1; padding: 8px 0; text-align: center;
+  font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text3); cursor: pointer; border-radius: 6px;
+  border: none; background: transparent; transition: all 0.2s;
+}
+.auth-tab.active { background: var(--red); color: #fff; }
+
+.auth-form { display: flex; flex-direction: column; gap: 14px; }
+
+.auth-divider {
+  display: flex; align-items: center; gap: 12px;
+  font-family: var(--font-mono); font-size: 10px;
+  color: var(--text3); letter-spacing: 0.1em;
+}
+.auth-divider::before, .auth-divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+.role-select-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+}
+.role-option {
+  padding: 14px 12px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--bg3);
+  cursor: pointer; text-align: center; transition: all 0.2s;
+}
+.role-option:hover { border-color: var(--border2); }
+.role-option.selected {
+  border-color: var(--red); background: var(--red-dim);
+}
+.role-option .role-icon { font-size: 24px; margin-bottom: 6px; }
+.role-option .role-name {
+  font-family: var(--font-mono); font-size: 11px;
+  font-weight: 600; letter-spacing: 0.08em; color: var(--text2);
+}
+.role-option.selected .role-name { color: var(--red2); }
+
+/* ══════════════════════════════════════════════════════════ */
+/*  SCREEN 2: ONBOARDING                                     */
+/* ══════════════════════════════════════════════════════════ */
+#screen-onboard {
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+.onboard-header {
+  padding: 20px 32px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--bg2);
+}
+
+.onboard-progress {
+  display: flex; align-items: center; gap: 0;
+}
+.progress-step {
+  display: flex; align-items: center; gap: 8px;
+}
+.progress-dot {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+  border: 1px solid var(--border); background: var(--bg3);
+  color: var(--text3); transition: all 0.3s;
+}
+.progress-dot.active { border-color: var(--red); background: var(--red); color: #fff; }
+.progress-dot.done   { border-color: var(--green); background: var(--green); color: #000; }
+.progress-line {
+  width: 32px; height: 1px; background: var(--border); margin: 0 4px;
+}
+.progress-line.done { background: var(--green); }
+.progress-label {
+  font-family: var(--font-mono); font-size: 10px;
+  color: var(--text3); margin-top: 2px; text-align: center;
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+
+.onboard-body {
+  flex: 1; display: flex; align-items: flex-start;
+  justify-content: center; padding: 40px 24px;
+  overflow-y: auto;
+}
+
+.onboard-step {
+  display: none; width: 100%; max-width: 560px;
+  animation: fadeUp 0.35s ease;
+}
+.onboard-step.active { display: block; }
+
+.step-eyebrow {
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--red2); letter-spacing: 0.1em;
+  text-transform: uppercase; margin-bottom: 8px;
+}
+.step-title {
+  font-family: var(--font-head); font-size: 32px;
+  font-weight: 800; line-height: 1.1; color: var(--text);
+  margin-bottom: 8px; letter-spacing: -0.02em;
+}
+.step-sub { color: var(--text2); font-size: 14px; margin-bottom: 32px; }
+
+.form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-field { display: flex; flex-direction: column; gap: 6px; }
+
+.skill-grid {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  padding: 16px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--bg3);
+  min-height: 80px;
+}
+.skill-pill {
+  padding: 6px 12px; border-radius: 4px;
+  font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+  letter-spacing: 0.06em; cursor: pointer;
+  border: 1px solid var(--border); background: var(--bg2);
+  color: var(--text2); transition: all 0.15s;
+}
+.skill-pill:hover { border-color: var(--border2); color: var(--text); }
+.skill-pill.selected {
+  background: var(--red-dim); border-color: rgba(240,62,62,0.5);
+  color: var(--red2);
+}
+
+.tier-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+}
+.tier-card {
+  padding: 16px 12px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--bg3);
+  text-align: center; cursor: pointer; transition: all 0.2s;
+}
+.tier-card:hover { border-color: var(--border2); }
+.tier-card.selected { border-color: var(--red); background: var(--red-dim); }
+.tier-icon { font-size: 28px; margin-bottom: 8px; }
+.tier-name {
+  font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+  color: var(--text); margin-bottom: 4px;
+}
+.tier-card.selected .tier-name { color: var(--red2); }
+.tier-desc { font-size: 11px; color: var(--text3); line-height: 1.5; }
+
+.onboard-nav {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 32px; padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+/* ══════════════════════════════════════════════════════════ */
+/*  SCREEN 3: DASHBOARD                                      */
+/* ══════════════════════════════════════════════════════════ */
+#screen-dashboard {
+  min-height: 100vh;
+  flex-direction: row;
+}
+
+/* ── Sidebar ─── */
+.sidebar {
+  width: 220px; flex-shrink: 0;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  position: sticky; top: 0; height: 100vh;
+  overflow-y: auto;
+}
+
+.sidebar-logo {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.sidebar-logo-mark {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--red); display: flex;
+  align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-weight: 700;
+  font-size: 13px; color: #fff; flex-shrink: 0;
+}
+.sidebar-wordmark {
+  font-family: var(--font-head); font-weight: 800;
+  font-size: 15px; color: var(--text); letter-spacing: -0.02em;
+}
+
+.sidebar-user {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-avatar {
+  width: 36px; height: 36px; border-radius: 8px;
+  background: var(--red-dim); border: 1px solid rgba(240,62,62,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-weight: 700;
+  font-size: 13px; color: var(--red); margin-bottom: 8px;
+}
+.sidebar-name {
+  font-weight: 600; font-size: 13px;
+  color: var(--text); line-height: 1.2;
+}
+.sidebar-role {
+  font-family: var(--font-mono); font-size: 10px;
+  color: var(--red2); letter-spacing: 0.08em;
+  text-transform: uppercase; margin-top: 2px;
+}
+
+.sidebar-scores {
+  display: flex; gap: 8px; margin-top: 10px;
+}
+.score-chip {
+  flex: 1; padding: 6px 8px; border-radius: 6px;
+  background: var(--bg3); border: 1px solid var(--border);
+  text-align: center;
+}
+.score-val {
+  font-family: var(--font-mono); font-size: 14px;
+  font-weight: 600; color: var(--green);
+}
+.score-lbl {
+  font-size: 9px; color: var(--text3);
+  letter-spacing: 0.06em; text-transform: uppercase;
+  margin-top: 1px;
+}
+
+.sidebar-nav { padding: 12px 10px; flex: 1; }
+.nav-section-label {
+  font-family: var(--font-mono); font-size: 9px;
+  color: var(--text3); letter-spacing: 0.12em;
+  text-transform: uppercase; padding: 0 8px;
+  margin-bottom: 4px; margin-top: 12px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: var(--radius-sm);
+  cursor: pointer; transition: all 0.15s;
+  color: var(--text2); font-size: 13px; font-weight: 500;
+  border: 1px solid transparent; text-decoration: none;
+  width: 100%;  background: transparent;
+  font-family: var(--font-body);
+}
+.nav-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+.nav-item.active {
+  background: var(--red-dim);
+  border-color: rgba(240,62,62,0.2);
+  color: var(--text);
+}
+.nav-item .nav-icon { font-size: 15px; flex-shrink: 0; opacity: 0.7; }
+.nav-item .nav-count {
+  margin-left: auto; font-family: var(--font-mono);
+  font-size: 10px; background: var(--red);
+  color: #fff; padding: 1px 6px; border-radius: 10px;
+}
+
+.sidebar-footer {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+}
+.online-dot {
+  display: inline-block; width: 6px; height: 6px;
+  background: var(--green); border-radius: 50%;
+  margin-right: 6px; animation: pulse 2s infinite;
+}
+
+/* ── Main area ─── */
+.main {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column;
+}
+
+.topbar {
+  height: 56px; padding: 0 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+  display: flex; align-items: center; gap: 16px;
+  position: sticky; top: 0; z-index: 30;
+}
+.topbar-title {
+  font-family: var(--font-head); font-weight: 700;
+  font-size: 16px; color: var(--text);
+}
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+
+.search-bar {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 6px 12px;
+  width: 220px; transition: border-color 0.2s;
+}
+.search-bar:focus-within { border-color: var(--red); }
+.search-bar input {
+  background: none; border: none; outline: none;
+  color: var(--text); font-size: 13px; flex: 1;
+  font-family: var(--font-body);
+}
+.search-bar input::placeholder { color: var(--text3); }
+.search-icon { color: var(--text3); font-size: 13px; flex-shrink: 0; }
+
+.content { flex: 1; overflow-y: auto; padding: 24px; }
+
+/* ── Dashboard view panels ─── */
+.view { display: none; }
+.view.active { display: block; animation: fadeIn 0.25s ease; }
+
+/* ── Stat cards ─── */
+.stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 24px; }
+.stat-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 18px 20px;
+  position: relative; overflow: hidden;
+}
+.stat-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 2px; background: var(--red); opacity: 0.6;
+}
+.stat-val {
+  font-family: var(--font-mono); font-size: 26px;
+  font-weight: 600; color: var(--text); line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-val.green { color: var(--green); }
+.stat-val.blue  { color: var(--blue);  }
+.stat-label { font-size: 12px; color: var(--text3); }
+.stat-delta {
+  font-family: var(--font-mono); font-size: 10px;
+  color: var(--green); margin-top: 6px;
+}
+
+/* ── Section headers ─── */
+.section-header {
+  display: flex; align-items: center;
+  justify-content: space-between; margin-bottom: 16px;
+}
+.section-title {
+  font-family: var(--font-head); font-size: 18px;
+  font-weight: 700; color: var(--text); letter-spacing: -0.01em;
+}
+.section-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+/* ── Gig cards ─── */
+.gig-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; }
+@media (max-width: 1100px) { .gig-grid { grid-template-columns: 1fr; } }
+
+.gig-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 18px 20px;
+  transition: all 0.2s; cursor: pointer;
+  display: flex; flex-direction: column; gap: 12px;
+  position: relative;
+}
+.gig-card:hover {
+  border-color: rgba(240,62,62,0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+.gig-card-top { display: flex; align-items: flex-start; gap: 12px; }
+.gig-source-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+  background: var(--bg3); border: 1px solid var(--border);
+}
+.gig-title {
+  font-weight: 600; font-size: 14px; color: var(--text);
+  line-height: 1.4; flex: 1;
+}
+.gig-meta {
+  display: flex; align-items: center; gap: 10px;
+  flex-wrap: wrap;
+}
+.gig-pay {
+  font-family: var(--font-mono); font-size: 14px;
+  font-weight: 600; color: var(--green);
+}
+.gig-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.gig-footer {
+  display: flex; align-items: center;
+  justify-content: space-between; gap: 8px;
+  padding-top: 12px; border-top: 1px solid var(--border);
+}
+.gig-stats {
+  display: flex; gap: 12px;
+  font-family: var(--font-mono); font-size: 10px;
+  color: var(--text3);
+}
+.fit-bar {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--font-mono); font-size: 10px; color: var(--text3);
+}
+.fit-track {
+  width: 60px; height: 4px; background: var(--bg3);
+  border-radius: 2px; overflow: hidden;
+}
+.fit-fill {
+  height: 100%; border-radius: 2px;
+  background: linear-gradient(90deg, var(--red), var(--green));
+  transition: width 1s ease;
+}
+
+/* ── AI Assistant ─── */
+.ai-panel {
+  position: fixed; bottom: 24px; right: 24px;
+  z-index: 100;
+}
+
+.ai-bubble {
+  width: 52px; height: 52px; border-radius: 14px;
+  background: var(--bg2); border: 1px solid rgba(240,62,62,0.4);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.25s;
+  box-shadow: 0 4px 24px rgba(240,62,62,0.2);
+  position: relative;
+}
+.ai-bubble:hover {
+  border-color: var(--red);
+  box-shadow: 0 4px 32px rgba(240,62,62,0.35);
+  transform: scale(1.05);
+}
+.ai-bubble svg { width: 22px; height: 22px; color: var(--red); }
+.ai-bubble-ping {
+  position: absolute; top: -3px; right: -3px;
+  width: 10px; height: 10px;
+}
+.ai-bubble-ping::before, .ai-bubble-ping::after {
+  content: ''; position: absolute; border-radius: 50%;
+  width: 100%; height: 100%; background: var(--red);
+}
+.ai-bubble-ping::after { animation: pulse 1.5s infinite; }
+
+.ai-window {
+  position: absolute; bottom: 64px; right: 0;
+  width: 360px; background: var(--bg2);
+  border: 1px solid var(--border2); border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  display: none; flex-direction: column;
+  overflow: hidden; animation: slide-in 0.25s ease;
+}
+.ai-window.open { display: flex; }
+
+.ai-header {
+  padding: 14px 16px; background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.ai-header-icon {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: var(--red-dim); border: 1px solid rgba(240,62,62,0.3);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.ai-header-icon svg { width: 14px; height: 14px; color: var(--red); }
+.ai-header-info { flex: 1; }
+.ai-header-title {
+  font-family: var(--font-mono); font-size: 11px;
+  font-weight: 600; color: var(--text); letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.ai-header-status {
+  font-size: 10px; color: var(--green);
+  display: flex; align-items: center; gap: 4px;
+}
+.ai-close {
+  width: 24px; height: 24px; border-radius: 6px;
+  background: rgba(255,255,255,0.05);
+  border: none; color: var(--text2); cursor: pointer;
+  font-size: 13px; display: flex; align-items: center;
+  justify-content: center; transition: all 0.15s;
+}
+.ai-close:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+
+.ai-messages {
+  flex: 1; overflow-y: auto; padding: 14px;
+  display: flex; flex-direction: column; gap: 10px;
+  max-height: 300px; min-height: 200px;
+  scrollbar-width: thin;
+}
+
+.ai-msg {
+  display: flex; gap: 8px;
+  animation: fadeUp 0.25s ease;
+}
+.ai-msg.user { flex-direction: row-reverse; }
+
+.ai-msg-bubble {
+  max-width: 82%; padding: 9px 12px;
+  border-radius: 10px; font-size: 13px;
+  line-height: 1.5;
+}
+.ai-msg.assistant .ai-msg-bubble {
+  background: var(--bg3); border: 1px solid var(--border);
+  color: var(--text2); border-radius: 2px 10px 10px 10px;
+}
+.ai-msg.user .ai-msg-bubble {
+  background: var(--red-dim); border: 1px solid rgba(240,62,62,0.3);
+  color: var(--text); border-radius: 10px 2px 10px 10px;
+}
+.ai-msg-avatar {
+  width: 24px; height: 24px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; flex-shrink: 0; margin-top: 2px;
+}
+.ai-msg.assistant .ai-msg-avatar {
+  background: var(--red-dim); border: 1px solid rgba(240,62,62,0.3);
+  color: var(--red);
+}
+.ai-msg.user .ai-msg-avatar {
+  background: var(--bg3); border: 1px solid var(--border);
+  color: var(--text2);
+}
+
+.ai-suggestions {
+  padding: 10px 14px;
+  border-top: 1px solid var(--border);
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.ai-sugg-chip {
+  padding: 5px 10px; border-radius: 20px;
+  font-size: 11px; font-family: var(--font-mono);
+  background: var(--bg3); border: 1px solid var(--border);
+  color: var(--text2); cursor: pointer; transition: all 0.15s;
+  white-space: nowrap;
+}
+.ai-sugg-chip:hover {
+  border-color: var(--red); color: var(--text);
+  background: var(--red-dim);
+}
+
+.ai-input-row {
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+  display: flex; gap: 8px;
+}
+.ai-input {
+  flex: 1; background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 8px; padding: 8px 12px;
+  color: var(--text); font-size: 13px; outline: none;
+  font-family: var(--font-body);
+  transition: border-color 0.2s;
+}
+.ai-input:focus { border-color: var(--red); }
+.ai-send {
+  width: 34px; height: 34px; border-radius: 8px;
+  background: var(--red); border: none; color: #fff;
+  cursor: pointer; display: flex; align-items: center;
+  justify-content: center; flex-shrink: 0;
+  transition: all 0.15s;
+}
+.ai-send:hover { background: var(--red2); }
+.ai-send:disabled { background: var(--bg3); color: var(--text3); cursor: not-allowed; }
+
+.typing-dot {
+  display: inline-block; width: 5px; height: 5px;
+  border-radius: 50%; background: var(--text3);
+  margin: 0 1px; animation: pulse 1s infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+/* ── Profile view ─── */
+.profile-layout { display: grid; grid-template-columns: 280px 1fr; gap: 20px; }
+.profile-card-main { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.profile-header-bg {
+  height: 80px;
+  background: linear-gradient(135deg, rgba(240,62,62,0.15), rgba(240,62,62,0.03));
+  border-bottom: 1px solid var(--border); position: relative;
+}
+.profile-av {
+  width: 56px; height: 56px; border-radius: 12px;
+  background: var(--red-dim); border: 2px solid var(--bg2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-size: 20px; font-weight: 700;
+  color: var(--red); position: absolute; bottom: -28px; left: 20px;
+}
+.profile-card-body { padding: 36px 20px 20px; }
+.profile-name {
+  font-family: var(--font-head); font-size: 20px;
+  font-weight: 700; color: var(--text); margin-bottom: 4px;
+}
+.profile-handle { font-family: var(--font-mono); font-size: 12px; color: var(--text3); }
+.profile-scores { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+
+.profile-section { margin-top: 24px; }
+.profile-section-title {
+  font-family: var(--font-mono); font-size: 10px;
+  color: var(--text3); letter-spacing: 0.1em;
+  text-transform: uppercase; margin-bottom: 10px;
+}
+
+/* ── Applications view ─── */
+.app-table { width: 100%; border-collapse: collapse; }
+.app-table th {
+  font-family: var(--font-mono); font-size: 10px;
+  color: var(--text3); letter-spacing: 0.1em;
+  text-transform: uppercase; padding: 0 12px 10px;
+  text-align: left; border-bottom: 1px solid var(--border);
+}
+.app-table td {
+  padding: 14px 12px; border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.app-table tr:last-child td { border-bottom: none; }
+.app-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+/* ── Settings form ─── */
+.settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.settings-section { margin-bottom: 32px; }
+.settings-section-title {
+  font-family: var(--font-head); font-size: 16px;
+  font-weight: 700; color: var(--text);
+  margin-bottom: 16px; padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── Toast ─── */
+.toast-container {
+  position: fixed; bottom: 24px; left: 50%;
+  transform: translateX(-50%); z-index: 9998;
+  display: flex; flex-direction: column; gap: 8px;
+  align-items: center; pointer-events: none;
+}
+.toast {
+  padding: 10px 20px; border-radius: var(--radius-sm);
+  font-family: var(--font-mono); font-size: 12px;
+  font-weight: 500; letter-spacing: 0.06em;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+  animation: fadeUp 0.3s ease;
+  pointer-events: auto;
+}
+.toast.success { background: var(--green); color: #000; }
+.toast.error   { background: var(--red);   color: #fff; }
+.toast.info    { background: var(--bg3);   color: var(--text); border: 1px solid var(--border2); }
+
+/* ── Spinner ─── */
+.spinner {
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.2);
+  border-top-color: currentColor;
+  animation: spin 0.6s linear infinite;
+  display: inline-block;
+}
+
+/* ── Skeleton ─── */
+.skeleton {
+  background: linear-gradient(90deg, var(--bg3) 25%, var(--bg2) 50%, var(--bg3) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 6px;
+}
+
+/* ── Empty state ─── */
+.empty-state {
+  text-align: center; padding: 60px 20px;
+  color: var(--text3);
+}
+.empty-state-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+.empty-state-title {
+  font-family: var(--font-head); font-size: 18px;
+  color: var(--text2); margin-bottom: 8px;
+}
+
+/* ── Responsive ─── */
+@media (max-width: 900px) {
+  .sidebar { display: none; }
+  .stats-row { grid-template-columns: 1fr 1fr; }
+  .profile-layout { grid-template-columns: 1fr; }
+}
+
+/* ── Misc ─── */
+.divider { height: 1px; background: var(--border); margin: 20px 0; }
+.text-red    { color: var(--red2); }
+.text-green  { color: var(--green); }
+.text-amber  { color: var(--amber); }
+.text-muted  { color: var(--text3); }
+.text-mono   { font-family: var(--font-mono); }
+.full-width  { width: 100%; }
+.flex        { display: flex; }
+.flex-center { display: flex; align-items: center; }
+.gap-8       { gap: 8px; }
+.gap-12      { gap: 12px; }
+.mt-8        { margin-top: 8px; }
+.mt-16       { margin-top: 16px; }
+.mt-24       { margin-top: 24px; }
+
+/* ── Scanline animation on login ─── */
+.scanline-wrap { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.scanline {
+  position: absolute; left: 0; right: 0; height: 2px;
+  background: linear-gradient(transparent, rgba(240,62,62,0.08), transparent);
+  animation: scanline 4s linear infinite;
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════
+     SCREEN 1: AUTH
+══════════════════════════════════════════════════ -->
+<div id="screen-auth" class="screen active">
+  <div class="auth-grid"></div>
+  <div class="auth-glow"></div>
+  <div class="scanline-wrap"><div class="scanline"></div></div>
+
+  <div class="auth-box fade-up">
+    <!-- Logo -->
+    <div class="auth-logo">
+      <div class="auth-logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h1>RedTeamGig</h1>
+      <p>AI Safety Talent Marketplace</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="authTab('signin')">Sign In</button>
+      <button class="auth-tab" onclick="authTab('signup')">Create Account</button>
+    </div>
+
+    <!-- Sign In Form -->
+    <div id="auth-signin">
+      <div class="auth-form">
+        <div class="form-field">
+          <label class="label">Email</label>
+          <input id="si-email" type="email" class="input" placeholder="you@example.com">
+        </div>
+        <div class="form-field">
+          <label class="label">Password</label>
+          <input id="si-pass" type="password" class="input" placeholder="••••••••">
+        </div>
+        <button class="btn btn-primary full-width" onclick="signIn()" id="si-btn">
+          <span class="spinner" id="si-spin" style="display:none"></span>
+          Sign In
+        </button>
+        <div class="auth-divider">OR</div>
+        <button class="btn btn-ghost full-width" onclick="demoLogin('red_teamer')">
+          Demo as Red Teamer
+        </button>
+        <button class="btn btn-ghost full-width" onclick="demoLogin('company_client')">
+          Demo as Company
+        </button>
+      </div>
+    </div>
+
+    <!-- Sign Up Form -->
+    <div id="auth-signup" style="display:none">
+      <div class="auth-form">
+        <div class="form-field">
+          <label class="label">I am a...</label>
+          <div class="role-select-row">
+            <div class="role-option selected" id="role-rt" onclick="selectRole('red_teamer')">
+              <div class="role-icon">🛡️</div>
+              <div class="role-name">Red Teamer</div>
+            </div>
+            <div class="role-option" id="role-co" onclick="selectRole('company_client')">
+              <div class="role-icon">🏢</div>
+              <div class="role-name">Company</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="label">Full Name</label>
+          <input id="su-name" type="text" class="input" placeholder="Alex Rivera">
+        </div>
+        <div class="form-field">
+          <label class="label">Email</label>
+          <input id="su-email" type="email" class="input" placeholder="you@example.com">
+        </div>
+        <div class="form-field">
+          <label class="label">Password</label>
+          <input id="su-pass" type="password" class="input" placeholder="8+ characters">
+        </div>
+        <button class="btn btn-primary full-width" onclick="signUp()" id="su-btn">
+          <span class="spinner" id="su-spin" style="display:none"></span>
+          Create Account & Continue
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     SCREEN 2: ONBOARDING (freelancer)
+══════════════════════════════════════════════════ -->
+<div id="screen-onboard" class="screen">
+  <div class="onboard-header">
+    <div class="flex-center gap-12">
+      <div style="font-family:var(--font-mono);font-size:12px;color:var(--red2);letter-spacing:0.08em;">RTG</div>
+      <div style="width:1px;height:20px;background:var(--border)"></div>
+      <div style="font-size:13px;color:var(--text2)">Freelancer Setup</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+      <div class="onboard-progress" id="onboard-progress">
+        <!-- Generated by JS -->
+      </div>
+      <div style="display:flex;gap:0;" id="progress-labels"></div>
+    </div>
+    <button class="btn btn-ghost" onclick="skipOnboarding()" style="font-size:11px">
+      Skip for now
+    </button>
+  </div>
+
+  <div class="onboard-body">
+    <!-- STEP 1: Basic Info -->
+    <div class="onboard-step active" id="step-1">
+      <div class="step-eyebrow">Step 1 of 4</div>
+      <h2 class="step-title">Tell us about<br>yourself</h2>
+      <p class="step-sub">This helps companies find and trust you faster.</p>
+
+      <div class="auth-form">
+        <div class="form-grid-2">
+          <div class="form-field">
+            <label class="label">Display Name</label>
+            <input id="ob-name" type="text" class="input" placeholder="Alex R.">
+          </div>
+          <div class="form-field">
+            <label class="label">Location</label>
+            <input id="ob-location" type="text" class="input" placeholder="New Jersey, USA">
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="label">One-line Bio</label>
+          <input id="ob-bio" type="text" class="input" placeholder="Expert in prompt injection and jailbreak testing...">
+        </div>
+        <div class="form-grid-2">
+          <div class="form-field">
+            <label class="label">GitHub URL</label>
+            <input id="ob-github" type="url" class="input" placeholder="https://github.com/...">
+          </div>
+          <div class="form-field">
+            <label class="label">Portfolio / HackerOne</label>
+            <input id="ob-portfolio" type="url" class="input" placeholder="https://...">
+          </div>
+        </div>
+        <div class="form-grid-2">
+          <div class="form-field">
+            <label class="label">Bugcrowd Profile</label>
+            <input id="ob-bugcrowd" type="url" class="input" placeholder="https://bugcrowd.com/...">
+          </div>
+          <div class="form-field">
+            <label class="label">Immunefi Profile</label>
+            <input id="ob-immunefi" type="url" class="input" placeholder="https://immunefi.com/...">
+          </div>
+        </div>
+      </div>
+
+      <div class="onboard-nav">
+        <div style="font-size:12px;color:var(--text3)">All fields optional — you can edit anytime.</div>
+        <button class="btn btn-primary" onclick="nextStep(2)">
+          Continue <span style="font-size:14px">→</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Skills -->
+    <div class="onboard-step" id="step-2">
+      <div class="step-eyebrow">Step 2 of 4</div>
+      <h2 class="step-title">Your specialties</h2>
+      <p class="step-sub">Select all areas you're comfortable working in. The more you select, the more gigs you'll match.</p>
+
+      <label class="label">Click to select your skills</label>
+      <div class="skill-grid" id="skill-grid">
+        <!-- Generated by JS -->
+      </div>
+
+      <div class="mt-24">
+        <label class="label">Experience Tier</label>
+        <div class="tier-grid">
+          <div class="tier-card" id="tier-entry" onclick="selectTier('entry')">
+            <div class="tier-icon">🌱</div>
+            <div class="tier-name">Entry</div>
+            <div class="tier-desc">0–1 year · Learning the ropes</div>
+          </div>
+          <div class="tier-card selected" id="tier-intermediate" onclick="selectTier('intermediate')">
+            <div class="tier-icon">⚡</div>
+            <div class="tier-name">Intermediate</div>
+            <div class="tier-desc">1–3 years · Proven results</div>
+          </div>
+          <div class="tier-card" id="tier-expert" onclick="selectTier('expert')">
+            <div class="tier-icon">🔥</div>
+            <div class="tier-name">Expert</div>
+            <div class="tier-desc">3+ years · Elite track record</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="onboard-nav">
+        <button class="btn btn-ghost" onclick="nextStep(1)">← Back</button>
+        <button class="btn btn-primary" onclick="nextStep(3)">
+          Continue <span style="font-size:14px">→</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Rates -->
+    <div class="onboard-step" id="step-3">
+      <div class="step-eyebrow">Step 3 of 4</div>
+      <h2 class="step-title">Set your rates</h2>
+      <p class="step-sub">Companies will see your rates before reaching out. You can always update these.</p>
+
+      <div class="auth-form">
+        <div class="form-grid-2">
+          <div class="form-field">
+            <label class="label">Hourly Rate Min (USD)</label>
+            <input id="ob-rate-min" type="number" class="input" placeholder="25">
+          </div>
+          <div class="form-field">
+            <label class="label">Hourly Rate Max (USD)</label>
+            <input id="ob-rate-max" type="number" class="input" placeholder="80">
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="label">Per-Task Rate (USD)</label>
+          <input id="ob-task-rate" type="number" class="input" placeholder="120">
+        </div>
+
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-top:8px;">
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">Market reference</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;justify-content:space-between;font-size:12px;">
+              <span style="color:var(--text3)">Entry level</span>
+              <span style="font-family:var(--font-mono);color:var(--text2)">$15–$30/hr</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;">
+              <span style="color:var(--text3)">Intermediate</span>
+              <span style="font-family:var(--font-mono);color:var(--text2)">$30–$60/hr</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;">
+              <span style="color:var(--text3)">Expert</span>
+              <span style="font-family:var(--font-mono);color:var(--text2)">$60–$120+/hr</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label class="label">Availability</label>
+          <select class="input" id="ob-availability">
+            <option value="full">Full-time available (40+ hrs/week)</option>
+            <option value="part">Part-time (10–20 hrs/week)</option>
+            <option value="weekends">Weekends only</option>
+            <option value="flexible">Project-based / flexible</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="onboard-nav">
+        <button class="btn btn-ghost" onclick="nextStep(2)">← Back</button>
+        <button class="btn btn-primary" onclick="nextStep(4)">
+          Continue <span style="font-size:14px">→</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 4: NDA + Finish -->
+    <div class="onboard-step" id="step-4">
+      <div class="step-eyebrow">Step 4 of 4</div>
+      <h2 class="step-title">Almost there!</h2>
+      <p class="step-sub">A few final preferences and you're in the marketplace.</p>
+
+      <div class="auth-form">
+        <div class="form-field">
+          <label class="label">Languages spoken</label>
+          <input id="ob-langs" type="text" class="input" placeholder="English, Spanish, Japanese...">
+        </div>
+        <div class="form-field">
+          <label class="label">Certifications (comma separated)</label>
+          <input id="ob-certs" type="text" class="input" placeholder="OWASP LLM Top 10, CEH, OSCP...">
+        </div>
+
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;display:flex;flex-direction:column;gap:14px;">
+          <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;">
+            <input type="checkbox" id="ob-nda" style="margin-top:2px;accent-color:var(--red);">
+            <div>
+              <div style="font-size:13px;color:var(--text);font-weight:500;margin-bottom:2px;">I'm willing to sign NDAs</div>
+              <div style="font-size:12px;color:var(--text3)">Unlocks higher-paying confidential gigs from companies like Anthropic and OpenAI.</div>
+            </div>
+          </label>
+          <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;">
+            <input type="checkbox" id="ob-usonly" style="margin-top:2px;accent-color:var(--red);">
+            <div>
+              <div style="font-size:13px;color:var(--text);font-weight:500;margin-bottom:2px;">US-only gigs preferred</div>
+              <div style="font-size:12px;color:var(--text3)">Some companies require testers based in the US for compliance reasons.</div>
+            </div>
+          </label>
+        </div>
+
+        <div style="background:var(--red-dim);border:1px solid rgba(240,62,62,0.2);border-radius:var(--radius-sm);padding:16px;">
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--red2);margin-bottom:6px;letter-spacing:0.06em;">YOU UNLOCK:</div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2)">
+              <span style="color:var(--green)">✓</span> Access to 50+ live gigs immediately
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2)">
+              <span style="color:var(--green)">✓</span> AI matching with Mission Control
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2)">
+              <span style="color:var(--green)">✓</span> Profile visible to top AI companies
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2)">
+              <span style="color:var(--green)">✓</span> Reliability score building from day one
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="onboard-nav">
+        <button class="btn btn-ghost" onclick="nextStep(3)">← Back</button>
+        <button class="btn btn-green" onclick="finishOnboarding()" id="finish-btn">
+          <span class="spinner" id="finish-spin" style="display:none"></span>
+          Launch My Profile 🚀
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     SCREEN 3: DASHBOARD
+══════════════════════════════════════════════════ -->
+<div id="screen-dashboard" class="screen">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-mark">RT</div>
+      <div class="sidebar-wordmark">RedTeamGig</div>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sb-avatar">AR</div>
+      <div class="sidebar-name" id="sb-name">Alex Rivera</div>
+      <div class="sidebar-role" id="sb-role">Red Teamer</div>
+      <div class="sidebar-scores">
+        <div class="score-chip">
+          <div class="score-val" id="sb-rely">—</div>
+          <div class="score-lbl">Rely</div>
+        </div>
+        <div class="score-chip">
+          <div class="score-val" id="sb-effic">—</div>
+          <div class="score-lbl">Effic</div>
+        </div>
+        <div class="score-chip">
+          <div class="score-val" id="sb-tasks">0</div>
+          <div class="score-lbl">Tasks</div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <button class="nav-item active" onclick="showView('hub')">
+        <span class="nav-icon">⚡</span> Mission Hub
+        <span class="nav-count" id="nav-count-hub">0</span>
+      </button>
+      <button class="nav-item" onclick="showView('applications')">
+        <span class="nav-icon">📋</span> Applications
+        <span class="nav-count" id="nav-count-apps">0</span>
+      </button>
+
+      <div class="nav-section-label">Profile</div>
+      <button class="nav-item" onclick="showView('profile')">
+        <span class="nav-icon">🛡</span> My Profile
+      </button>
+      <button class="nav-item" onclick="showView('settings')">
+        <span class="nav-icon">⚙️</span> Settings
+      </button>
+
+      <div class="nav-section-label">Learn</div>
+      <button class="nav-item" onclick="showView('resources')">
+        <span class="nav-icon">📚</span> Resources
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div style="font-size:11px;color:var(--text3)">
+        <span class="online-dot"></span>
+        System online
+      </div>
+      <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-top:4px;letter-spacing:0.06em;">
+        v2.0 • redteamgig.com
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">Mission Hub</div>
+      <div style="flex:1"></div>
+      <div class="topbar-right">
+        <div class="search-bar">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="Search gigs..." id="gig-search" oninput="filterGigs()">
+        </div>
+        <div style="display:flex;gap:6px;" id="filter-row">
+          <button class="btn btn-ghost" style="padding:6px 12px;" onclick="filterBySource('all')" id="f-all">All</button>
+          <button class="btn btn-ghost" style="padding:6px 12px;" onclick="filterBySource('internal')" id="f-int">Internal</button>
+          <button class="btn btn-ghost" style="padding:6px 12px;" onclick="filterBySource('external')" id="f-ext">Partner ↗</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- HUB VIEW -->
+      <div class="view active" id="view-hub">
+        <!-- Stats -->
+        <div class="stats-row" id="stats-row">
+          <div class="stat-card">
+            <div class="stat-val" id="stat-gigs">—</div>
+            <div class="stat-label">Live gigs available</div>
+            <div class="stat-delta">↑ Updated hourly</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-val green" id="stat-match">—</div>
+            <div class="stat-label">AI-matched for you</div>
+            <div class="stat-delta">Based on your skills</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-val blue" id="stat-earn">$0</div>
+            <div class="stat-label">Potential earnings</div>
+            <div class="stat-delta">This week's gigs</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-val" id="stat-apps">0</div>
+            <div class="stat-label">My applications</div>
+            <div class="stat-delta">Active this month</div>
+          </div>
+        </div>
+
+        <!-- Gigs -->
+        <div class="section-header">
+          <div>
+            <div class="section-title">Available Gigs</div>
+            <div class="section-sub" id="gig-subtitle">Loading opportunities...</div>
+          </div>
+        </div>
+        <div class="gig-grid" id="gig-grid">
+          <!-- Skeleton loaders -->
+          <div class="card"><div class="skeleton" style="height:20px;width:60%;margin-bottom:10px;"></div><div class="skeleton" style="height:14px;width:40%;"></div></div>
+          <div class="card"><div class="skeleton" style="height:20px;width:70%;margin-bottom:10px;"></div><div class="skeleton" style="height:14px;width:50%;"></div></div>
+          <div class="card"><div class="skeleton" style="height:20px;width:55%;margin-bottom:10px;"></div><div class="skeleton" style="height:14px;width:45%;"></div></div>
+          <div class="card"><div class="skeleton" style="height:20px;width:65%;margin-bottom:10px;"></div><div class="skeleton" style="height:14px;width:35%;"></div></div>
+        </div>
+      </div>
+
+      <!-- APPLICATIONS VIEW -->
+      <div class="view" id="view-applications">
+        <div class="section-header">
+          <div>
+            <div class="section-title">My Applications</div>
+            <div class="section-sub">Track the status of every gig you've applied to</div>
+          </div>
+        </div>
+        <div class="card" style="padding:0;overflow:hidden;">
+          <table class="app-table" id="app-table">
+            <thead>
+              <tr>
+                <th>Gig</th>
+                <th>Company</th>
+                <th>Applied</th>
+                <th>Rate</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="app-tbody">
+              <tr><td colspan="5"><div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">No applications yet</div><p>Apply to gigs from the Mission Hub to see them here.</p></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PROFILE VIEW -->
+      <div class="view" id="view-profile">
+        <div class="section-header">
+          <div class="section-title">My Profile</div>
+          <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+        </div>
+        <div class="profile-layout">
+          <!-- Left: profile card -->
+          <div>
+            <div class="profile-card-main">
+              <div class="profile-header-bg"></div>
+              <div class="profile-card-body">
+                <div class="profile-av" id="profile-av">AR</div>
+                <div class="profile-name" id="profile-display-name">Loading...</div>
+                <div class="profile-handle mono text-muted" id="profile-handle">@loading</div>
+                <div style="margin-top:12px;">
+                  <span id="profile-tier-badge" class="badge badge-red">Intermediate</span>
+                  <span id="profile-nda-badge" class="badge badge-gray" style="margin-left:6px;">No NDA</span>
+                </div>
+                <div class="profile-scores">
+                  <div class="score-chip" style="padding:10px;">
+                    <div class="score-val" id="p-rely-val">—%</div>
+                    <div class="score-lbl">Reliability</div>
+                  </div>
+                  <div class="score-chip" style="padding:10px;">
+                    <div class="score-val" id="p-effic-val">—%</div>
+                    <div class="score-lbl">Efficiency</div>
+                  </div>
+                </div>
+                <div class="profile-section">
+                  <div class="profile-section-title">Skills</div>
+                  <div style="display:flex;flex-wrap:wrap;gap:6px;" id="profile-skills-display"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: edit form -->
+          <div class="card">
+            <div class="settings-section">
+              <div class="settings-section-title">Basic Info</div>
+              <div class="settings-grid">
+                <div class="form-field">
+                  <label class="label">Display Name</label>
+                  <input type="text" class="input" id="p-name">
+                </div>
+                <div class="form-field">
+                  <label class="label">Location</label>
+                  <input type="text" class="input" id="p-location">
+                </div>
+              </div>
+              <div class="form-field mt-16">
+                <label class="label">Bio</label>
+                <textarea class="input" id="p-bio" rows="3"></textarea>
+              </div>
+            </div>
+            <div class="settings-section">
+              <div class="settings-section-title">Links</div>
+              <div class="settings-grid">
+                <div class="form-field">
+                  <label class="label">GitHub</label>
+                  <input type="url" class="input" id="p-github">
+                </div>
+                <div class="form-field">
+                  <label class="label">HackerOne / Portfolio</label>
+                  <input type="url" class="input" id="p-portfolio">
+                </div>
+                <div class="form-field">
+                  <label class="label">Bugcrowd</label>
+                  <input type="url" class="input" id="p-bugcrowd">
+                </div>
+                <div class="form-field">
+                  <label class="label">Immunefi</label>
+                  <input type="url" class="input" id="p-immunefi">
+                </div>
+              </div>
+            </div>
+            <div class="settings-section">
+              <div class="settings-section-title">Rates (USD)</div>
+              <div class="settings-grid">
+                <div class="form-field">
+                  <label class="label">Hourly Min</label>
+                  <input type="number" class="input" id="p-rate-min">
+                </div>
+                <div class="form-field">
+                  <label class="label">Hourly Max</label>
+                  <input type="number" class="input" id="p-rate-max">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS VIEW -->
+      <div class="view" id="view-settings">
+        <div class="section-header">
+          <div class="section-title">Settings</div>
+        </div>
+        <div class="card" style="max-width:500px;">
+          <div class="settings-section">
+            <div class="settings-section-title">Account</div>
+            <div class="form-field">
+              <label class="label">Email</label>
+              <input type="email" class="input" id="s-email" disabled style="opacity:0.5;">
+            </div>
+            <div class="form-field mt-16">
+              <label class="label">New Password</label>
+              <input type="password" class="input" placeholder="Leave blank to keep current">
+            </div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-section-title">Preferences</div>
+            <div style="display:flex;flex-direction:column;gap:14px;">
+              <label style="display:flex;align-items:center;justify-content:space-between;">
+                <div>
+                  <div style="font-size:13px;color:var(--text);">Available for hire</div>
+                  <div style="font-size:12px;color:var(--text3)">Show your profile in directory</div>
+                </div>
+                <div class="toggle" id="toggle-hire" onclick="toggleSetting('hire')" style="cursor:pointer;width:40px;height:22px;background:var(--green);border-radius:11px;position:relative;transition:background 0.2s;">
+                  <div style="position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:right 0.2s;"></div>
+                </div>
+              </label>
+              <label style="display:flex;align-items:center;justify-content:space-between;">
+                <div>
+                  <div style="font-size:13px;color:var(--text);">Email notifications</div>
+                  <div style="font-size:12px;color:var(--text3)">New gig matches, application updates</div>
+                </div>
+                <div class="toggle" id="toggle-notif" onclick="toggleSetting('notif')" style="cursor:pointer;width:40px;height:22px;background:var(--green);border-radius:11px;position:relative;transition:background 0.2s;">
+                  <div style="position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:right 0.2s;"></div>
+                </div>
+              </label>
+            </div>
+          </div>
+          <button class="btn btn-primary" style="width:100%;justify-content:center;">Save Settings</button>
+        </div>
+      </div>
+
+      <!-- RESOURCES VIEW -->
+      <div class="view" id="view-resources">
+        <div class="section-header">
+          <div class="section-title">Resources</div>
+          <div class="section-sub">Guides, references and tools for AI red teamers</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
+          <div class="gig-card" onclick="aiAsk('Tell me about OWASP LLM Top 10 vulnerabilities')">
+            <div style="font-size:28px;margin-bottom:8px;">📋</div>
+            <div style="font-weight:600;color:var(--text);margin-bottom:4px;">OWASP LLM Top 10</div>
+            <div style="font-size:12px;color:var(--text3)">Quick reference guide to the most critical LLM vulnerabilities.</div>
+            <div style="font-family:var(--font-mono);font-size:10px;color:var(--red2);margin-top:10px;">Ask AI →</div>
+          </div>
+          <div class="gig-card" onclick="aiAsk('How do I evaluate a bug bounty scope? What should I look for?')">
+            <div style="font-size:28px;margin-bottom:8px;">🎯</div>
+            <div style="font-weight:600;color:var(--text);margin-bottom:4px;">Bounty Scope Checklist</div>
+            <div style="font-size:12px;color:var(--text3)">How to evaluate if a bug bounty scope is well-defined.</div>
+            <div style="font-family:var(--font-mono);font-size:10px;color:var(--red2);margin-top:10px;">Ask AI →</div>
+          </div>
+          <div class="gig-card" onclick="aiAsk('What are the best practices for prompt injection testing?')">
+            <div style="font-size:28px;margin-bottom:8px;">💉</div>
+            <div style="font-weight:600;color:var(--text);margin-bottom:4px;">Prompt Injection 101</div>
+            <div style="font-size:12px;color:var(--text3)">Best practices and methodologies for injection testing.</div>
+            <div style="font-family:var(--font-mono);font-size:10px;color:var(--red2);margin-top:10px;">Ask AI →</div>
+          </div>
+          <div class="gig-card" onclick="aiAsk('What are current market rates for AI red teaming work?')">
+            <div style="font-size:28px;margin-bottom:8px;">💰</div>
+            <div style="font-weight:600;color:var(--text);margin-bottom:4px;">Market Rates Guide</div>
+            <div style="font-size:12px;color:var(--text3)">Current pay rates across skill levels and gig types.</div>
+            <div style="font-family:var(--font-mono);font-size:10px;color:var(--red2);margin-top:10px;">Ask AI →</div>
+          </div>
+          <div class="gig-card" onclick="aiAsk('How do I write a strong cover note for an AI red teaming gig?')">
+            <div style="font-size:28px;margin-bottom:8px;">✍️</div>
+            <div style="font-weight:600;color:var(--text);margin-bottom:4px;">Cover Note Templates</div>
+            <div style="font-size:12px;color:var(--text3)">How to write a cover note that gets you hired.</div>
+            <div style="font-family:var(--font-mono);font-size:10px;color:var(--red2);margin-top:10px;">Ask AI →</div>
+          </div>
+          <div class="gig-card" onclick="aiAsk('What platforms should I use for AI red teaming work besides RedTeamGig?')">
+            <div style="font-size:28px;margin-bottom:8px;">🌐</div>
+            <div style="font-weight:600;color:var(--text);margin-bottom:4px;">Platform Comparison</div>
+            <div style="font-size:12px;color:var(--text3)">Mercor, Scale, Surge, Appen, Immunefi compared.</div>
+            <div style="font-family:var(--font-mono);font-size:10px;color:var(--red2);margin-top:10px;">Ask AI →</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+
+  <!-- AI Assistant -->
+  <div class="ai-panel">
+    <div class="ai-window" id="ai-window">
+      <div class="ai-header">
+        <div class="ai-header-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="ai-header-info">
+          <div class="ai-header-title">Mission Control AI</div>
+          <div class="ai-header-status">
+            <span class="online-dot" style="width:5px;height:5px;margin-right:3px;"></span>
+            Online · RedTeamGig assistant
+          </div>
+        </div>
+        <button class="ai-close" onclick="toggleAI()">✕</button>
+      </div>
+
+      <div class="ai-messages" id="ai-messages">
+        <div class="ai-msg assistant fade-in">
+          <div class="ai-msg-avatar">AI</div>
+          <div class="ai-msg-bubble">
+            Hey! I'm your Mission Control assistant. I can help you find the right gigs, understand bounty scopes, prep for applications, and navigate the marketplace. What can I help with?
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-suggestions" id="ai-suggestions">
+        <button class="ai-sugg-chip" onclick="aiAsk('What gigs match my skills?')">Match my skills</button>
+        <button class="ai-sugg-chip" onclick="aiAsk('How do I improve my profile score?')">Boost my score</button>
+        <button class="ai-sugg-chip" onclick="aiAsk('What is the OWASP LLM Top 10?')">OWASP LLM Top 10</button>
+        <button class="ai-sugg-chip" onclick="aiAsk('How do I write a good cover note?')">Cover notes</button>
+      </div>
+
+      <div class="ai-input-row">
+        <input type="text" class="ai-input" id="ai-input" placeholder="Ask about gigs, rates, scope..."
+               onkeydown="if(event.key==='Enter')sendAI()">
+        <button class="ai-send" onclick="sendAI()" id="ai-send-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2L15 22 11 13 2 9l20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <button class="ai-bubble" onclick="toggleAI()" id="ai-bubble">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div class="ai-bubble-ping"></div>
+    </button>
+  </div>
+</div>
+
+<!-- Apply Modal -->
+<div id="apply-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center;">
+  <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:28px;width:100%;max-width:480px;margin:0 16px;animation:fadeUp 0.25s ease;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <div style="font-family:var(--font-head);font-size:18px;font-weight:700;color:var(--text);">Apply for Gig</div>
+      <button onclick="closeApply()" style="background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;">✕</button>
+    </div>
+    <div id="apply-gig-title" style="font-size:14px;color:var(--text2);margin-bottom:20px;padding:12px;background:var(--bg3);border-radius:var(--radius-sm);border:1px solid var(--border);"></div>
+    <div class="auth-form">
+      <div class="form-field">
+        <label class="label">Cover Note <span style="color:var(--text3);font-weight:400;text-transform:none;">(max 150 words)</span></label>
+        <textarea class="input" id="apply-cover" rows="4" placeholder="Why are you a great fit for this gig? Be specific about relevant experience..."></textarea>
+      </div>
+      <div class="form-field">
+        <label class="label">Proposed Rate (USD / task)</label>
+        <input type="number" class="input" id="apply-rate" placeholder="120">
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-ghost" onclick="closeApply()" style="flex:1;justify-content:center;">Cancel</button>
+        <button class="btn btn-primary" onclick="submitApply()" id="apply-btn" style="flex:2;justify-content:center;">
+          <span class="spinner" id="apply-spin" style="display:none"></span>
+          Submit Application
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-container" id="toasts"></div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────
+const SUPA_URL = 'https://cnhmfxwyqtpbmjadlwty.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaG1meHd5cXRwYm1qYWRsd3R5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1MzA1NTksImV4cCI6MjA5MjEwNjU1OX0.bTTVehjz_LQLoTd0xW-FMqLdrB7nnKUlU163vLWcdrA';
+const db = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+
+// ── AI SYSTEM PROMPT (strictly scoped) ───────────────────────
+const AI_SYSTEM = `You are the Mission Control assistant embedded inside RedTeamGig — an AI safety and cybersecurity freelance marketplace.
+
+YOUR SCOPE — only answer questions about:
+- The RedTeamGig platform: how it works, how to sign up, profile tips, scoring system
+- AI red teaming gigs: jailbreaking, prompt injection, bias auditing, agentic attacks, RAG exploitation, data poisoning
+- Bug bounties: understanding scope, rules of engagement, payout structures (Immunefi, HackerOne, Bugcrowd)
+- Gig application advice: cover notes, rate negotiation, skill positioning
+- AI safety platforms: Mercor, Scale AI, Surge AI, Appen, Anthropic, OpenAI — comparing gig types
+- Career guidance for AI red teamers: skill building, certifications, OWASP LLM Top 10
+
+YOU MUST POLITELY DECLINE anything outside this scope: personal advice, general coding help, creative writing, politics, entertainment, etc.
+
+TONE: Concise, professional, helpful. Use markdown lightly. Always end with a practical tip or next step.`;
+
+// ── STATE ─────────────────────────────────────────────────────
+let state = {
+  user:        null,
+  profile:     null,
+  gigs:        [],
+  filteredGigs:[],
+  applications:[],
+  currentStep: 1,
+  selectedRole:'red_teamer',
+  selectedSkills: [],
+  selectedTier: 'intermediate',
+  currentGigId: null,
+  aiOpen: false,
+  filterSource: 'all',
+};
+
+const SKILLS = [
+  'Jailbreaking','Prompt Injection','Bias Auditing',
+  'Agentic Systems','Data Poisoning','RAG Exploitation',
+  'Model Extraction','Adversarial Inputs','LLM Fuzzing',
+  'Tool-call Attacks','Indirect Injection','RLHF Evaluation',
+  'Content Safety','Red Team Planning','Multilingual Testing',
+];
+
+const SOURCE_ICONS = {
+  'internal':           '🎯',
+  'aggregated_mercor':  'M',
+  'aggregated_scale':   'S',
+  'aggregated_appen':   'A',
+  'aggregated_surge':   '⚡',
+  'aggregated_other':   '🌐',
+};
+
+const TIER_COLORS = {
+  entry:        'badge-green',
+  intermediate: 'badge-amber',
+  expert:       'badge-red',
+  elite:        'badge-red',
+};
+
+// ── UTILS ─────────────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function toast(msg, type='info') {
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = msg;
+  document.getElementById('toasts').appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+function setBtn(id, loading, text) {
+  const btn = document.getElementById(id);
+  const spin = document.getElementById(id.replace('-btn','-spin').replace('btn','spin'));
+  if (btn) btn.disabled = loading;
+  if (spin) spin.style.display = loading ? 'inline-block' : 'none';
+}
+
+function initSkillGrid() {
+  const g = document.getElementById('skill-grid');
+  g.innerHTML = SKILLS.map(s => `
+    <div class="skill-pill ${state.selectedSkills.includes(s)?'selected':''}"
+         onclick="toggleSkill('${s}')">${s}</div>
+  `).join('');
+}
+
+function initProgressBar() {
+  const steps = ['Basics','Skills','Rates','Launch'];
+  const prog = document.getElementById('onboard-progress');
+  prog.innerHTML = steps.map((s,i) => {
+    const n = i+1;
+    const isDone   = n < state.currentStep;
+    const isActive = n === state.currentStep;
+    return `
+      ${i > 0 ? `<div class="progress-line ${isDone?'done':''}"></div>` : ''}
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+        <div class="progress-dot ${isActive?'active':''} ${isDone?'done':''}">${isDone?'✓':n}</div>
+        <div class="progress-label" style="color:${isActive?'var(--text2)':'var(--text3)'}">${s}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ── AUTH ──────────────────────────────────────────────────────
+function authTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('auth-signin').style.display = tab==='signin' ? 'block' : 'none';
+  document.getElementById('auth-signup').style.display = tab==='signup' ? 'block' : 'none';
+}
+
+function selectRole(role) {
+  state.selectedRole = role;
+  document.getElementById('role-rt').classList.toggle('selected', role==='red_teamer');
+  document.getElementById('role-co').classList.toggle('selected', role==='company_client');
+}
+
+async function signIn() {
+  const email = document.getElementById('si-email').value.trim();
+  const pass  = document.getElementById('si-pass').value;
+  if (!email || !pass) { toast('Please fill in email and password', 'error'); return; }
+  setBtn('si-btn', true);
+  const { data, error } = await db.auth.signInWithPassword({ email, password: pass });
+  setBtn('si-btn', false, 'Sign In');
+  if (error) { toast(error.message, 'error'); return; }
+  state.user = data.user;
+  await loadProfile();
+  enterDashboard();
+}
+
+async function signUp() {
+  const name  = document.getElementById('su-name').value.trim();
+  const email = document.getElementById('su-email').value.trim();
+  const pass  = document.getElementById('su-pass').value;
+  if (!name || !email || !pass) { toast('Please fill in all fields', 'error'); return; }
+  if (pass.length < 8) { toast('Password must be 8+ characters', 'error'); return; }
+  setBtn('su-btn', true);
+  const { data, error } = await db.auth.signUp({
+    email, password: pass,
+    options: { data: { display_name: name, role: state.selectedRole } }
+  });
+  setBtn('su-btn', false);
+  if (error) { toast(error.message, 'error'); return; }
+  state.user = data.user;
+  toast('Account created! Setting up your profile...', 'success');
+  // For company_client — go straight to dashboard
+  if (state.selectedRole === 'company_client') {
+    await loadProfile(); enterDashboard(); return;
+  }
+  // For red_teamer — show onboarding
+  state.currentStep = 1;
+  initSkillGrid();
+  initProgressBar();
+  showScreen('screen-onboard');
+}
+
+async function demoLogin(role) {
+  state.selectedRole = role;
+  // Fake demo profile
+  state.user = { id: 'demo-' + role, email: 'demo@redteamgig.com' };
+  state.profile = {
+    id: 'demo', role,
+    display_name: role === 'red_teamer' ? 'Alex Rivera' : 'Anthropic Security',
+    location: 'New Jersey, USA',
+    bio: role === 'red_teamer' ? 'Expert in prompt injection and agentic system attacks.' : 'Leading AI safety company.',
+    skill_level: 'intermediate',
+    reliability_score: 94, efficiency_score: 88,
+    total_tasks_done: 12,
+    verified_skills: ['Jailbreaking','Prompt Injection','Agentic Systems'],
+    github_url: 'https://github.com/demo',
+    is_nda_ready: true,
+    hourly_rate_min: 40, hourly_rate_max: 80,
+  };
+  enterDashboard();
+}
+
+// ── PROFILE ───────────────────────────────────────────────────
+async function loadProfile() {
+  if (!state.user || state.user.id.startsWith('demo')) return;
+  const { data } = await db.from('profiles').select('*').eq('id', state.user.id).single();
+  if (data) state.profile = data;
+}
+
+function enterDashboard() {
+  const p = state.profile;
+  if (!p) return;
+  // Sidebar
+  const initials = (p.display_name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('sb-avatar').textContent    = initials;
+  document.getElementById('sb-name').textContent      = p.display_name || 'User';
+  document.getElementById('sb-role').textContent      = p.role === 'red_teamer' ? 'Red Teamer' : 'Company';
+  document.getElementById('sb-rely').textContent      = p.reliability_score ? Math.round(p.reliability_score)+'%' : '—';
+  document.getElementById('sb-effic').textContent     = p.efficiency_score  ? Math.round(p.efficiency_score)+'%'  : '—';
+  document.getElementById('sb-tasks').textContent     = p.total_tasks_done || 0;
+  // Profile view
+  document.getElementById('profile-av').textContent   = initials;
+  document.getElementById('profile-display-name').textContent = p.display_name || '';
+  document.getElementById('profile-handle').textContent = '@' + (p.display_name||'user').toLowerCase().replace(/\s+/g,'');
+  document.getElementById('p-rely-val').textContent   = p.reliability_score ? Math.round(p.reliability_score)+'%' : '—%';
+  document.getElementById('p-effic-val').textContent  = p.efficiency_score  ? Math.round(p.efficiency_score)+'%'  : '—%';
+  document.getElementById('p-name').value             = p.display_name || '';
+  document.getElementById('p-location').value         = p.location || '';
+  document.getElementById('p-bio').value              = p.bio || '';
+  document.getElementById('p-github').value           = p.github_url || '';
+  document.getElementById('p-portfolio').value        = p.portfolio_url || '';
+  document.getElementById('p-bugcrowd').value         = p.bugcrowd_url || '';
+  document.getElementById('p-immunefi').value         = p.immunefi_url || '';
+  document.getElementById('p-rate-min').value         = p.hourly_rate_min || '';
+  document.getElementById('p-rate-max').value         = p.hourly_rate_max || '';
+  if (document.getElementById('s-email')) document.getElementById('s-email').value = state.user?.email || '';
+  // Tier badge
+  const tierBadge = document.getElementById('profile-tier-badge');
+  tierBadge.textContent = (p.skill_level||'entry').charAt(0).toUpperCase()+(p.skill_level||'entry').slice(1);
+  tierBadge.className   = 'badge '+(TIER_COLORS[p.skill_level]||'badge-gray');
+  // NDA badge
+  const ndaBadge = document.getElementById('profile-nda-badge');
+  ndaBadge.textContent  = p.is_nda_ready ? 'NDA Ready' : 'No NDA';
+  ndaBadge.className    = 'badge ' + (p.is_nda_ready ? 'badge-green' : 'badge-gray');
+  // Skills
+  const skillsEl = document.getElementById('profile-skills-display');
+  skillsEl.innerHTML = (p.verified_skills||[]).map(s=>`<span class="tag">${s}</span>`).join('');
+  showScreen('screen-dashboard');
+  loadGigs();
+  loadApplications();
+}
+
+// ── ONBOARDING ────────────────────────────────────────────────
+function nextStep(n) {
+  document.getElementById(`step-${state.currentStep}`).classList.remove('active');
+  state.currentStep = n;
+  document.getElementById(`step-${n}`).classList.add('active');
+  initProgressBar();
+  window.scrollTo(0,0);
+}
+
+function toggleSkill(s) {
+  const idx = state.selectedSkills.indexOf(s);
+  if (idx > -1) state.selectedSkills.splice(idx,1);
+  else state.selectedSkills.push(s);
+  initSkillGrid();
+}
+
+function selectTier(tier) {
+  state.selectedTier = tier;
+  ['entry','intermediate','expert'].forEach(t =>
+    document.getElementById('tier-'+t).classList.toggle('selected', t===tier)
+  );
+}
+
+function skipOnboarding() { enterDashboard(); }
+
+async function finishOnboarding() {
+  setBtn('finish-btn', true);
+  const payload = {
+    display_name:   document.getElementById('ob-name').value.trim() || state.profile?.display_name,
+    location:       document.getElementById('ob-location').value.trim(),
+    bio:            document.getElementById('ob-bio').value.trim(),
+    github_url:     document.getElementById('ob-github').value.trim(),
+    portfolio_url:  document.getElementById('ob-portfolio').value.trim(),
+    bugcrowd_url:   document.getElementById('ob-bugcrowd').value.trim(),
+    immunefi_url:   document.getElementById('ob-immunefi').value.trim(),
+    verified_skills:state.selectedSkills,
+    skill_level:    state.selectedTier,
+    hourly_rate_min:parseFloat(document.getElementById('ob-rate-min').value)||null,
+    hourly_rate_max:parseFloat(document.getElementById('ob-rate-max').value)||null,
+    per_task_rate:  parseFloat(document.getElementById('ob-task-rate').value)||null,
+    languages_spoken: document.getElementById('ob-langs').value.split(',').map(s=>s.trim()).filter(Boolean),
+    certifications: document.getElementById('ob-certs').value.split(',').map(s=>s.trim()).filter(Boolean),
+    is_nda_ready:   document.getElementById('ob-nda').checked,
+  };
+  // Save to Supabase if real user
+  if (state.user && !state.user.id.startsWith('demo')) {
+    await db.from('profiles').upsert({ id: state.user.id, ...payload });
+    await loadProfile();
+  } else {
+    // Demo mode
+    state.profile = { ...state.profile, ...payload };
+  }
+  setBtn('finish-btn', false);
+  toast('Profile created! Welcome to RedTeamGig 🚀', 'success');
+  enterDashboard();
+}
+
+// ── DASHBOARD NAV ─────────────────────────────────────────────
+const VIEW_TITLES = {
+  hub:'Mission Hub', applications:'My Applications',
+  profile:'My Profile', settings:'Settings', resources:'Resources'
+};
+
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.getElementById('topbar-title').textContent = VIEW_TITLES[id] || id;
+  // Show/hide filter row
+  document.getElementById('filter-row').style.display = id==='hub' ? 'flex' : 'none';
+}
+
+// ── GIGS ──────────────────────────────────────────────────────
+async function loadGigs() {
+  const { data, error } = await db
+    .from('gigs').select('*')
+    .eq('status','active')
+    .order('created_at', { ascending: false })
+    .limit(20);
+
+  if (error || !data) {
+    // Demo gigs fallback
+    state.gigs = getDemoGigs();
+  } else if (data.length === 0) {
+    state.gigs = getDemoGigs();
+  } else {
+    state.gigs = data;
+  }
+
+  state.filteredGigs = [...state.gigs];
+  renderGigs();
+  updateStats();
+}
+
+function getDemoGigs() {
+  return [
+    { id:'d1', source_type:'aggregated_mercor', status:'active', title:'AI Red Teamer — Adversarial Testing (EN/JP)', tags:['Jailbreaking','Multilingual','Intermediate'], skill_level:'intermediate', pay_min_usd:20, pay_max_usd:50, pay_type:'hourly', external_url:'https://work.mercor.com', external_source:'Mercor', apply_count:14, view_count:87 },
+    { id:'d2', source_type:'internal', status:'active', title:'LLM Prompt Injection Tester for Production System', tags:['Prompt Injection','Expert','Agentic'], skill_level:'expert', pay_min_usd:80, pay_max_usd:150, pay_type:'hourly', apply_count:3, view_count:21 },
+    { id:'d3', source_type:'aggregated_scale', status:'active', title:'LLM Safety Evaluator — Bias & Harm Detection', tags:['Bias Auditing','Entry','Content Safety'], skill_level:'entry', pay_min_usd:25, pay_max_usd:40, pay_type:'hourly', external_url:'https://scale.com/jobs', external_source:'Scale AI', apply_count:28, view_count:142 },
+    { id:'d4', source_type:'internal', status:'active', title:'Claude Agentic Pipeline Red Team — Tool-Call Attacks', tags:['Agentic Systems','Expert','Claude API'], skill_level:'expert', pay_min_usd:100, pay_max_usd:180, pay_type:'hourly', apply_count:6, view_count:44 },
+    { id:'d5', source_type:'aggregated_surge', status:'active', title:'Multi-turn Jailbreak Tester — GPT-4 & Claude', tags:['Jailbreaking','Expert','Multi-turn'], skill_level:'expert', pay_min_usd:30, pay_max_usd:80, pay_type:'hourly', external_url:'https://surgehq.ai', external_source:'Surge AI', apply_count:19, view_count:93 },
+    { id:'d6', source_type:'internal', status:'active', title:'RAG Pipeline Security Audit — Vector DB Poisoning', tags:['RAG Exploitation','Data Poisoning','Expert'], skill_level:'expert', pay_min_usd:120, pay_max_usd:200, pay_type:'task', apply_count:2, view_count:18 },
+  ];
+}
+
+function renderGigs() {
+  const grid = document.getElementById('gig-grid');
+  const gigs = state.filteredGigs;
+  document.getElementById('gig-subtitle').textContent = `${gigs.length} opportunities found`;
+  document.getElementById('nav-count-hub').textContent = gigs.length;
+
+  if (gigs.length === 0) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:span 2"><div class="empty-state-icon">🔍</div><div class="empty-state-title">No gigs match</div><p>Try adjusting your filters.</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = gigs.map(g => {
+    const isExt = g.source_type !== 'internal';
+    const pay   = g.pay_min_usd ? `$${g.pay_min_usd}–$${g.pay_max_usd}/${g.pay_type==='hourly'?'hr':'task'}` : 'Negotiable';
+    const icon  = SOURCE_ICONS[g.source_type] || '🌐';
+    const tags  = (g.tags||[]).slice(0,3).map(t=>`<span class="tag">${t}</span>`).join('');
+    const fitPct= calcFit(g);
+    const tierCls = TIER_COLORS[g.skill_level] || 'badge-gray';
+
+    return `
+    <div class="gig-card" onclick="openApply('${g.id}','${escHtml(g.title)}','${isExt}','${g.external_url||''}')">
+      <div class="gig-card-top">
+        <div class="gig-source-icon">${icon.length>1?`<span style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--text2)">${icon}</span>`:icon}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;gap:6px;margin-bottom:5px;flex-wrap:wrap;">
+            ${isExt?'<span class="badge badge-partner">↗ Partner</span>':'<span class="badge badge-green">Internal</span>'}
+            <span class="badge ${tierCls}">${g.skill_level||'entry'}</span>
+          </div>
+          <div class="gig-title">${escHtml(g.title)}</div>
+        </div>
+      </div>
+      <div class="gig-meta">
+        <span class="gig-pay">${pay}</span>
+        ${g.external_source?`<span style="font-family:var(--font-mono);font-size:10px;color:var(--text3);">${g.external_source}</span>`:''}
+      </div>
+      <div class="gig-tags">${tags}</div>
+      <div class="gig-footer">
+        <div class="gig-stats">
+          <span>${g.apply_count||0} applied</span>
+          <span>${g.view_count||0} views</span>
+        </div>
+        <div class="fit-bar">
+          <span>Fit</span>
+          <div class="fit-track">
+            <div class="fit-fill" style="width:${fitPct}%"></div>
+          </div>
+          <span style="color:${fitPct>70?'var(--green)':fitPct>40?'var(--amber)':'var(--text3)'}">${fitPct}%</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function calcFit(gig) {
+  if (!state.profile?.verified_skills?.length) return Math.floor(30+Math.random()*50);
+  const skills = state.profile.verified_skills || [];
+  const tags   = gig.tags || [];
+  const matches = tags.filter(t => skills.some(s => s.toLowerCase().includes(t.toLowerCase()) || t.toLowerCase().includes(s.toLowerCase())));
+  const base = tags.length > 0 ? Math.round((matches.length / tags.length) * 60) : 40;
+  return Math.min(99, base + 20 + Math.floor(Math.random()*15));
+}
+
+function updateStats() {
+  const total = state.gigs.length;
+  const matched = state.filteredGigs.filter(g => calcFit(g) > 60).length;
+  const potential = state.gigs.reduce((s,g) => s + (g.pay_max_usd||0), 0);
+  document.getElementById('stat-gigs').textContent  = total;
+  document.getElementById('stat-match').textContent = matched;
+  document.getElementById('stat-earn').textContent  = '$' + (potential/1000).toFixed(0) + 'k+';
+  document.getElementById('stat-apps').textContent  = state.applications.length;
+}
+
+function filterGigs() {
+  const q = document.getElementById('gig-search').value.toLowerCase();
+  state.filteredGigs = state.gigs.filter(g => {
+    const matchSrc = state.filterSource === 'all' ||
+      (state.filterSource === 'internal' && g.source_type === 'internal') ||
+      (state.filterSource === 'external' && g.source_type !== 'internal');
+    const matchQ = !q || g.title?.toLowerCase().includes(q) ||
+      (g.tags||[]).some(t => t.toLowerCase().includes(q));
+    return matchSrc && matchQ;
+  });
+  renderGigs();
+}
+
+function filterBySource(src) {
+  state.filterSource = src;
+  ['all','int','ext'].forEach(id => {
+    const el = document.getElementById('f-'+id);
+    if (el) el.classList.remove('btn-primary');
+    if (el) el.classList.add('btn-ghost');
+  });
+  const map = {all:'all',internal:'int',external:'ext'};
+  const btn = document.getElementById('f-'+map[src]);
+  if (btn) { btn.classList.add('btn-primary'); btn.classList.remove('btn-ghost'); }
+  filterGigs();
+}
+
+// ── APPLICATIONS ──────────────────────────────────────────────
+async function loadApplications() {
+  if (!state.user || state.user.id.startsWith('demo')) {
+    state.applications = [];
+    renderApplications();
+    return;
+  }
+  const { data } = await db.from('gig_applications')
+    .select('*')
+    .eq('applicant_id', state.user.id)
+    .order('created_at', { ascending: false });
+  state.applications = data || [];
+  renderApplications();
+  document.getElementById('nav-count-apps').textContent = state.applications.length;
+  document.getElementById('stat-apps').textContent = state.applications.length;
+}
+
+function renderApplications() {
+  const tbody = document.getElementById('app-tbody');
+  if (!state.applications.length) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">No applications yet</div><p>Apply to gigs from the Mission Hub.</p></div></td></tr>`;
+    return;
+  }
+  const STATUS_COLORS = {
+    pending:'badge-gray', shortlisted:'badge-green',
+    hired:'badge-blue', rejected:'badge-red', withdrawn:'badge-gray'
+  };
+  tbody.innerHTML = state.applications.map(a => `
+    <tr>
+      <td style="font-weight:500;color:var(--text);">${escHtml(a.gig_title||'—')}</td>
+      <td style="color:var(--text2);">—</td>
+      <td style="font-family:var(--font-mono);font-size:11px;color:var(--text3);">${new Date(a.created_at).toLocaleDateString()}</td>
+      <td style="font-family:var(--font-mono);color:var(--green);">${a.proposed_rate?'$'+a.proposed_rate:'—'}</td>
+      <td><span class="badge ${STATUS_COLORS[a.status]||'badge-gray'}">${a.status||'pending'}</span></td>
+    </tr>`
+  ).join('');
+}
+
+// ── APPLY MODAL ───────────────────────────────────────────────
+function openApply(id, title, isExt, extUrl) {
+  if (isExt === 'true' && extUrl) {
+    // External gig — track referral + redirect
+    trackReferral(id, extUrl);
+    window.open(extUrl, '_blank');
+    return;
+  }
+  state.currentGigId = id;
+  document.getElementById('apply-gig-title').textContent = title;
+  const modal = document.getElementById('apply-modal');
+  modal.style.display = 'flex';
+}
+
+function closeApply() {
+  document.getElementById('apply-modal').style.display = 'none';
+  document.getElementById('apply-cover').value = '';
+  document.getElementById('apply-rate').value  = '';
+}
+
+async function submitApply() {
+  const cover = document.getElementById('apply-cover').value.trim();
+  const rate  = parseFloat(document.getElementById('apply-rate').value) || null;
+  if (!cover) { toast('Please write a cover note', 'error'); return; }
+
+  setBtn('apply-btn', true);
+  if (!state.user.id.startsWith('demo')) {
+    await db.from('gig_applications').insert({
+      gig_id:        state.currentGigId,
+      applicant_id:  state.user.id,
+      cover_note:    cover,
+      proposed_rate: rate,
+      status:        'pending',
+    });
+  }
+  // Add to local state for demo
+  state.applications.unshift({
+    gig_id: state.currentGigId,
+    gig_title: document.getElementById('apply-gig-title').textContent,
+    status: 'pending', proposed_rate: rate,
+    created_at: new Date().toISOString(),
+  });
+  setBtn('apply-btn', false);
+  closeApply();
+  toast('Application submitted! 🎯', 'success');
+  renderApplications();
+  document.getElementById('nav-count-apps').textContent = state.applications.length;
+  document.getElementById('stat-apps').textContent = state.applications.length;
+}
+
+async function trackReferral(gigId, url) {
+  if (!state.user) return;
+  await db.from('referral_tracking').insert({
+    gig_id:       gigId,
+    user_id:      state.user.id.startsWith('demo') ? null : state.user.id,
+    external_url: url,
+    session_id:   sessionStorage.getItem('rtg_sid') || (()=>{const id=Math.random().toString(36).slice(2);sessionStorage.setItem('rtg_sid',id);return id;})(),
+  });
+}
+
+// ── PROFILE SAVE ──────────────────────────────────────────────
+async function saveProfile() {
+  const payload = {
+    display_name:   document.getElementById('p-name').value.trim(),
+    location:       document.getElementById('p-location').value.trim(),
+    bio:            document.getElementById('p-bio').value.trim(),
+    github_url:     document.getElementById('p-github').value.trim(),
+    portfolio_url:  document.getElementById('p-portfolio').value.trim(),
+    bugcrowd_url:   document.getElementById('p-bugcrowd').value.trim(),
+    immunefi_url:   document.getElementById('p-immunefi').value.trim(),
+    hourly_rate_min:parseFloat(document.getElementById('p-rate-min').value)||null,
+    hourly_rate_max:parseFloat(document.getElementById('p-rate-max').value)||null,
+  };
+  if (!state.user.id.startsWith('demo')) {
+    const { error } = await db.from('profiles').update(payload).eq('id', state.user.id);
+    if (error) { toast('Save failed: ' + error.message, 'error'); return; }
+  }
+  Object.assign(state.profile, payload);
+  toast('Profile saved ✓', 'success');
+  // Refresh sidebar name
+  document.getElementById('sb-name').textContent = payload.display_name || state.profile.display_name;
+}
+
+// ── AI ASSISTANT ──────────────────────────────────────────────
+function toggleAI() {
+  state.aiOpen = !state.aiOpen;
+  document.getElementById('ai-window').classList.toggle('open', state.aiOpen);
+  if (state.aiOpen) setTimeout(() => document.getElementById('ai-input').focus(), 100);
+}
+
+function aiAsk(prompt) {
+  if (!state.aiOpen) toggleAI();
+  document.getElementById('ai-input').value = prompt;
+  sendAI();
+}
+
+function appendAIMsg(role, content, loading=false) {
+  const msgs = document.getElementById('ai-messages');
+  const div  = document.createElement('div');
+  div.className = `ai-msg ${role} fade-in`;
+  div.id = loading ? 'ai-loading-msg' : '';
+  div.innerHTML = `
+    <div class="ai-msg-avatar">${role==='user'?'YOU':'AI'}</div>
+    <div class="ai-msg-bubble">${loading ? '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>' : escHtml(content).replace(/\n/g,'<br>')}</div>
+  `;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+async function sendAI() {
+  const input = document.getElementById('ai-input');
+  const text  = input.value.trim();
+  if (!text) return;
+  input.value = '';
+
+  // Hide suggestions after first message
+  document.getElementById('ai-suggestions').style.display = 'none';
+
+  appendAIMsg('user', text);
+  const loadDiv = appendAIMsg('assistant', '', true);
+  document.getElementById('ai-send-btn').disabled = true;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 600,
+        system: AI_SYSTEM,
+        messages: [{ role: 'user', content: text }],
+      }),
+    });
+    const data = await res.json();
+    const reply = data.content?.find(b=>b.type==='text')?.text || 'Sorry, I could not process that.';
+    loadDiv.remove();
+    appendAIMsg('assistant', reply);
+  } catch(e) {
+    loadDiv.remove();
+    appendAIMsg('assistant', '⚠️ Connection error. The AI service is temporarily unavailable.');
+  } finally {
+    document.getElementById('ai-send-btn').disabled = false;
+  }
+}
+
+// ── SETTINGS TOGGLE ───────────────────────────────────────────
+const toggleStates = { hire: true, notif: true };
+function toggleSetting(key) {
+  toggleStates[key] = !toggleStates[key];
+  const el = document.getElementById('toggle-'+key);
+  const dot = el.querySelector('div');
+  if (toggleStates[key]) {
+    el.style.background = 'var(--green)';
+    dot.style.right = '3px';
+  } else {
+    el.style.background = 'var(--border2)';
+    dot.style.right = 'calc(100% - 19px)';
+  }
+}
+
+// ── MISC ──────────────────────────────────────────────────────
+function escHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', async () => {
+  // Check existing session
+  const { data: { session } } = await db.auth.getSession();
+  if (session?.user) {
+    state.user = session.user;
+    await loadProfile();
+    if (state.profile) {
+      enterDashboard();
+    } else {
+      state.selectedRole = 'red_teamer';
+      initSkillGrid();
+      initProgressBar();
+      showScreen('screen-onboard');
+    }
+  }
+  // Init filter button
+  filterBySource('all');
+});
+
+// Auth state change listener
+db.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_OUT') {
+    state = { user:null, profile:null, gigs:[], filteredGigs:[], applications:[], currentStep:1, selectedRole:'red_teamer', selectedSkills:[], selectedTier:'intermediate', currentGigId:null, aiOpen:false, filterSource:'all' };
+    showScreen('screen-auth');
+  }
+});
+</script>
+</body>
+</html>
