@@ -678,43 +678,35 @@ textarea.f-input { resize: vertical; min-height: 80px; }
 <script>
 const SUPABASE_URL = 'https://YOUR_URL.supabase.co'; 
 const SUPABASE_KEY = 'YOUR_ANON_KEY';
-const supabaseApp = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-async function init() {
-    const { data: { session } } = await supabaseApp.auth.getSession();
-    const isAtDashboard = window.location.pathname.includes('app');
+async function checkAuth() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    const isDashboard = window.location.pathname.includes('app');
 
     if (session) {
-        if (!isAtDashboard) {
-            window.location.href = '/app';
+        // Stop the blink: If we are already on the dashboard, just show the UI
+        if (isDashboard) {
+            const { data: profile } = await supabaseClient
+                .from('profiles')
+                .select('*')
+                .eq('id', session.user.id)
+                .single();
+
+            if (profile) {
+                document.getElementById('loading-screen').style.display = 'none';
+                document.getElementById('app').style.display = 'flex';
+                const roleView = profile.role === 'company_client' ? 'company-view' : 'freelancer-view';
+                document.getElementById(roleView).classList.add('active');
+            }
             return;
         }
-
-        // Logic for when we are safely on the dashboard
-        const { data: profile } = await supabaseApp
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .single();
-
-        if (profile) {
-            document.getElementById('loading-screen').style.display = 'none';
-            document.getElementById('app').style.display = 'flex';
-            const roleView = profile.role === 'company_client' ? 'company-view' : 'freelancer-view';
-            document.getElementById(roleView).classList.add('active');
-        }
-    } else if (isAtDashboard) {
+        window.location.href = '/app';
+    } else if (isDashboard) {
         window.location.href = '/';
     }
 }
-
-// Run the check once on load
-init();
-
-// Only listen for signs out to avoid redirect loops on login
-supabaseApp.auth.onAuthStateChange((event) => {
-    if (event === 'SIGNED_OUT') window.location.href = '/';
-});
+checkAuth();
 </script>
 </body>
 </html>
