@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RedTeamGig — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Cabinet+Grotesk:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+:root {
+  --ink:    #0a0b0f;
+  --ink2:   #0f1117;
+  --ink3:   #161b27;
+  --ink4:   #1c2333;
+  --wire:   rgba(255,255,255,0.06);
+  --wire2:  rgba(255,255,255,0.1);
+  --wire3:  rgba(255,255,255,0.15);
+  --sig:    #e8382f;
+  --sig2:   #ff5c52;
+  --go:     #16c979;
+  --go2:    #0ea562;
+  --amber:  #f0a000;
+  --blue:   #3b82f6;
+  --dim:    #5a6478;
+  --muted:  #8b95a8;
+  --text:   #dde3ef;
+  --head:   'Cabinet Grotesk', sans-serif;
+  --mono:   'DM Mono', monospace;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--ink);
+  color: var(--text);
+  font-family: 'Cabinet Grotesk', sans-serif;
+  font-size: 14px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+::-webkit-scrollbar { width: 3px; height: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--wire2); border-radius: 2px; }
+
+/* ── Noise overlay ─────────────── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 9999; opacity: 0.5;
+}
+
+/* ── Layout ─────────────────────── */
+.layout { display: flex; min-height: 100vh; }
+
+/* ── Sidebar ─────────────────────── */
+.sidebar {
+  width: 214px; flex-shrink: 0;
+  background: var(--ink2);
+  border-right: 1px solid var(--wire);
+  display: flex; flex-direction: column;
+  position: sticky; top: 0; height: 100vh;
+  overflow-y: auto;
+}
+.sb-logo {
+  padding: 18px 16px 14px;
+  border-bottom: 1px solid var(--wire);
+  display: flex; align-items: center; gap: 9px;
+}
+.sb-logomark {
+  width: 28px; height: 28px;
+  background: var(--sig); border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.sb-wordmark {
+  font-family: 'Cabinet Grotesk', sans-serif;
+  font-weight: 800; font-size: 15px;
+  color: var(--text); letter-spacing: -0.02em;
+}
+.sb-user {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--wire);
+}
+.sb-av {
+  width: 34px; height: 34px; border-radius: 8px;
+  background: rgba(232,56,47,0.12);
+  border: 1px solid rgba(232,56,47,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-weight: 500; font-size: 12px;
+  color: var(--sig2); margin-bottom: 7px;
+}
+.sb-name { font-weight: 600; font-size: 13px; color: var(--text); }
+.sb-role {
+  font-family: var(--mono); font-size: 9px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--sig2); margin-top: 2px;
+}
+.sb-scores {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 6px; margin-top: 9px;
+}
+.sb-score {
+  background: var(--ink3); border: 1px solid var(--wire);
+  border-radius: 6px; padding: 6px 8px; text-align: center;
+}
+.sb-score-val {
+  font-family: var(--mono); font-size: 13px;
+  font-weight: 500; color: var(--go); line-height: 1;
+}
+.sb-score-lbl {
+  font-family: var(--mono); font-size: 8px;
+  color: var(--dim); letter-spacing: 0.08em;
+  text-transform: uppercase; margin-top: 2px;
+}
+.sb-nav { padding: 10px 8px; flex: 1; }
+.sb-section-lbl {
+  font-family: var(--mono); font-size: 8px;
+  color: var(--dim); letter-spacing: 0.12em;
+  text-transform: uppercase; padding: 0 8px;
+  margin: 10px 0 4px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 7px 9px; border-radius: 7px;
+  cursor: pointer; transition: all 0.15s;
+  color: var(--muted); font-size: 13px; font-weight: 500;
+  border: 1px solid transparent; background: none;
+  font-family: 'Cabinet Grotesk', sans-serif;
+  width: 100%; text-align: left;
+}
+.nav-item:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+.nav-item.active {
+  color: var(--text);
+  background: rgba(232,56,47,0.08);
+  border-color: rgba(232,56,47,0.15);
+}
+.nav-icon { font-size: 14px; flex-shrink: 0; opacity: 0.8; }
+.nav-badge {
+  margin-left: auto; font-family: var(--mono);
+  font-size: 9px; background: var(--sig);
+  color: #fff; padding: 1px 5px; border-radius: 8px;
+}
+.sb-foot {
+  padding: 10px 14px;
+  border-top: 1px solid var(--wire);
+}
+
+/* ── Main ─────────────────────────── */
+.main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.topbar {
+  height: 52px; padding: 0 22px;
+  border-bottom: 1px solid var(--wire);
+  background: var(--ink2);
+  display: flex; align-items: center; gap: 14px;
+  position: sticky; top: 0; z-index: 30;
+}
+.topbar-title {
+  font-family: 'Cabinet Grotesk', sans-serif;
+  font-weight: 700; font-size: 15px; color: var(--text);
+}
+.search-wrap {
+  display: flex; align-items: center; gap: 7px;
+  background: var(--ink3); border: 1px solid var(--wire);
+  border-radius: 7px; padding: 5px 11px;
+  transition: border-color 0.2s;
+}
+.search-wrap:focus-within { border-color: rgba(232,56,47,0.4); }
+.search-wrap input {
+  background: none; border: none; outline: none;
+  color: var(--text); font-size: 13px;
+  font-family: 'Cabinet Grotesk', sans-serif;
+  width: 200px;
+}
+.search-wrap input::placeholder { color: var(--dim); }
+.content { flex: 1; overflow-y: auto; padding: 22px; }
+
+/* ── Views ─────────────────────────── */
+.view { display: none; }
+.view.active { display: block; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+@keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+@keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+
+/* ── Cards ─────────────────────────── */
+.card {
+  background: var(--ink2); border: 1px solid var(--wire);
+  border-radius: 12px;
+}
+.card-p { padding: 18px 20px; }
+
+/* ── Stats row ─────────────────────── */
+.stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 20px; }
+@media(max-width:1100px) { .stats-grid { grid-template-columns: repeat(2,1fr); } }
+.stat-card {
+  background: var(--ink2); border: 1px solid var(--wire);
+  border-radius: 12px; padding: 16px 18px;
+  position: relative; overflow: hidden;
+}
+.stat-card::after {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: var(--sig); opacity: 0.5;
+}
+.stat-val {
+  font-family: var(--mono); font-size: 28px;
+  font-weight: 500; color: var(--text); line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-val.green { color: var(--go); }
+.stat-val.amber { color: var(--amber); }
+.stat-label { font-size: 12px; color: var(--muted); }
+.stat-delta { font-family: var(--mono); font-size: 10px; color: var(--go); margin-top: 5px; }
+
+/* ── Gig grid ─────────────────────── */
+.gig-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; }
+@media(max-width:1000px) { .gig-grid { grid-template-columns: 1fr; } }
+
+.gig-card {
+  background: var(--ink2); border: 1px solid var(--wire);
+  border-radius: 12px; padding: 16px 18px;
+  cursor: pointer; transition: all 0.18s;
+  display: flex; flex-direction: column; gap: 11px;
+}
+.gig-card:hover {
+  border-color: rgba(232,56,47,0.25);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.4);
+}
+.gig-card-head { display: flex; gap: 11px; align-items: flex-start; }
+.gig-src-icon {
+  width: 34px; height: 34px; border-radius: 7px;
+  background: var(--ink3); border: 1px solid var(--wire);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+  font-family: var(--mono); font-weight: 500; color: var(--muted);
+}
+.gig-title {
+  font-weight: 600; font-size: 13px; color: var(--text);
+  line-height: 1.4; flex: 1; min-width: 0;
+}
+.gig-pay {
+  font-family: var(--mono); font-size: 13px;
+  font-weight: 500; color: var(--go);
+}
+.gig-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.gig-tag {
+  font-family: var(--mono); font-size: 9px;
+  letter-spacing: 0.05em; padding: 3px 8px;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--wire); color: var(--muted);
+}
+.gig-foot {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-top: 11px; border-top: 1px solid var(--wire); gap: 8px;
+}
+.gig-meta-row {
+  font-family: var(--mono); font-size: 9px;
+  color: var(--dim); display: flex; gap: 10px;
+}
+.fit-bar { display: flex; align-items: center; gap: 5px; font-family: var(--mono); font-size: 9px; color: var(--dim); }
+.fit-track { width: 52px; height: 3px; background: var(--ink3); border-radius: 2px; overflow: hidden; }
+.fit-fill { height: 100%; border-radius: 2px; transition: width 0.8s ease; }
+
+/* ── Badges ─────────────────────── */
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 2px 8px; border-radius: 3px;
+  font-family: var(--mono); font-size: 9px;
+  font-weight: 500; letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+.badge-sig    { background: rgba(232,56,47,0.1);  color: var(--sig2); border: 1px solid rgba(232,56,47,0.2); }
+.badge-go     { background: rgba(22,201,121,0.08); color: var(--go);   border: 1px solid rgba(22,201,121,0.15); }
+.badge-amber  { background: rgba(240,160,0,0.08);  color: var(--amber);border: 1px solid rgba(240,160,0,0.15); }
+.badge-blue   { background: rgba(59,130,246,0.08); color: var(--blue); border: 1px solid rgba(59,130,246,0.15); }
+.badge-dim    { background: rgba(255,255,255,0.04);color: var(--muted);border: 1px solid var(--wire); }
+.badge-partner{ background: rgba(59,130,246,0.1);  color: #60a5fa;    border: 1px solid rgba(59,130,246,0.2); }
+
+/* ── Talent table ─────────────────── */
+.talent-table { width: 100%; border-collapse: collapse; }
+.talent-table th {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--dim);
+  padding: 0 14px 10px; text-align: left;
+  border-bottom: 1px solid var(--wire);
+}
+.talent-table td {
+  padding: 13px 14px; border-bottom: 1px solid var(--wire);
+  vertical-align: middle;
+}
+.talent-table tr:last-child td { border-bottom: none; }
+.talent-table tr:hover td { background: rgba(255,255,255,0.015); }
+.t-av {
+  width: 30px; height: 30px; border-radius: 7px;
+  background: var(--ink3); border: 1px solid var(--wire);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 10px; font-weight: 500;
+  color: var(--muted); flex-shrink: 0;
+}
+
+/* ── Buttons ─────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: 7px;
+  font-family: var(--mono); font-size: 11px;
+  font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase;
+  cursor: pointer; border: none; transition: all 0.18s;
+}
+.btn:active { transform: scale(0.97); }
+.btn-sig  { background: var(--sig);  color: #fff; }
+.btn-sig:hover { background: var(--sig2); box-shadow: 0 0 20px rgba(232,56,47,0.3); }
+.btn-go   { background: var(--go);   color: #000; font-weight: 700; }
+.btn-go:hover { opacity: 0.9; box-shadow: 0 0 16px rgba(22,201,121,0.3); }
+.btn-ghost {
+  background: transparent; color: var(--muted);
+  border: 1px solid var(--wire2);
+}
+.btn-ghost:hover { color: var(--text); border-color: var(--wire3); background: rgba(255,255,255,0.03); }
+.btn-sm { padding: 5px 12px; font-size: 10px; }
+
+/* ── Section header ─────────────── */
+.section-head {
+  display: flex; align-items: flex-end;
+  justify-content: space-between; margin-bottom: 14px;
+}
+.section-title {
+  font-family: 'Cabinet Grotesk', sans-serif;
+  font-weight: 700; font-size: 17px;
+  color: var(--text); letter-spacing: -0.01em;
+}
+.section-sub { font-size: 12px; color: var(--dim); margin-top: 2px; }
+
+/* ── Inputs ─────────────────────── */
+.f-input {
+  width: 100%;
+  background: var(--ink3); border: 1px solid var(--wire2);
+  border-radius: 7px; padding: 10px 13px;
+  color: var(--text); font-size: 14px;
+  font-family: 'Cabinet Grotesk', sans-serif;
+  outline: none; transition: border-color 0.18s, box-shadow 0.18s;
+}
+.f-input:focus { border-color: var(--sig); box-shadow: 0 0 0 3px rgba(232,56,47,0.1); }
+.f-input::placeholder { color: var(--dim); }
+select.f-input { cursor: pointer; }
+textarea.f-input { resize: vertical; min-height: 80px; }
+.f-label {
+  display: block; font-family: var(--mono);
+  font-size: 9px; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--dim); margin-bottom: 6px;
+}
+
+/* ── Skeleton ─────────────────────── */
+.skel {
+  background: linear-gradient(90deg, var(--ink3) 25%, var(--ink4) 50%, var(--ink3) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite; border-radius: 5px;
+}
+
+/* ── Empty state ─────────────────── */
+.empty {
+  text-align: center; padding: 52px 20px;
+  font-size: 13px; color: var(--dim);
+}
+.empty-icon { font-size: 36px; margin-bottom: 12px; opacity: 0.5; }
+.empty-title {
+  font-family: 'Cabinet Grotesk', sans-serif;
+  font-size: 16px; color: var(--muted); margin-bottom: 6px;
+}
+
+/* ── Toast ─────────────────────────── */
+.toast-wrap {
+  position: fixed; bottom: 20px; left: 50%;
+  transform: translateX(-50%); z-index: 9998;
+  display: flex; flex-direction: column; gap: 6px;
+  align-items: center; pointer-events: none;
+}
+.toast {
+  padding: 9px 18px; border-radius: 7px;
+  font-family: var(--mono); font-size: 11px;
+  font-weight: 500; letter-spacing: 0.06em;
+  animation: fadeUp 0.3s ease;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+}
+.toast.ok   { background: var(--go);  color: #000; }
+.toast.err  { background: var(--sig); color: #fff; }
+.toast.info { background: var(--ink3); color: var(--text); border: 1px solid var(--wire2); }
+
+/* ── AI panel ─────────────────────── */
+.ai-panel { position: fixed; bottom: 22px; right: 22px; z-index: 90; }
+.ai-fab {
+  width: 50px; height: 50px; border-radius: 13px;
+  background: var(--ink2); border: 1px solid rgba(232,56,47,0.35);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.22s;
+  box-shadow: 0 4px 20px rgba(232,56,47,0.15);
+  position: relative;
+}
+.ai-fab:hover { border-color: var(--sig); box-shadow: 0 4px 28px rgba(232,56,47,0.3); transform: scale(1.05); }
+.ai-fab svg { width: 20px; height: 20px; color: var(--sig); }
+.ai-ping {
+  position: absolute; top: -4px; right: -4px;
+  width: 11px; height: 11px; border-radius: 50%;
+  background: var(--sig); border: 2px solid var(--ink);
+  animation: pulse 2s infinite;
+}
+.ai-win {
+  position: absolute; bottom: 60px; right: 0;
+  width: 340px; background: var(--ink2);
+  border: 1px solid var(--wire2); border-radius: 14px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.65);
+  display: none; flex-direction: column;
+  overflow: hidden; animation: fadeUp 0.22s ease;
+}
+.ai-win.open { display: flex; }
+.ai-win-head {
+  padding: 12px 14px; background: var(--ink3);
+  border-bottom: 1px solid var(--wire);
+  display: flex; align-items: center; gap: 9px;
+}
+.ai-win-icon {
+  width: 26px; height: 26px; border-radius: 7px;
+  background: rgba(232,56,47,0.1); border: 1px solid rgba(232,56,47,0.2);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.ai-win-icon svg { width: 13px; height: 13px; color: var(--sig); }
+.ai-win-title { font-family: var(--mono); font-size: 10px; font-weight: 500; color: var(--text); letter-spacing: 0.07em; text-transform: uppercase; }
+.ai-win-sub { font-size: 10px; color: var(--go); display: flex; align-items: center; gap: 3px; margin-top: 1px; }
+.ai-msgs {
+  flex: 1; overflow-y: auto; padding: 12px;
+  display: flex; flex-direction: column; gap: 9px;
+  max-height: 280px; min-height: 180px;
+}
+.ai-msg { display: flex; gap: 7px; animation: fadeUp 0.22s ease; }
+.ai-msg.user { flex-direction: row-reverse; }
+.ai-msg-av {
+  width: 22px; height: 22px; border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; flex-shrink: 0; margin-top: 2px;
+}
+.ai-msg.assistant .ai-msg-av { background: rgba(232,56,47,0.1); border: 1px solid rgba(232,56,47,0.2); color: var(--sig); }
+.ai-msg.user      .ai-msg-av { background: var(--ink3); border: 1px solid var(--wire); color: var(--muted); }
+.ai-bubble {
+  max-width: 84%; padding: 8px 11px;
+  border-radius: 9px; font-size: 12px; line-height: 1.55;
+}
+.ai-msg.assistant .ai-bubble { background: var(--ink3); border: 1px solid var(--wire); color: var(--muted); border-radius: 2px 9px 9px 9px; }
+.ai-msg.user      .ai-bubble { background: rgba(232,56,47,0.1); border: 1px solid rgba(232,56,47,0.2); color: var(--text); border-radius: 9px 2px 9px 9px; }
+.ai-suggs { padding: 8px 12px; border-top: 1px solid var(--wire); display: flex; flex-wrap: wrap; gap: 5px; }
+.ai-sugg {
+  padding: 4px 9px; border-radius: 20px;
+  font-family: var(--mono); font-size: 10px;
+  background: var(--ink3); border: 1px solid var(--wire);
+  color: var(--muted); cursor: pointer; transition: all 0.14s;
+}
+.ai-sugg:hover { border-color: var(--sig); color: var(--text); background: rgba(232,56,47,0.08); }
+.ai-input-row { padding: 10px 12px; border-top: 1px solid var(--wire); display: flex; gap: 7px; }
+.ai-input {
+  flex: 1; background: var(--ink3); border: 1px solid var(--wire);
+  border-radius: 7px; padding: 7px 11px;
+  color: var(--text); font-size: 12px; outline: none;
+  font-family: 'Cabinet Grotesk', sans-serif;
+  transition: border-color 0.18s;
+}
+.ai-input:focus { border-color: rgba(232,56,47,0.4); }
+.ai-send {
+  width: 32px; height: 32px; border-radius: 7px;
+  background: var(--sig); border: none; color: #fff;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s; flex-shrink: 0;
+}
+.ai-send:hover { background: var(--sig2); }
+.ai-send:disabled { background: var(--ink3); color: var(--dim); cursor: not-allowed; }
+.dot-pulse span {
+  display: inline-block; width: 4px; height: 4px;
+  border-radius: 50%; background: var(--dim); margin: 0 1px;
+  animation: pulse 1s infinite;
+}
+.dot-pulse span:nth-child(2) { animation-delay: 0.2s; }
+.dot-pulse span:nth-child(3) { animation-delay: 0.4s; }
+
+/* ── Apply modal ─────────────────── */
+.modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(5,6,10,0.8);
+  backdrop-filter: blur(6px);
+  z-index: 80;
+  display: none; align-items: center; justify-content: center; padding: 16px;
+}
+.modal-backdrop.open { display: flex; }
+
+/* ── Spinners ─────────────────────── */
+.spinner { display: inline-block; width: 14px; height: 14px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.25); border-top-color: currentColor; animation: spin 0.6s linear infinite; }
+
+/* ── Online indicator ─────────────── */
+.online-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--go); display: inline-block;
+  animation: pulse 2s infinite; margin-right: 5px;
+}
+
+/* ── Scout panel ─────────────────── */
+.scout-result {
+  background: var(--ink3); border: 1px solid var(--wire);
+  border-radius: 8px; padding: 14px 16px;
+  animation: fadeUp 0.3s ease;
+  font-size: 13px; color: var(--muted); line-height: 1.6;
+}
+
+/* ── Analytics ─────────────────────── */
+.analytics-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+.a-card {
+  background: var(--ink2); border: 1px solid var(--wire);
+  border-radius: 12px; padding: 18px 20px;
+}
+.a-title { font-family: var(--mono); font-size: 9px; color: var(--dim); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+.a-val { font-family: var(--mono); font-size: 32px; font-weight: 500; color: var(--text); }
+.a-bar-wrap { margin-top: 12px; display: flex; flex-direction: column; gap: 7px; }
+.a-bar-row { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 10px; color: var(--muted); }
+.a-bar-track { flex: 1; height: 4px; background: var(--ink3); border-radius: 2px; }
+.a-bar-fill { height: 100%; border-radius: 2px; background: var(--sig); transition: width 0.8s ease; }
+</style>
+</head>
+<body>
+
+<div class="layout" id="app" style="display:none;">
+
+<!-- ── SIDEBAR ──────────────────────────────────────────── -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logomark">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <span class="sb-wordmark">RedTeamGig</span>
+  </div>
+
+  <div class="sb-user">
+    <div class="sb-av" id="sb-av">??</div>
+    <div class="sb-name" id="sb-name">Loading...</div>
+    <div class="sb-role" id="sb-role">—</div>
+    <!-- Scores shown only for freelancers -->
+    <div class="sb-scores" id="sb-scores" style="display:none;">
+      <div class="sb-score">
+        <div class="sb-score-val" id="sb-rely">—</div>
+        <div class="sb-score-lbl">Rely</div>
+      </div>
+      <div class="sb-score">
+        <div class="sb-score-val" id="sb-effic">—</div>
+        <div class="sb-score-lbl">Effic</div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="sb-nav" id="sb-nav">
+    <!-- Injected by JS based on role -->
+  </nav>
+
+  <div class="sb-foot">
+    <div style="font-size:11px;color:var(--dim);display:flex;align-items:center;">
+      <span class="online-dot"></span> System online
+    </div>
+    <button onclick="signOut()" style="margin-top:8px;width:100%;background:none;border:none;color:var(--dim);font-family:var(--mono);font-size:9px;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;text-align:left;padding:0;transition:color 0.15s;" onmouseover="this.style.color='var(--sig2)'" onmouseout="this.style.color='var(--dim)'">
+      ← Sign Out
+    </button>
+  </div>
+</aside>
+
+<!-- ── MAIN ──────────────────────────────────────────────── -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbar-title">Loading...</div>
+    <div style="flex:1;"></div>
+    <div class="search-wrap" id="search-wrap" style="display:none;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="color:var(--dim);flex-shrink:0;">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35" stroke-linecap="round"/>
+      </svg>
+      <input type="text" placeholder="Search gigs..." id="search-input" oninput="handleSearch()">
+    </div>
+    <div style="display:flex;gap:7px;" id="filter-btns" style="display:none;">
+      <button class="btn btn-sm btn-ghost active-filter" id="f-all" onclick="setFilter('all')">All</button>
+      <button class="btn btn-sm btn-ghost" id="f-int" onclick="setFilter('internal')">Internal</button>
+      <button class="btn btn-sm btn-ghost" id="f-ext" onclick="setFilter('partner')">Partner ↗</button>
+    </div>
+  </div>
+
+  <div class="content" id="content">
+    <!-- Views injected here -->
+  </div>
+</div>
+
+</div><!-- /app -->
+
+<!-- ── LOADING STATE ─────────────────────────────────────── -->
+<div id="loading-screen" style="min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;">
+  <div style="width:36px;height:36px;border:2px solid rgba(232,56,47,0.2);border-top-color:var(--sig);border-radius:50%;animation:spin 0.7s linear infinite;"></div>
+  <div style="font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:0.1em;">AUTHENTICATING...</div>
+</div>
+
+<!-- ── AI PANEL ──────────────────────────────────────────── -->
+<div class="ai-panel" id="ai-panel" style="display:none;">
+  <div class="ai-win" id="ai-win">
+    <div class="ai-win-head">
+      <div class="ai-win-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke-linecap="round"/></svg>
+      </div>
+      <div>
+        <div class="ai-win-title">Mission Control</div>
+        <div class="ai-win-sub">
+          <span class="online-dot" style="width:4px;height:4px;margin-right:3px;"></span>
+          AI Assistant · Scoped to RedTeamGig
+        </div>
+      </div>
+      <button onclick="toggleAI()" style="margin-left:auto;background:rgba(255,255,255,0.05);border:none;border-radius:5px;width:22px;height:22px;color:var(--muted);cursor:pointer;font-size:12px;">✕</button>
+    </div>
+    <div class="ai-msgs" id="ai-msgs">
+      <div class="ai-msg assistant">
+        <div class="ai-msg-av">AI</div>
+        <div class="ai-bubble">Hey — I'm your Mission Control. Ask me about any gig, how to evaluate scope, or what your profile needs to get shortlisted.</div>
+      </div>
+    </div>
+    <div class="ai-suggs" id="ai-suggs">
+      <button class="ai-sugg" onclick="aiAsk('What gigs match my skills best?')">Best matches</button>
+      <button class="ai-sugg" onclick="aiAsk('How do I improve my profile score?')">Boost score</button>
+      <button class="ai-sugg" onclick="aiAsk('Explain OWASP LLM Top 10')">OWASP LLM 10</button>
+      <button class="ai-sugg" onclick="aiAsk('How do I write a strong cover note?')">Cover note</button>
+    </div>
+    <div class="ai-input-row">
+      <input class="ai-input" id="ai-input" placeholder="Ask about gigs, rates, scope..." onkeydown="if(event.key==='Enter')sendAI()">
+      <button class="ai-send" id="ai-send" onclick="sendAI()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2L15 22 11 13 2 9l20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+  <button class="ai-fab" onclick="toggleAI()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke-linecap="round"/></svg>
+    <div class="ai-ping"></div>
+  </button>
+</div>
+
+<!-- ── APPLY MODAL ───────────────────────────────────────── -->
+<div class="modal-backdrop" id="apply-modal" onclick="if(event.target.id==='apply-modal')closeApply()">
+  <div style="background:var(--ink2);border:1px solid var(--wire2);border-radius:14px;width:100%;max-width:460px;overflow:hidden;animation:fadeUp 0.22s ease;">
+    <div style="padding:18px 22px;border-bottom:1px solid var(--wire);display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-family:'Cabinet Grotesk',sans-serif;font-weight:700;font-size:16px;color:var(--text);">Apply for Gig</div>
+      <button onclick="closeApply()" style="background:rgba(255,255,255,0.06);border:none;border-radius:6px;width:26px;height:26px;color:var(--muted);cursor:pointer;">✕</button>
+    </div>
+    <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px;">
+      <div id="apply-gig-name" style="font-size:13px;color:var(--muted);padding:11px 13px;background:var(--ink3);border:1px solid var(--wire);border-radius:7px;"></div>
+      <div>
+        <label class="f-label">Cover Note</label>
+        <textarea class="f-input" id="apply-cover" rows="4" placeholder="Why are you the right tester for this? Be specific..."></textarea>
+      </div>
+      <div>
+        <label class="f-label">Proposed Rate (USD/task or /hr)</label>
+        <input type="number" class="f-input" id="apply-rate" placeholder="120">
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-ghost" onclick="closeApply()" style="flex:1;justify-content:center;">Cancel</button>
+        <button class="btn btn-sig" onclick="submitApply()" id="apply-submit-btn" style="flex:2;justify-content:center;">
+          <span class="spinner" id="apply-spin" style="display:none;"></span>
+          Submit Application
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-wrap" id="toasts"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
