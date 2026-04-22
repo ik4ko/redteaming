@@ -676,48 +676,44 @@ textarea.f-input { resize: vertical; min-height: 80px; }
 <div class="toast-wrap" id="toasts"></div>
 
 <script>
-// 1. YOUR CONNECTION KEYS
+// --- 1. ONLY DECLARE THIS ONCE ---
+// Check if it's already there and delete the extra one
 const SUPABASE_URL = 'https://YOUR_URL.supabase.co'; 
 const SUPABASE_KEY = 'YOUR_ANON_KEY';
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); 
 
-// 2. THE GATEKEEPER (Stops loops and identifies roles)
-supabase.auth.onAuthStateChange(async (event, session) => {
+// --- 2. AUTH LOGIC ---
+supabaseClient.auth.onAuthStateChange(async (event, session) => {
     const isAtDashboard = window.location.pathname.includes('app');
 
     if (session) {
-        // Redirect to dashboard if on landing page
         if (!isAtDashboard) {
             window.location.href = '/app';
             return;
         }
 
-        // Fetch user data from your 'profiles' table
-        const { data: profile, error } = await supabase
+        // Fetch user profile
+        const { data: profile } = await supabaseClient
             .from('profiles')
             .select('*')
             .eq('id', session.user.id)
             .single();
 
         if (profile) {
-            // Update sidebar info
+            // Update Sidebar
             document.getElementById('sb-name').innerText = profile.display_name || 'User';
             
-            // MATCHING YOUR DROPDOWN ROLES:
+            // Map roles to views
             if (profile.role === 'red_teamer') {
-                document.getElementById('sb-role').innerText = "RED TEAMER";
                 document.getElementById('freelancer-view').classList.add('active');
             } else if (profile.role === 'company_client') {
-                document.getElementById('sb-role').innerText = "COMPANY";
                 document.getElementById('company-view').classList.add('active');
             }
 
-            // HIDE LOADING & SHOW APP
-            // Note: If you have an ID for your "Authenticating..." spinner, hide it here:
-            // document.getElementById('loader').style.display = 'none';
+            // --- THE KEY MOVE: HIDE LOADING, SHOW APP ---
+            document.getElementById('loading-screen').style.display = 'none';
             document.getElementById('app').style.display = 'flex';
-        } else {
-            console.error("No profile found for this user ID.");
+            document.getElementById('ai-panel').style.display = 'block';
         }
     } else {
         if (isAtDashboard) window.location.href = '/';
@@ -725,9 +721,8 @@ supabase.auth.onAuthStateChange(async (event, session) => {
 });
 
 async function signOut() {
-    await supabase.auth.signOut();
+    await supabaseClient.auth.signOut();
 }
 </script>
-
 </body>
 </html>
