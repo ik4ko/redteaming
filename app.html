@@ -675,6 +675,35 @@ textarea.f-input { resize: vertical; min-height: 80px; }
 <!-- Toast container -->
 <div class="toast-wrap" id="toasts"></div>
 
-<script src="script.js"></script>
+<script>
+// --- Direct Connection ---
+const sbUrl = 'https://YOUR_PROJECT.supabase.co'; 
+const sbKey = 'YOUR_ANON_KEY';
+const sb = supabase.createClient(sbUrl, sbKey); 
+
+async function startDashboard() {
+    const { data: { session } } = await sb.auth.getSession();
+    
+    if (session) {
+        const { data: profile } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
+        
+        if (profile) {
+            // KILL THE SPINNER
+            document.getElementById('loading-screen').style.display = 'none';
+            // SHOW THE APP
+            document.getElementById('app').style.display = 'flex';
+            
+            // Set Role View
+            const viewId = (profile.role === 'company_client') ? 'company-view' : 'freelancer-view';
+            const view = document.getElementById(viewId);
+            if (view) view.classList.add('active');
+        }
+    } else {
+        window.location.href = '/';
+    }
+}
+startDashboard();
+</script>
+
 </body>
 </html>
