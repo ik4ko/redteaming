@@ -676,52 +676,53 @@ textarea.f-input { resize: vertical; min-height: 80px; }
 <div class="toast-wrap" id="toasts"></div>
 
 <script>
-// --- 1. ONLY DECLARE THIS ONCE ---
-// Check if it's already there and delete the extra one
+// 1. Connection (Only once!)
 const SUPABASE_URL = 'https://YOUR_URL.supabase.co'; 
 const SUPABASE_KEY = 'YOUR_ANON_KEY';
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); 
+const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); 
 
-// --- 2. AUTH LOGIC ---
-supabaseClient.auth.onAuthStateChange(async (event, session) => {
-    const isAtDashboard = window.location.pathname.includes('app');
+// 2. The Auth Listener
+client.auth.onAuthStateChange(async (event, session) => {
+    const isAtApp = window.location.pathname.includes('app');
 
     if (session) {
-        if (!isAtDashboard) {
+        // --- THE FIX: Only redirect if we are NOT already on the app page ---
+        if (!isAtApp) {
             window.location.href = '/app';
-            return;
+            return; // Stop this function here
         }
 
-        // Fetch user profile
-        const { data: profile } = await supabaseClient
+        // We are safely on the app page. Now load the data.
+        const { data: profile } = await client
             .from('profiles')
             .select('*')
             .eq('id', session.user.id)
             .single();
 
         if (profile) {
-            // Update Sidebar
-            document.getElementById('sb-name').innerText = profile.display_name || 'User';
+            // Update UI IDs from your Part 3 code
+            if(document.getElementById('sb-name')) document.getElementById('sb-name').innerText = profile.display_name || 'User';
             
-            // Map roles to views
+            // Activate views based on your Supabase Role Enum
             if (profile.role === 'red_teamer') {
-                document.getElementById('freelancer-view').classList.add('active');
+                document.getElementById('freelancer-view')?.classList.add('active');
             } else if (profile.role === 'company_client') {
-                document.getElementById('company-view').classList.add('active');
+                document.getElementById('company-view')?.classList.add('active');
             }
 
-            // --- THE KEY MOVE: HIDE LOADING, SHOW APP ---
+            // KILL THE SPINNER AND SHOW THE APP
             document.getElementById('loading-screen').style.display = 'none';
             document.getElementById('app').style.display = 'flex';
-            document.getElementById('ai-panel').style.display = 'block';
+            if(document.getElementById('ai-panel')) document.getElementById('ai-panel').style.display = 'block';
         }
     } else {
-        if (isAtDashboard) window.location.href = '/';
+        // If logged out and trying to see the app, send to home
+        if (isAtApp) window.location.href = '/';
     }
 });
 
 async function signOut() {
-    await supabaseClient.auth.signOut();
+    await client.auth.signOut();
 }
 </script>
 </body>
