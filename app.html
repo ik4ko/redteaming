@@ -676,34 +676,55 @@ textarea.f-input { resize: vertical; min-height: 80px; }
 <div class="toast-wrap" id="toasts"></div>
 
 <script>
-// --- Direct Connection ---
-const sbUrl = 'https://YOUR_PROJECT.supabase.co'; 
-const sbKey = 'YOUR_ANON_KEY';
-const sb = supabase.createClient(sbUrl, sbKey); 
+const SB_URL = 'https://YOUR_PROJECT.supabase.co'; 
+const SB_KEY = 'YOUR_ANON_KEY';
+const sb = supabase.createClient(SB_URL, SB_KEY);
 
-async function startDashboard() {
+async function gatekeeper() {
+    // 1. Get the session ONE TIME on page load
     const { data: { session } } = await sb.auth.getSession();
+    const currentPath = window.location.pathname;
     
+    // Normalize path to ignore .html or trailing slashes
+    const isDashboard = currentPath.includes('/app');
+
     if (session) {
-        const { data: profile } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
-        
-        if (profile) {
-            // KILL THE SPINNER
-            document.getElementById('loading-screen').style.display = 'none';
-            // SHOW THE APP
-            document.getElementById('app').style.display = 'flex';
-            
-            // Set Role View
-            const viewId = (profile.role === 'company_client') ? 'company-view' : 'freelancer-view';
-            const view = document.getElementById(viewId);
-            if (view) view.classList.add('active');
+        // --- THE KILL SWITCH ---
+        // If we are already on the dashboard, STOP. Do not redirect.
+        if (isDashboard) {
+            console.log("Gatekeeper: User at home. Terminating redirect logic.");
+            loadDashboardUI(session.user);
+            return; 
         }
+
+        // If logged in but on landing page, redirect to dashboard
+        console.log("Gatekeeper: Redirecting to dashboard...");
+        window.location.href = '/app';
     } else {
-        window.location.href = '/';
+        // If NOT logged in and trying to access dashboard, send to landing
+        if (isDashboard) {
+            window.location.href = '/';
+        }
     }
 }
-startDashboard();
-</script>
 
+async function loadDashboardUI(user) {
+    const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).single();
+    
+    if (profile) {
+        // Force hide the spinner and show the app instantly
+        document.getElementById('loading-screen').style.display = 'none';
+        document.getElementById('app').style.display = 'flex';
+        
+        // Populate UI
+        document.getElementById('sb-name').innerText = profile.display_name || 'User';
+        const roleView = profile.role === 'company_client' ? 'company-view' : 'freelancer-view';
+        document.getElementById(roleView).classList.add('active');
+    }
+}
+
+// Execute immediately
+gatekeeper();
+</script>
 </body>
 </html>
