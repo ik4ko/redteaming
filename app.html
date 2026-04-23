@@ -226,20 +226,13 @@ textarea.f-input{resize:vertical;min-height:80px}
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════
-     LOADING SCREEN
-═══════════════════════════════════════ -->
-<div id="loading-screen" style="min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;">
+<div id="loading-screen" style="min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:var(--ink);">
   <div style="width:34px;height:34px;border:2px solid rgba(232,56,47,.2);border-top-color:var(--sig);border-radius:50%;animation:spin .7s linear infinite;"></div>
   <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:.1em;">AUTHENTICATING...</div>
 </div>
 
-<!-- ═══════════════════════════════════════
-     APP SHELL — hidden until boot() shows it
-═══════════════════════════════════════ -->
 <div id="app-shell" class="layout" style="display:none;">
 
-  <!-- ── SIDEBAR ─────────────────────────── -->
   <aside class="sidebar">
     <div class="sb-logo">
       <div class="sb-logomark">
@@ -254,7 +247,6 @@ textarea.f-input{resize:vertical;min-height:80px}
       <div class="sb-av" id="sb-initials">??</div>
       <div class="sb-name" id="sb-name">Loading…</div>
       <div class="sb-role-badge" id="sb-role-lbl">—</div>
-      <!-- Scores — visible for red_teamer only -->
       <div class="sb-scores" id="sb-scores">
         <div class="sb-score">
           <div class="sb-score-val" id="sb-rely">—</div>
@@ -267,7 +259,6 @@ textarea.f-input{resize:vertical;min-height:80px}
       </div>
     </div>
 
-    <!-- Freelancer nav -->
     <nav class="sb-nav" id="nav-freelancer" style="display:none;">
       <div class="sb-sec">Work</div>
       <button class="nav-item" data-fl-nav="hub" onclick="showFreelancerView('hub')">
@@ -287,7 +278,6 @@ textarea.f-input{resize:vertical;min-height:80px}
       </button>
     </nav>
 
-    <!-- Company nav -->
     <nav class="sb-nav" id="nav-company" style="display:none;">
       <div class="sb-sec">Talent</div>
       <button class="nav-item" data-co-nav="co-overview" onclick="showCompanyView('co-overview')">
@@ -318,34 +308,26 @@ textarea.f-input{resize:vertical;min-height:80px}
     </div>
   </aside>
 
-  <!-- ── MAIN ────────────────────────────── -->
   <div class="main">
 
-    <!-- Topbar -->
     <div class="topbar">
       <div class="topbar-title" id="topbar-title">Dashboard</div>
       <div style="flex:1;"></div>
-      <!-- Hub controls: search + filter pills -->
       <div id="hub-controls" style="display:none;align-items:center;gap:8px;flex-wrap:wrap;">
         <div class="search-box">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="color:var(--dim);flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35" stroke-linecap="round"/></svg>
           <input type="text" id="gig-search" placeholder="Search gigs…" oninput="applySearch()">
         </div>
-        <button class="filter-btn filter-active" data-filter="all"      onclick="setFilter('all')">All</button>
+        <button class="filter-btn filter-active" data-filter="all"       onclick="setFilter('all')">All</button>
         <button class="filter-btn"               data-filter="internal" onclick="setFilter('internal')">Internal</button>
         <button class="filter-btn"               data-filter="partner"  onclick="setFilter('partner')">Partner ↗</button>
       </div>
     </div>
 
-    <!-- Content -->
     <div class="content">
 
-      <!-- ════════════════════════════════════
-           FREELANCER VIEW
-      ════════════════════════════════════ -->
       <div id="freelancer-view" style="display:none;">
 
-        <!-- Hub -->
         <div id="fl-hub" style="display:none;">
           <div class="stats-row">
             <div class="stat-card">
@@ -384,7 +366,6 @@ textarea.f-input{resize:vertical;min-height:80px}
           </div>
         </div>
 
-        <!-- Applications -->
         <div id="fl-applications" style="display:none;">
           <div class="section-head">
             <div>
@@ -410,7 +391,6 @@ textarea.f-input{resize:vertical;min-height:80px}
           </div>
         </div>
 
-        <!-- Profile -->
         <div id="fl-fl-profile" style="display:none;">
           <div class="section-head" style="max-width:620px;">
             <div><div class="section-title">My Profile</div></div>
@@ -442,7 +422,6 @@ textarea.f-input{resize:vertical;min-height:80px}
           </div>
         </div>
 
-        <!-- Resources -->
         <div id="fl-resources" style="display:none;">
           <div class="section-head">
             <div>
@@ -463,343 +442,49 @@ textarea.f-input{resize:vertical;min-height:80px}
               <div class="td-muted" style="font-size:12px;margin-top:2px;">Is this bounty worth your time?</div>
               <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--sig2);margin-top:8px;letter-spacing:.06em;">ASK AI →</div>
             </div>
-            <div class="gig-card" onclick="aiAsk('What are current market rates for AI red teaming work by skill tier?')">
-              <div style="font-size:24px;">💰</div>
-              <div class="td-title">Market Rates Guide</div>
-              <div class="td-muted" style="font-size:12px;margin-top:2px;">Current pay by tier.</div>
-              <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--sig2);margin-top:8px;letter-spacing:.06em;">ASK AI →</div>
-            </div>
-            <div class="gig-card" onclick="aiAsk('Help me write a strong cover note for an AI red teaming gig application')">
-              <div style="font-size:24px;">✍️</div>
-              <div class="td-title">Cover Note Templates</div>
-              <div class="td-muted" style="font-size:12px;margin-top:2px;">Cover notes that convert.</div>
-              <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--sig2);margin-top:8px;letter-spacing:.06em;">ASK AI →</div>
-            </div>
-            <div class="gig-card" onclick="aiAsk('Best practices for prompt injection testing in LLM systems')">
-              <div style="font-size:24px;">💉</div>
-              <div class="td-title">Prompt Injection 101</div>
-              <div class="td-muted" style="font-size:12px;margin-top:2px;">Testing methodology guide.</div>
-              <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--sig2);margin-top:8px;letter-spacing:.06em;">ASK AI →</div>
-            </div>
-            <div class="gig-card" onclick="aiAsk('Compare Mercor, Scale AI, Surge AI, Appen, and Immunefi for AI red teaming work')">
-              <div style="font-size:24px;">🌐</div>
-              <div class="td-title">Platform Comparison</div>
-              <div class="td-muted" style="font-size:12px;margin-top:2px;">Mercor vs Scale vs Surge vs Appen.</div>
-              <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--sig2);margin-top:8px;letter-spacing:.06em;">ASK AI →</div>
-            </div>
           </div>
         </div>
+      </div> <div id="company-view" style="display:none;">
+         </div>
 
-      </div><!-- /freelancer-view -->
-
-      <!-- ════════════════════════════════════
-           COMPANY VIEW
-      ════════════════════════════════════ -->
-      <div id="company-view" style="display:none;">
-
-        <!-- Overview -->
-        <div id="co-overview" style="display:none;">
-          <div class="stats-row" style="grid-template-columns:repeat(2,1fr);max-width:500px;">
-            <div class="stat-card">
-              <div class="stat-val green" id="co-stat-talent">—</div>
-              <div class="stat-label">Red Teamers in pool</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-val amber" id="co-stat-experts">—</div>
-              <div class="stat-label">Expert-tier testers</div>
-            </div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:900px;">
-            <div class="card card-p">
-              <div class="section-head">
-                <div class="section-title" style="font-size:15px;">Recent Talent</div>
-                <button class="btn btn-ghost btn-sm" onclick="showCompanyView('co-talent')">View all</button>
-              </div>
-              <div id="co-recent-wrap">
-                <div class="skel" style="height:40px;border-radius:7px;margin-bottom:7px;"></div>
-                <div class="skel" style="height:40px;border-radius:7px;"></div>
-              </div>
-            </div>
-            <div class="card card-p">
-              <div class="section-head">
-                <div class="section-title" style="font-size:15px;">Quick Scout</div>
-              </div>
-              <div style="font-size:12px;color:var(--dim);margin-bottom:10px;">Describe your need — AI finds matches instantly.</div>
-              <textarea class="f-input" id="quick-scout-input" rows="3" placeholder="Expert jailbreak tester, Claude API, NDA-ready, US-based…"></textarea>
-              <button class="btn btn-sig btn-full" style="margin-top:10px;" onclick="runQuickScoutOverview()">
-                <span class="spinner" id="qs-spin" style="display:none;"></span>
-                ✦ Scout Now
-              </button>
-              <div id="qs-result" style="margin-top:10px;"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Talent Pool -->
-        <div id="co-talent" style="display:none;">
-          <div class="section-head">
-            <div>
-              <div class="section-title">Talent Pool</div>
-              <div class="section-sub">All registered red teamers</div>
-            </div>
-            <div style="display:flex;gap:8px;">
-              <input type="text" class="f-input" id="talent-search" placeholder="Search…" oninput="filterTalent()" style="width:170px;padding:6px 11px;">
-              <select class="f-input" id="talent-tier-filter" onchange="filterTalent()" style="width:130px;padding:6px 10px;font-size:12px;">
-                <option value="">All tiers</option>
-                <option value="entry">Entry</option>
-                <option value="intermediate">Intermediate</option>
-                <option value="expert">Expert</option>
-              </select>
-            </div>
-          </div>
-          <div class="card" style="padding:0;overflow:hidden;">
-            <table class="talent-table">
-              <thead><tr>
-                <th>Name</th><th>Specialty</th><th>Tier</th><th>GitHub</th><th>Joined</th><th>Action</th>
-              </tr></thead>
-              <tbody id="talent-tbody">
-                <tr><td colspan="6">
-                  <div style="display:flex;flex-direction:column;gap:6px;padding:16px;">
-                    <div class="skel" style="height:36px;"></div>
-                    <div class="skel" style="height:36px;"></div>
-                    <div class="skel" style="height:36px;"></div>
-                  </div>
-                </td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- AI Scout -->
-        <div id="co-scout" style="display:none;">
-          <div style="max-width:640px;">
-            <div class="section-head">
-              <div>
-                <div class="section-title">AI Scout</div>
-                <div class="section-sub">Describe your ideal candidate in plain English</div>
-              </div>
-            </div>
-            <div class="card card-p" style="margin-bottom:14px;">
-              <label class="f-label">What kind of red teamer do you need?</label>
-              <textarea class="f-input" id="scout-query" rows="4" placeholder="We need an expert in agentic system attacks, familiar with Claude API tool-use, US-based, willing to sign NDA…"></textarea>
-              <div style="display:flex;gap:10px;margin-top:12px;">
-                <button class="btn btn-sig" id="scout-btn" style="flex:1;" onclick="runScout()">
-                  <span class="spinner" id="scout-spin" style="display:none;"></span>
-                  ✦ Run AI Scout
-                </button>
-                <button class="btn btn-ghost" onclick="document.getElementById('scout-query').value='';document.getElementById('scout-result').innerHTML=''">Clear</button>
-              </div>
-            </div>
-            <div id="scout-result"></div>
-          </div>
-        </div>
-
-        <!-- Analytics -->
-        <div id="co-analytics" style="display:none;">
-          <div class="section-head">
-            <div>
-              <div class="section-title">Market Analytics</div>
-              <div class="section-sub">Live data from the talent pool</div>
-            </div>
-          </div>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:900px;">
-            <div class="card card-p">
-              <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">Total Testers</div>
-              <div style="font-family:'DM Mono',monospace;font-size:30px;font-weight:500;color:var(--txt);" id="an-total">—</div>
-            </div>
-            <div class="card card-p">
-              <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;">By Tier</div>
-              <div id="an-tier-bars">
-                <div class="skel" style="height:14px;margin-bottom:8px;"></div>
-                <div class="skel" style="height:14px;margin-bottom:8px;"></div>
-                <div class="skel" style="height:14px;"></div>
-              </div>
-            </div>
-            <div class="card card-p">
-              <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;">Top Specialties</div>
-              <div id="an-spec-bars">
-                <div class="skel" style="height:14px;margin-bottom:8px;"></div>
-                <div class="skel" style="height:14px;margin-bottom:8px;"></div>
-                <div class="skel" style="height:14px;"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Post a Gig -->
-        <div id="co-post" style="display:none;">
-          <div style="max-width:540px;">
-            <div class="section-head">
-              <div>
-                <div class="section-title">Post a Gig</div>
-                <div class="section-sub">Visible to all registered red teamers immediately</div>
-              </div>
-            </div>
-            <div class="card card-p">
-              <div style="display:flex;flex-direction:column;gap:13px;">
-                <div><label class="f-label">Gig Title *</label><input class="f-input" id="pg-title" placeholder="e.g. Multi-turn jailbreak tester for Claude 4 + tools"></div>
-                <div><label class="f-label">Description *</label><textarea class="f-input" id="pg-desc" rows="5" placeholder="Scope, deliverables, rules of engagement…"></textarea></div>
-                <div style="display:flex;align-items:center;justify-content:space-between;">
-                  <label class="f-label" style="margin:0;">Tags</label>
-                  <button class="btn btn-ghost btn-sm" id="tag-btn" onclick="generateTags()">
-                    <span class="spinner" id="tag-spin" style="display:none;"></span>
-                    ✦ AI Generate
-                  </button>
-                </div>
-                <div id="tags-box" style="display:flex;flex-wrap:wrap;gap:6px;padding:11px 12px;background:var(--ink3);border:1px solid var(--wire);border-radius:7px;min-height:40px;">
-                  <span class="td-muted" style="font-size:10px;">Fill title & description then click AI Generate</span>
-                </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px;">
-                  <div><label class="f-label">Pay Min ($)</label><input type="number" class="f-input" id="pg-pmin" placeholder="50"></div>
-                  <div><label class="f-label">Pay Max ($)</label><input type="number" class="f-input" id="pg-pmax" placeholder="150"></div>
-                  <div>
-                    <label class="f-label">Pay Type</label>
-                    <select class="f-input" id="pg-ptype">
-                      <option value="per_task">Per Task</option>
-                      <option value="hourly">Hourly</option>
-                      <option value="fixed">Fixed</option>
-                      <option value="bounty">Bounty</option>
-                    </select>
-                  </div>
-                </div>
-                <div>
-                  <label class="f-label">Skill Level</label>
-                  <select class="f-input" id="pg-tier">
-                    <option value="entry">Entry</option>
-                    <option value="intermediate" selected>Intermediate</option>
-                    <option value="expert">Expert</option>
-                  </select>
-                </div>
-                <button class="btn btn-sig btn-full" id="post-gig-btn" onclick="postGig()">
-                  <span class="spinner" id="post-gig-spin" style="display:none;"></span>
-                  Post Gig Live
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div><!-- /company-view -->
-
-    </div><!-- /content -->
-  </div><!-- /main -->
-</div><!-- /app-shell -->
-
-<!-- ═══════════════════════════════════════
-     AI PANEL — freelancer only
-═══════════════════════════════════════ -->
-<div id="ai-panel" class="ai-panel" style="display:none;">
+    </div> </div> </div> <div class="ai-panel" id="ai-panel" style="display:none;">
   <div class="ai-win" id="ai-win">
     <div class="ai-win-head">
-      <div class="ai-win-icon">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke-linecap="round"/></svg>
-      </div>
+      <div class="ai-win-icon">🛰</div>
       <div>
         <div class="ai-win-title">Mission Control</div>
-        <div class="ai-win-sub">
-          <span class="online-dot" style="width:4px;height:4px;margin-right:2px;"></span>
-          AI · RedTeamGig scoped
-        </div>
+        <div class="ai-win-sub"><span class="online-dot"></span>Active matching</div>
       </div>
-      <button onclick="toggleAI()" style="margin-left:auto;background:rgba(255,255,255,.05);border:none;border-radius:5px;width:22px;height:22px;color:var(--mut);cursor:pointer;font-size:12px;">✕</button>
     </div>
     <div class="ai-msgs" id="ai-msgs">
       <div class="ai-msg assistant">
         <div class="ai-av">AI</div>
-        <div class="ai-bubble">Hey — I'm Mission Control. Ask me about any gig, bounty scope, your profile, or AI red teaming techniques.</div>
+        <div class="ai-bubble">Identity verified. How can I assist with your red teaming operations?</div>
       </div>
     </div>
-    <div class="ai-suggs" id="ai-suggs">
-      <button class="ai-sugg" onclick="aiAsk('What gigs match my skills best right now?')">Best matches</button>
-      <button class="ai-sugg" onclick="aiAsk('How do I improve my reliability score?')">Boost score</button>
-      <button class="ai-sugg" onclick="aiAsk('OWASP LLM Top 10 quick reference')">OWASP LLM 10</button>
-      <button class="ai-sugg" onclick="aiAsk('How to write a strong cover note for a red teaming gig?')">Cover notes</button>
+    <div class="ai-suggs">
+      <div class="ai-sugg" onclick="aiAsk('Summarize latest jailbreak trends')">Latest Trends</div>
+      <div class="ai-sugg" onclick="aiAsk('Suggest high-pay gigs for my skills')">Matching Gigs</div>
     </div>
     <div class="ai-input-row">
-      <input class="ai-input" id="ai-input" placeholder="Ask about gigs, rates, scope…" onkeydown="if(event.key==='Enter')sendAI()">
-      <button class="ai-send" id="ai-send" onclick="sendAI()">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2L15 22 11 13 2 9l20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
+      <input type="text" class="ai-input" id="ai-input" placeholder="Ask Mission Control…" onkeydown="if(event.key==='Enter') aiSend()">
+      <button class="ai-send" onclick="aiSend()" id="ai-btn">↑</button>
     </div>
   </div>
-  <button class="ai-fab" onclick="toggleAI()">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke-linecap="round"/></svg>
+  <div class="ai-fab" onclick="toggleAI()">
     <div class="ai-ping"></div>
-  </button>
-</div>
-
-<!-- ═══════════════════════════════════════
-     APPLY MODAL
-═══════════════════════════════════════ -->
-<div class="modal-bd" id="apply-modal" onclick="if(event.target.id==='apply-modal')closeApplyModal()">
-  <div class="modal-box">
-    <div class="modal-head">
-      <div class="modal-title">Apply for Gig</div>
-      <button class="modal-close" onclick="closeApplyModal()">✕</button>
-    </div>
-    <div class="modal-body">
-      <div id="apply-gig-name" style="font-size:13px;color:var(--mut);padding:10px 12px;background:var(--ink3);border:1px solid var(--wire);border-radius:7px;"></div>
-      <div>
-        <label class="f-label">Cover Note</label>
-        <textarea class="f-input" id="apply-cover" rows="4" placeholder="Why are you the right tester for this? Be specific about relevant experience…"></textarea>
-      </div>
-      <div>
-        <label class="f-label">Proposed Rate (USD)</label>
-        <input type="number" class="f-input" id="apply-rate" placeholder="120">
-      </div>
-      <div style="display:flex;gap:10px;">
-        <button class="btn btn-ghost" onclick="closeApplyModal()" style="flex:1;">Cancel</button>
-        <button class="btn btn-sig" id="apply-btn" onclick="submitApply()" style="flex:2;">
-          <span class="spinner" id="apply-spin" style="display:none;"></span>
-          Submit Application
-        </button>
-      </div>
-    </div>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
   </div>
 </div>
 
-<!-- Toast container -->
+<div class="modal-bd" id="modal-bd" onclick="if(event.target===this) closeModal()">
+  <div class="modal-box">
+    <div id="modal-content"></div>
+  </div>
+</div>
+
 <div class="toast-wrap" id="toasts"></div>
 
-<!-- ── Show correct nav based on role ─ -->
-<script>
-/* Quick nav reveal — called from script.js after role is known */
-function showNav(role) {
-  if (role === 'red_teamer') {
-    document.getElementById('nav-freelancer').style.display = '';
-  } else {
-    document.getElementById('nav-company').style.display = '';
-  }
-}
-</script>
-
-<script src="script.js"></script>
-
-<!-- Patch: show correct nav once APP.role is set -->
-<script>
-/* Wait for script.js boot() to finish, then reveal nav */
-(function waitForRole() {
-  if (typeof APP !== 'undefined' && APP.role) {
-    showNav(APP.role);
-  } else {
-    requestAnimationFrame(waitForRole);
-  }
-})();
-
-/* Company overview quick scout helper */
-async function runQuickScoutOverview() {
-  const q   = document.getElementById('quick-scout-input')?.value.trim();
-  const res = document.getElementById('qs-result');
-  const spin= document.getElementById('qs-spin');
-  if (!q || !res) return;
-  spin.style.display = 'inline-block';
-  res.innerHTML = '';
-  try {
-    const reply = await callClaude(q, 'You are a talent scout. Give a 2-3 sentence concise recommendation about what candidate profile to target based on this brief.', 250);
-    res.innerHTML = `<div class="scout-result" style="font-size:12px;">${reply.replace(/\n/g,'<br>')}</div>`;
-  } finally { spin.style.display = 'none'; }
-}
-</script>
-
+<script src="scripts.js"></script>
 </body>
 </html>
