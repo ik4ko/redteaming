@@ -72,7 +72,7 @@ async function boot() {
 
 function showDashboard() {
   const hub = document.getElementById('fl-hub');
-  const profView = document.getElementById('profile-edit-view');
+  const profView = document.getElementById('fl-fl-profile'); // Match your HTML ID
   const title = document.getElementById('topbar-title');
 
   if (hub) hub.style.display = 'block';
@@ -82,18 +82,45 @@ function showDashboard() {
 
 function showProfile() {
   const hub = document.getElementById('fl-hub');
-  const profView = document.getElementById('profile-edit-view');
+  const profView = document.getElementById('fl-fl-profile'); // Match your HTML ID
   const title = document.getElementById('topbar-title');
 
   if (hub) hub.style.display = 'none';
   if (profView) profView.style.display = 'block';
   if (title) title.innerText = "Mission Profile";
 
-  // Pre-fill data
+  // Pre-fill using the IDs from your app.html (p-github, p-bio, etc)
   if (APP.profile) {
-    if(document.getElementById('prof-github')) document.getElementById('prof-github').value = APP.profile.github_url || '';
-    if(document.getElementById('prof-bio')) document.getElementById('prof-bio').value = APP.profile.bio || '';
-    if(document.getElementById('prof-skills')) document.getElementById('prof-skills').value = APP.profile.skills?.join(', ') || '';
+    if(document.getElementById('p-github')) document.getElementById('p-github').value = APP.profile.github_url || '';
+    if(document.getElementById('p-bio')) document.getElementById('p-bio').value = APP.profile.bio || '';
+    if(document.getElementById('p-name')) document.getElementById('p-name').value = APP.profile.display_name || '';
+  }
+}
+
+/* ── Profile Management ────────────────────────────────────── */
+
+async function saveProfile() {
+  // Use the IDs from your actual HTML
+  const name = document.getElementById('p-name')?.value;
+  const github = document.getElementById('p-github')?.value;
+  const bio = document.getElementById('p-bio')?.value;
+
+  const { error } = await db.from('profiles').update({
+    display_name: name,
+    github_url: github,
+    bio: bio,
+    updated_at: new Date()
+  }).eq('id', APP.user.id);
+
+  if (error) {
+    console.error(error);
+    alert("Sync failed.");
+  } else {
+    alert("Profile synced to Mission Control.");
+    APP.profile.display_name = name;
+    APP.profile.github_url = github;
+    APP.profile.bio = bio;
+    paintSidebar(); // Refresh name in sidebar
   }
 }
 
