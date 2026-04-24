@@ -6,7 +6,7 @@ const SUPA_URL = 'https://cnhmfxwyqtpbmjadlwty.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaG1meHd5cXRwYm1qYWRsd3R5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1MzA1NTksImV4cCI6MjA5MjEwNjU1OX0.bTTVehjz_LQLoTd0xW-FMqLdrB7nnKUlU163vLWcdrA';
 const db = window.supabase.createClient(SUPA_URL, SUPA_KEY);
 
-const AI_SYSTEM = `You are Mission Control, the AI assistant inside RedTeamGig — a members-only AI safety talent marketplace. Answer ONLY platform questions.`;
+const AI_SYSTEM = `You are Mission Control, the AI assistant inside RedTeamGig. Answer ONLY questions about platform usage and red teaming. Be extremely concise.`;
 
 const APP = {
   user: null,
@@ -14,6 +14,7 @@ const APP = {
   role: null,
   gigs: [],
   initialized: false,
+  aiCount: 0 // Track usage to prevent abuse
 };
 
 document.addEventListener('DOMContentLoaded', boot);
@@ -47,12 +48,10 @@ async function boot() {
   } catch (err) {
     console.error("Boot Error:", err);
   } finally {
-    // Reveal UI
     const loadingScreen = document.getElementById('loading-screen') || document.querySelector('.circling-thing-container');
     if (loadingScreen) loadingScreen.style.display = 'none';
     show('app-shell');
     
-    // Initial Render
     if (typeof paintSidebar === 'function') paintSidebar();
 
     if (APP.role === 'company_client' || APP.role === 'admin') {
@@ -60,8 +59,7 @@ async function boot() {
       if (typeof initCompany === 'function') initCompany();
     } else {
       show('freelancer-view');
-      initFreelancer(); // Defined below
-      show('ai-panel');
+      initFreelancer(); 
     }
   }
 
@@ -74,16 +72,8 @@ async function boot() {
 
 async function initFreelancer() {
   show('fl-hub');
-  
-  const { data, error } = await db
-    .from('external_gigs')
-    .select('*')
-    .order('posted_at', { ascending: false });
-
-  if (error) {
-    console.error("Error fetching gigs:", error);
-    return;
-  }
+  const { data, error } = await db.from('external_gigs').select('*').order('posted_at', { ascending: false });
+  if (error) return console.error("Gigs error:", error);
 
   APP.gigs = data;
   renderGigs(APP.gigs);
@@ -96,11 +86,6 @@ function renderGigs(list) {
 
   grid.innerHTML = '';
   if (countLbl) countLbl.innerText = `${list.length} missions available`;
-
-  if (list.length === 0) {
-    grid.innerHTML = '<div style="grid-column:1/-1; padding:40px; text-align:center; opacity:0.5;">No missions found. Check back later!</div>';
-    return;
-  }
 
   list.forEach(gig => {
     const finalLink = gig.referral_url || gig.apply_url || '#';
@@ -128,6 +113,63 @@ function renderGigs(list) {
   });
 }
 
+/* ── Profile Management ────────────────────────────────────── */
+
+async function saveProfile() {
+  const github = document.getElementById('prof-github')?.value;
+  const bio = document.getElementById('prof-bio')?.value;
+  const skills = document.getElementById('prof-skills')?.value;
+
+  const { error } = await db.from('profiles').update({
+    github_url: github,
+    bio: bio,
+    skills: skills ? skills.split(',') : [],
+    updated_at: new Date()
+  }).eq('id', APP.user.id);
+
+  if (error) alert("Sync failed.");
+  else alert("Profile synced to Mission Control.");
+}
+
+/* ── AI Panel (Mission Control) ─────────────────────────────── */
+
+function toggleAI(forceOpen = null) {
+  const panel = document.getElementById('ai-panel');
+  if (!panel) return;
+  
+  if (forceOpen === true) panel.classList.add('ai-open');
+  else if (forceOpen === false) panel.classList.remove('ai-open');
+  else panel.classList.toggle('ai-open');
+}
+
+async function aiSend() {
+  const input = document.getElementById('ai-input');
+  const chatBox = document.getElementById('ai-chat-box');
+  const text = input.value.trim();
+  
+  if (!text) return;
+  
+  // ABUSE PROTECTION: Max 10 messages per session & Max 400 chars
+  if (APP.aiCount >= 10) {
+    alert("Mission Control quota reached for this session.");
+    return;
+  }
+  if (text.length > 400) {
+    alert("Message too long.");
+    return;
+  }
+
+  APP.aiCount++;
+  chatBox.innerHTML += `<div class="msg msg-user">${text}</div>`;
+  input.value = '';
+
+  const context = `Context: Current available gigs include ${APP.gigs.slice(0,5).map(g => g.title).join(', ')}.`;
+  const reply = await callClaude(text, AI_SYSTEM + " " + context);
+  
+  chatBox.innerHTML += `<div class="msg msg-ai">${reply}</div>`;
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
 /* ── UI Helpers ────────────────────────────────────────────── */
 
 function show(id) { 
@@ -135,9 +177,20 @@ function show(id) {
   if (el) el.style.display = (id === 'app-shell' ? 'flex' : 'block');
 }
 
-function hide(id) { 
-  const el = document.getElementById(id);
-  if (el) el.style.display = 'none'; 
+async function callClaude(userMsg, system) {
+  try {
+    const res = await fetch('/api/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: userMsg, system: system }),
+    });
+    const data = await res.json();
+    return data.content?.find(b => b.type === 'text')?.text || 'Connection lost...';
+  } catch (e) {
+    return "Mission Control offline. Check Vercel logs.";
+  }
 }
 
-// Add your paintSidebar, callClaude, and other functions below...
+function paintSidebar() {
+    // Add your sidebar logic here
+}
