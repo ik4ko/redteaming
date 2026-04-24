@@ -259,24 +259,33 @@ textarea.f-input{resize:vertical;min-height:80px}
       </div>
     </div>
 
-    <nav class="sb-nav" id="nav-freelancer" style="display:none;">
-      <div class="sb-sec">Work</div>
-      <button class="nav-item" data-fl-nav="hub" onclick="showFreelancerView('hub')">
-        <span class="nav-icon">⚡</span> Mission Hub
-        <span class="nav-badge" id="nav-hub-badge">0</span>
-      </button>
-      <button class="nav-item" data-fl-nav="applications" onclick="showFreelancerView('applications')">
-        <span class="nav-icon">📋</span> Applications
-        <span class="nav-badge" id="nav-apps-badge">0</span>
-      </button>
-      <div class="sb-sec">Me</div>
-      <button class="nav-item" data-fl-nav="fl-profile" onclick="showFreelancerView('fl-profile');populateProfileForm()">
-        <span class="nav-icon">🛡</span> My Profile
-      </button>
-      <button class="nav-item" data-fl-nav="resources" onclick="showFreelancerView('resources')">
-        <span class="nav-icon">📚</span> Resources
-      </button>
-    </nav>
+  <nav class="sb-nav" id="nav-freelancer" style="display:none;">
+  <div class="sb-sec">Work</div>
+  
+  <button class="nav-item" data-fl-nav="hub" onclick="showDashboard()">
+    <span class="nav-icon">⚡</span> Mission Hub
+    <span class="nav-badge" id="nav-hub-badge">0</span>
+  </button>
+  
+  <button class="nav-item" data-fl-nav="applications" onclick="showFreelancerView('applications')">
+    <span class="nav-icon">📋</span> Applications
+    <span class="nav-badge" id="nav-apps-badge">0</span>
+  </button>
+
+  <div class="sb-sec">Me</div>
+  
+  <button class="nav-item" data-fl-nav="fl-profile" onclick="showProfile()">
+    <span class="nav-icon">🛡</span> My Profile
+  </button>
+  
+  <button class="nav-item" onclick="toggleAI()">
+    <span class="nav-icon">🛰️</span> Mission Control
+  </button>
+
+  <button class="nav-item" data-fl-nav="resources" onclick="showFreelancerView('resources')">
+    <span class="nav-icon">📚</span> Resources
+  </button>
+</nav>
 
     <nav class="sb-nav" id="nav-company" style="display:none;">
       <div class="sb-sec">Talent</div>
