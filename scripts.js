@@ -14,7 +14,7 @@ const APP = {
   role: null,
   gigs: [],
   initialized: false,
-  aiCount: 0 // Track usage to prevent abuse
+  aiCount: 0 
 };
 
 document.addEventListener('DOMContentLoaded', boot);
@@ -52,13 +52,13 @@ async function boot() {
     if (loadingScreen) loadingScreen.style.display = 'none';
     show('app-shell');
     
-    if (typeof paintSidebar === 'function') paintSidebar();
+    paintSidebar();
 
     if (APP.role === 'company_client' || APP.role === 'admin') {
       show('company-view');
-      if (typeof initCompany === 'function') initCompany();
     } else {
       show('freelancer-view');
+      showDashboard(); // Default view
       initFreelancer(); 
     }
   }
@@ -68,15 +68,46 @@ async function boot() {
   });
 }
 
+/* ── View Switching Logic ──────────────────────────────────── */
+
+function showDashboard() {
+  const hub = document.getElementById('fl-hub');
+  const profView = document.getElementById('profile-edit-view');
+  const title = document.getElementById('topbar-title');
+
+  if (hub) hub.style.display = 'block';
+  if (profView) profView.style.display = 'none';
+  if (title) title.innerText = "Mission Hub";
+}
+
+function showProfile() {
+  const hub = document.getElementById('fl-hub');
+  const profView = document.getElementById('profile-edit-view');
+  const title = document.getElementById('topbar-title');
+
+  if (hub) hub.style.display = 'none';
+  if (profView) profView.style.display = 'block';
+  if (title) title.innerText = "Mission Profile";
+
+  // Pre-fill data
+  if (APP.profile) {
+    if(document.getElementById('prof-github')) document.getElementById('prof-github').value = APP.profile.github_url || '';
+    if(document.getElementById('prof-bio')) document.getElementById('prof-bio').value = APP.profile.bio || '';
+    if(document.getElementById('prof-skills')) document.getElementById('prof-skills').value = APP.profile.skills?.join(', ') || '';
+  }
+}
+
 /* ── Freelancer Hub Logic ──────────────────────────────────── */
 
 async function initFreelancer() {
-  show('fl-hub');
   const { data, error } = await db.from('external_gigs').select('*').order('posted_at', { ascending: false });
   if (error) return console.error("Gigs error:", error);
 
   APP.gigs = data;
   renderGigs(APP.gigs);
+  
+  // Update stats
+  if(document.getElementById('stat-total')) document.getElementById('stat-total').innerText = data.length;
 }
 
 function renderGigs(list) {
@@ -123,12 +154,18 @@ async function saveProfile() {
   const { error } = await db.from('profiles').update({
     github_url: github,
     bio: bio,
-    skills: skills ? skills.split(',') : [],
+    skills: skills ? skills.split(',').map(s => s.trim()) : [],
     updated_at: new Date()
   }).eq('id', APP.user.id);
 
   if (error) alert("Sync failed.");
-  else alert("Profile synced to Mission Control.");
+  else {
+    alert("Profile synced to Mission Control.");
+    // Update local state
+    APP.profile.github_url = github;
+    APP.profile.bio = bio;
+    APP.profile.skills = skills ? skills.split(',') : [];
+  }
 }
 
 /* ── AI Panel (Mission Control) ─────────────────────────────── */
@@ -136,7 +173,6 @@ async function saveProfile() {
 function toggleAI(forceOpen = null) {
   const panel = document.getElementById('ai-panel');
   if (!panel) return;
-  
   if (forceOpen === true) panel.classList.add('ai-open');
   else if (forceOpen === false) panel.classList.remove('ai-open');
   else panel.classList.toggle('ai-open');
@@ -146,24 +182,15 @@ async function aiSend() {
   const input = document.getElementById('ai-input');
   const chatBox = document.getElementById('ai-chat-box');
   const text = input.value.trim();
-  
   if (!text) return;
-  
-  // ABUSE PROTECTION: Max 10 messages per session & Max 400 chars
-  if (APP.aiCount >= 10) {
-    alert("Mission Control quota reached for this session.");
-    return;
-  }
-  if (text.length > 400) {
-    alert("Message too long.");
-    return;
-  }
+  if (APP.aiCount >= 10) return alert("Mission Control quota reached.");
+  if (text.length > 400) return alert("Message too long.");
 
   APP.aiCount++;
   chatBox.innerHTML += `<div class="msg msg-user">${text}</div>`;
   input.value = '';
 
-  const context = `Context: Current available gigs include ${APP.gigs.slice(0,5).map(g => g.title).join(', ')}.`;
+  const context = `Context: Gigs: ${APP.gigs.slice(0,5).map(g => g.title).join(', ')}.`;
   const reply = await callClaude(text, AI_SYSTEM + " " + context);
   
   chatBox.innerHTML += `<div class="msg msg-ai">${reply}</div>`;
@@ -177,6 +204,11 @@ function show(id) {
   if (el) el.style.display = (id === 'app-shell' ? 'flex' : 'block');
 }
 
+function hide(id) {
+  const el = document.getElementById(id);
+  if (el) el.style.display = 'none';
+}
+
 async function callClaude(userMsg, system) {
   try {
     const res = await fetch('/api/claude', {
@@ -185,12 +217,18 @@ async function callClaude(userMsg, system) {
       body: JSON.stringify({ prompt: userMsg, system: system }),
     });
     const data = await res.json();
-    return data.content?.find(b => b.type === 'text')?.text || 'Connection lost...';
+    return data.content?.[0]?.text || 'Connection lost...';
   } catch (e) {
-    return "Mission Control offline. Check Vercel logs.";
+    return "Mission Control offline.";
   }
 }
 
 function paintSidebar() {
-    // Add your sidebar logic here
+  // Update user name in sidebar
+  const nameEl = document.querySelector('.user-name');
+  if (nameEl && APP.profile) nameEl.innerText = APP.profile.display_name;
+}
+
+async function signOut() {
+  await db.auth.signOut();
 }
