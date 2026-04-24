@@ -34,36 +34,57 @@ async function boot() {
 
   // 1. Session check
   const { data: { session }, error: sessErr } = await db.auth.getSession();
-
   if (sessErr || !session?.user) {
-    if (window.location.pathname.includes('app.html')) {
-      window.location.replace('/index.html');
-    }
+    window.location.replace('/index.html');
     return;
   }
-
   APP.user = session.user;
 
-  // 2. Load profile
-  let { data: profile } = await db
-    .from('profiles')
-    .select('*')
-    .eq('id', APP.user.id)
-    .single();
-
-  // If profile doesn't exist, create it
+  // 2. Profile fetch
+  let { data: profile } = await db.from('profiles').select('*').eq('id', APP.user.id).single();
   if (!profile) {
-    const { data: newProfile, error: createErr } = await db.from('profiles').upsert({
+    const { data: newProfile } = await db.from('profiles').upsert({
       id: APP.user.id,
       display_name: APP.user.email.split('@')[0],
       role: 'red_teamer',
     }).select().single();
-    
-    if (createErr) {
-        console.error("Profile creation error:", createErr);
-    }
     profile = newProfile;
   }
+  APP.profile = profile;
+  APP.role = profile?.role || 'red_teamer';
+
+  // 3. THE KEY CHANGE: Hide spinner, show app shell 
+  const loadingScreen = document.getElementById('loading-screen');
+  if (loadingScreen) loadingScreen.style.display = 'none';
+
+  const appShell = document.getElementById('app-shell');
+  if (appShell) appShell.style.display = 'flex';
+
+  paintSidebar();
+
+  if (APP.role === 'company_client' || APP.role === 'admin') {
+    show('company-view');
+    initCompany();
+  } else {
+    show('freelancer-view');
+    initFreelancer();
+    show('ai-panel');
+  }
+
+  db.auth.onAuthStateChange((event) => {
+    if (event === 'SIGNED_OUT') window.location.replace('/index.html');
+  });
+}
+
+// Ensure these helper functions exist at the bottom 
+function show(id) { 
+  const el = document.getElementById(id);
+  if (el) el.style.display = (id === 'app-shell' ? 'flex' : 'block');
+}
+function hide(id) { 
+  const el = document.getElementById(id);
+  if (el) el.style.display = 'none'; 
+}
 
   APP.profile = profile;
   APP.role = profile?.role || 'red_teamer';
