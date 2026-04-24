@@ -1,23 +1,19 @@
 /* ============================================================
    RedTeamGig — script.js
-   Gatekeeper: session check → role → render. 
+   Stable "Gatekeeper" Version + Profile Support
    ============================================================ */
 
 const SUPA_URL = 'https://cnhmfxwyqtpbmjadlwty.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaG1meHd5cXRwYm1qYWRsd3R5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1MzA1NTksImV4cCI6MjA5MjEwNjU1OX0.bTTVehjz_LQLoTd0xW-FMqLdrB7nnKUlU163vLWcdrA';
 const db = window.supabase.createClient(SUPA_URL, SUPA_KEY);
 
-/* ── AI system prompt ──────────────────────────────────────── */
-const AI_SYSTEM = `You are Mission Control, the AI assistant inside RedTeamGig. Be concise.`;
+const AI_SYSTEM = `You are Mission Control. Be extremely concise.`;
 
-/* ── App state ──────────────────────────────────────────────── */
 const APP = {
   user: null,
   profile: null,
   role: null,
   gigs: [],
-  talent: [],
-  applications: [],
   initialized: false,
 };
 
@@ -28,16 +24,13 @@ async function boot() {
   APP.initialized = true;
 
   try {
-    // 1. Session check
     const { data: { session }, error: sessErr } = await db.auth.getSession();
-    
     if (sessErr || !session?.user) {
       window.location.replace('/index.html');
       return;
     }
     APP.user = session.user;
 
-    // 2. Profile fetch
     let { data: profile } = await db.from('profiles').select('*').eq('id', APP.user.id).single();
 
     if (!profile) {
@@ -53,24 +46,24 @@ async function boot() {
     APP.role = profile?.role || 'red_teamer';
 
   } catch (err) {
-    console.error("Critical Boot Error:", err);
+    console.error("Boot Error:", err);
   } finally {
-    // 3. THE FAIL-SAFE: Kills the spinner
+    // 1. Reveal UI and Kill Spinner
     const loadingScreen = document.getElementById('loading-screen') || document.querySelector('.circling-thing-container');
     if (loadingScreen) loadingScreen.style.display = 'none';
-
-    const appShell = document.getElementById('app-shell');
-    if (appShell) appShell.style.display = 'flex';
-
-    // 4. Initial Render
+    
+    show('app-shell');
+    
+    // 2. Initial Render
     paintSidebar();
 
     if (APP.role === 'company_client' || APP.role === 'admin') {
       show('company-view');
     } else {
       show('freelancer-view');
-      showDashboard(); // Defaults to Hub
+      showDashboard(); // Defaults to Hub view
       initFreelancer(); 
+      show('ai-panel');
     }
   }
 
@@ -79,10 +72,10 @@ async function boot() {
   });
 }
 
-/* ── View Switching (Syncs with your Sidebar) ──────────────── */
+/* ── View Switching (Fixes the Sidebar Buttons) ────────────── */
 
 function showDashboard() {
-  hide('fl-fl-profile'); 
+  hide('fl-fl-profile'); // Matches the ID in your app.html
   show('fl-hub');
   const title = document.getElementById('topbar-title');
   if (title) title.innerText = "Mission Hub";
@@ -90,10 +83,11 @@ function showDashboard() {
 
 function showProfile() {
   hide('fl-hub');
-  show('fl-fl-profile'); 
+  show('fl-fl-profile'); // Matches the ID in your app.html
   const title = document.getElementById('topbar-title');
   if (title) title.innerText = "Mission Profile";
 
+  // Pre-fill profile data from your HTML IDs
   if (APP.profile) {
     if(document.getElementById('p-name')) document.getElementById('p-name').value = APP.profile.display_name || '';
     if(document.getElementById('p-github')) document.getElementById('p-github').value = APP.profile.github_url || '';
@@ -101,22 +95,24 @@ function showProfile() {
   }
 }
 
-/* ── Freelancer Data ───────────────────────────────────────── */
+/* ── Freelancer Hub Logic ──────────────────────────────────── */
 
 async function initFreelancer() {
   const { data, error } = await db.from('external_gigs').select('*').order('posted_at', { ascending: false });
-  if (data) {
-    APP.gigs = data;
-    renderGigs(data);
-    const totalEl = document.getElementById('stat-total');
-    if(totalEl) totalEl.innerText = data.length;
-  }
+  if (error) return console.error("Gigs error:", error);
+
+  APP.gigs = data;
+  renderGigs(APP.gigs);
 }
 
 function renderGigs(list) {
   const grid = document.getElementById('gig-grid');
+  const countLbl = document.getElementById('gig-count-lbl');
   if (!grid) return;
   grid.innerHTML = '';
+
+  if (countLbl) countLbl.innerText = `${list.length} missions available`;
+
   list.forEach(gig => {
     const card = document.createElement('div');
     card.className = 'gig-card';
@@ -126,7 +122,10 @@ function renderGigs(list) {
         <div class="gig-title">${gig.title}</div>
       </div>
       <div class="gig-pay-row"><span class="gig-pay">${gig.pay_range || 'Competitive'}</span></div>
-      <a href="${gig.apply_url || '#'}" target="_blank" class="btn btn-sig btn-sm">View Mission ↗</a>
+      <div class="gig-tags">${gig.tags ? gig.tags.map(t => `<span class="gig-tag">${t}</span>`).join('') : ''}</div>
+      <div class="gig-foot">
+        <a href="${gig.apply_url || '#'}" target="_blank" class="btn btn-sig btn-sm">View Mission ↗</a>
+      </div>
     `;
     grid.appendChild(card);
   });
@@ -146,9 +145,9 @@ async function saveProfile() {
     updated_at: new Date()
   }).eq('id', APP.user.id);
 
-  if (error) alert("Update failed.");
+  if (error) alert("Sync failed.");
   else {
-    alert("Profile Updated.");
+    alert("Profile synced.");
     APP.profile.display_name = name;
     paintSidebar();
   }
@@ -161,16 +160,15 @@ function show(id) {
   if (el) el.style.display = (id === 'app-shell' ? 'flex' : 'block');
 }
 
-function hide(id) { 
+function hide(id) {
   const el = document.getElementById(id);
-  if (el) el.style.display = 'none'; 
+  if (el) el.style.display = 'none';
 }
 
 function paintSidebar() {
   const nameEl = document.getElementById('sb-name');
   if (nameEl && APP.profile) nameEl.innerText = APP.profile.display_name;
   
-  // Show the freelancer nav
   const nav = document.getElementById('nav-freelancer');
   if (nav && APP.role === 'red_teamer') nav.style.display = 'block';
 }
