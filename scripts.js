@@ -48,17 +48,18 @@ async function boot() {
   } catch (err) {
     console.error("Boot Error:", err);
   } finally {
-    const loadingScreen = document.getElementById('loading-screen') || document.querySelector('.circling-thing-container');
+    const loadingScreen = document.getElementById('loading-screen');
     if (loadingScreen) loadingScreen.style.display = 'none';
-    show('app-shell');
     
+    show('app-shell');
     paintSidebar();
 
     if (APP.role === 'company_client' || APP.role === 'admin') {
       show('company-view');
+      // showCompanyView('co-overview'); // if you have this function
     } else {
       show('freelancer-view');
-      showDashboard(); // Default view
+      showDashboard(); // This will show the Hub
       initFreelancer(); 
     }
   }
