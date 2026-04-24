@@ -1,5 +1,5 @@
 /* ============================================================
-   RedTeamGig — script.js
+   RedTeamGig — script.js (FIXED)
    ============================================================ */
 
 const SUPA_URL = 'https://cnhmfxwyqtpbmjadlwty.supabase.co';
@@ -48,20 +48,21 @@ async function boot() {
   } catch (err) {
     console.error("Boot Error:", err);
   } finally {
-    const loadingScreen = document.getElementById('loading-screen');
-    if (loadingScreen) loadingScreen.style.display = 'none';
+    // FORCE HIDE LOADING SCREEN
+    const loader = document.getElementById('loading-screen') || document.querySelector('.circling-thing-container');
+    if (loader) loader.style.display = 'none';
     
     show('app-shell');
-    paintSidebar();
-
+    
     if (APP.role === 'company_client' || APP.role === 'admin') {
       show('company-view');
-      // showCompanyView('co-overview'); // if you have this function
     } else {
       show('freelancer-view');
-      showDashboard(); // This will show the Hub
+      showDashboard(); // Ensure Hub is visible
       initFreelancer(); 
     }
+    
+    paintSidebar();
   }
 
   db.auth.onAuthStateChange((event) => {
@@ -72,56 +73,23 @@ async function boot() {
 /* ── View Switching Logic ──────────────────────────────────── */
 
 function showDashboard() {
-  const hub = document.getElementById('fl-hub');
-  const profView = document.getElementById('fl-fl-profile'); // Match your HTML ID
+  hide('fl-fl-profile'); // Matches your HTML ID
+  show('fl-hub');
   const title = document.getElementById('topbar-title');
-
-  if (hub) hub.style.display = 'block';
-  if (profView) profView.style.display = 'none';
   if (title) title.innerText = "Mission Hub";
 }
 
 function showProfile() {
-  const hub = document.getElementById('fl-hub');
-  const profView = document.getElementById('fl-fl-profile'); // Match your HTML ID
+  hide('fl-hub');
+  show('fl-fl-profile'); // Matches your HTML ID
   const title = document.getElementById('topbar-title');
-
-  if (hub) hub.style.display = 'none';
-  if (profView) profView.style.display = 'block';
   if (title) title.innerText = "Mission Profile";
 
-  // Pre-fill using the IDs from your app.html (p-github, p-bio, etc)
+  // Pre-fill profile fields
   if (APP.profile) {
+    if(document.getElementById('p-name')) document.getElementById('p-name').value = APP.profile.display_name || '';
     if(document.getElementById('p-github')) document.getElementById('p-github').value = APP.profile.github_url || '';
     if(document.getElementById('p-bio')) document.getElementById('p-bio').value = APP.profile.bio || '';
-    if(document.getElementById('p-name')) document.getElementById('p-name').value = APP.profile.display_name || '';
-  }
-}
-
-/* ── Profile Management ────────────────────────────────────── */
-
-async function saveProfile() {
-  // Use the IDs from your actual HTML
-  const name = document.getElementById('p-name')?.value;
-  const github = document.getElementById('p-github')?.value;
-  const bio = document.getElementById('p-bio')?.value;
-
-  const { error } = await db.from('profiles').update({
-    display_name: name,
-    github_url: github,
-    bio: bio,
-    updated_at: new Date()
-  }).eq('id', APP.user.id);
-
-  if (error) {
-    console.error(error);
-    alert("Sync failed.");
-  } else {
-    alert("Profile synced to Mission Control.");
-    APP.profile.display_name = name;
-    APP.profile.github_url = github;
-    APP.profile.bio = bio;
-    paintSidebar(); // Refresh name in sidebar
   }
 }
 
@@ -134,17 +102,13 @@ async function initFreelancer() {
   APP.gigs = data;
   renderGigs(APP.gigs);
   
-  // Update stats
   if(document.getElementById('stat-total')) document.getElementById('stat-total').innerText = data.length;
 }
 
 function renderGigs(list) {
   const grid = document.getElementById('gig-grid');
-  const countLbl = document.getElementById('gig-count-lbl');
   if (!grid) return;
-
   grid.innerHTML = '';
-  if (countLbl) countLbl.innerText = `${list.length} missions available`;
 
   list.forEach(gig => {
     const finalLink = gig.referral_url || gig.apply_url || '#';
@@ -175,24 +139,22 @@ function renderGigs(list) {
 /* ── Profile Management ────────────────────────────────────── */
 
 async function saveProfile() {
-  const github = document.getElementById('prof-github')?.value;
-  const bio = document.getElementById('prof-bio')?.value;
-  const skills = document.getElementById('prof-skills')?.value;
+  const name = document.getElementById('p-name')?.value;
+  const github = document.getElementById('p-github')?.value;
+  const bio = document.getElementById('p-bio')?.value;
 
   const { error } = await db.from('profiles').update({
+    display_name: name,
     github_url: github,
     bio: bio,
-    skills: skills ? skills.split(',').map(s => s.trim()) : [],
     updated_at: new Date()
   }).eq('id', APP.user.id);
 
   if (error) alert("Sync failed.");
   else {
     alert("Profile synced to Mission Control.");
-    // Update local state
-    APP.profile.github_url = github;
-    APP.profile.bio = bio;
-    APP.profile.skills = skills ? skills.split(',') : [];
+    APP.profile.display_name = name;
+    paintSidebar();
   }
 }
 
@@ -208,20 +170,20 @@ function toggleAI(forceOpen = null) {
 
 async function aiSend() {
   const input = document.getElementById('ai-input');
-  const chatBox = document.getElementById('ai-chat-box');
+  const chatBox = document.getElementById('ai-msgs'); // FIXED ID
   const text = input.value.trim();
+  
   if (!text) return;
-  if (APP.aiCount >= 10) return alert("Mission Control quota reached.");
-  if (text.length > 400) return alert("Message too long.");
-
+  if (APP.aiCount >= 10) return alert("Quota reached.");
+  
   APP.aiCount++;
-  chatBox.innerHTML += `<div class="msg msg-user">${text}</div>`;
+  chatBox.innerHTML += `<div class="ai-msg user"><div class="ai-bubble">${text}</div></div>`;
   input.value = '';
 
-  const context = `Context: Gigs: ${APP.gigs.slice(0,5).map(g => g.title).join(', ')}.`;
+  const context = `Gigs: ${APP.gigs.slice(0,3).map(g => g.title).join(', ')}.`;
   const reply = await callClaude(text, AI_SYSTEM + " " + context);
   
-  chatBox.innerHTML += `<div class="msg msg-ai">${reply}</div>`;
+  chatBox.innerHTML += `<div class="ai-msg assistant"><div class="ai-av">AI</div><div class="ai-bubble">${reply}</div></div>`;
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
@@ -245,18 +207,13 @@ async function callClaude(userMsg, system) {
       body: JSON.stringify({ prompt: userMsg, system: system }),
     });
     const data = await res.json();
-    return data.content?.[0]?.text || 'Connection lost...';
+    return data.content?.[0]?.text || 'Offline...';
   } catch (e) {
-    return "Mission Control offline.";
+    return "Connection error.";
   }
 }
 
 function paintSidebar() {
-  // Update user name in sidebar
-  const nameEl = document.querySelector('.user-name');
+  const nameEl = document.getElementById('user-name-display');
   if (nameEl && APP.profile) nameEl.innerText = APP.profile.display_name;
-}
-
-async function signOut() {
-  await db.auth.signOut();
 }
