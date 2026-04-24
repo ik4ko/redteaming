@@ -313,11 +313,14 @@ textarea.f-input{resize:vertical;min-height:80px}
     <div class="topbar">
       <div class="topbar-title" id="topbar-title">Dashboard</div>
       <div style="flex:1;"></div>
-      <div id="hub-controls" style="display:none;align-items:center;gap:8px;flex-wrap:wrap;">
-        <div class="search-box">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="color:var(--dim);flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35" stroke-linecap="round"/></svg>
-          <input type="text" id="gig-search" placeholder="Search gigs…" oninput="applySearch()">
-        </div>
+     <div id="hub-controls" style="display:none; align-items:center; gap:8px; flex-wrap:wrap;">
+  <div class="search-box">
+    <input type="text" id="gig-search" placeholder="Search gigs…" oninput="applySearch()">
+  </div>
+  <button class="filter-btn filter-active" onclick="setFilter('all')">All</button>
+  <button class="filter-btn" onclick="setFilter('internal')">Internal</button>
+  <button class="filter-btn" onclick="setFilter('partner')">Partner ↗</button>
+</div>
         <button class="filter-btn filter-active" data-filter="all"       onclick="setFilter('all')">All</button>
         <button class="filter-btn"               data-filter="internal" onclick="setFilter('internal')">Internal</button>
         <button class="filter-btn"               data-filter="partner"  onclick="setFilter('partner')">Partner ↗</button>
@@ -326,25 +329,61 @@ textarea.f-input{resize:vertical;min-height:80px}
 
     <div class="content">
 
-      <div id="freelancer-view" style="display:none;">
+    <div id="freelancer-view" style="display:none;">
 
-        <div id="fl-hub" style="display:none;">
-          <div class="stats-row">
-            <div class="stat-card">
-              <div class="stat-val" id="stat-total">—</div>
-              <div class="stat-label">Live gigs available</div>
-              <div class="stat-delta">↑ Updated continuously</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-val green" id="stat-matched">—</div>
-              <div class="stat-label">Strong AI matches</div>
-              <div class="stat-delta">Based on your skills</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-val amber" id="stat-top-pay">$—</div>
-              <div class="stat-label">Top rate available</div>
-              <div class="stat-delta">Expert-tier gigs</div>
-            </div>
+  <div id="fl-hub" style="display:none;">
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-val" id="stat-total">—</div>
+        <div class="stat-label">Live gigs available</div>
+        <div class="stat-delta">↑ Updated continuously</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val green" id="stat-matched">—</div>
+        <div class="stat-label">Strong AI matches</div>
+        <div class="stat-delta">Based on your skills</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val amber" id="stat-top-pay">$—</div>
+        <div class="stat-label">Top rate available</div>
+        <div class="stat-delta">Expert-tier gigs</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="stat-apps">0</div>
+        <div class="stat-label">My applications</div>
+        <div class="stat-delta">Track in Applications</div>
+      </div>
+    </div>
+
+    <div class="section-head" style="margin-top:32px;">
+      <div id="gig-count-lbl" style="font-family:'DM Mono'; font-size:12px; color:var(--dim);">Loading missions...</div>
+    </div>
+    <div id="gig-grid" class="gig-grid">
+      </div>
+  </div>
+
+  <div id="profile-edit-view" style="display:none; max-width:600px; margin:40px auto; padding:20px; background:var(--ink2); border:1px solid var(--wire);">
+    <h2 style="font-family:'Cabinet Grotesk'; font-size:24px; margin-bottom:20px; font-weight:800;">Mission Profile</h2>
+    
+    <div class="form-group" style="margin-bottom:15px;">
+      <label style="display:block; color:var(--dim); font-size:11px; margin-bottom:5px; font-family:'DM Mono';">GITHUB USERNAME</label>
+      <input type="text" id="prof-github" placeholder="e.g. jdoe_redteam" style="width:100%; background:var(--ink3); border:1px solid var(--wire); padding:12px; color:white; font-family:'DM Mono';">
+    </div>
+
+    <div class="form-group" style="margin-bottom:15px;">
+      <label style="display:block; color:var(--dim); font-size:11px; margin-bottom:5px; font-family:'DM Mono';">SKILLS (Comma separated)</label>
+      <input type="text" id="prof-skills" placeholder="jailbreaking, prompt injection, python" style="width:100%; background:var(--ink3); border:1px solid var(--wire); padding:12px; color:white; font-family:'DM Mono';">
+    </div>
+
+    <div class="form-group" style="margin-bottom:15px;">
+      <label style="display:block; color:var(--dim); font-size:11px; margin-bottom:5px; font-family:'DM Mono';">BIO / RESUME LINK</label>
+      <textarea id="prof-bio" placeholder="Tell us about your adversarial testing experience..." style="width:100%; background:var(--ink3); border:1px solid var(--wire); padding:12px; color:white; height:120px; font-family:'DM Mono'; resize:none;"></textarea>
+    </div>
+
+    <button class="btn btn-sig" onclick="saveProfile()" style="width:100%; padding:14px; font-weight:700;">Sync to Mission Control</button>
+  </div>
+
+</div>
             <div class="stat-card">
               <div class="stat-val" id="stat-apps">0</div>
               <div class="stat-label">My applications</div>
@@ -442,6 +481,42 @@ textarea.f-input{resize:vertical;min-height:80px}
               <div class="td-muted" style="font-size:12px;margin-top:2px;">Is this bounty worth your time?</div>
               <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--sig2);margin-top:8px;letter-spacing:.06em;">ASK AI →</div>
             </div>
+            .ai-trigger-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: var(--sig); /* Your signature red color */
+  border: 1px solid var(--wire2);
+  border-radius: 100px;
+  color: white;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ai-trigger-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  background: var(--sig2);
+  box-shadow: 0 15px 40px rgba(232, 56, 47, 0.3);
+}
+
+.ai-trigger-btn:active {
+  transform: translateY(0);
+}
+
+/* Hide the text on small mobile screens if needed */
+@media (max-width: 600px) {
+  .ai-trigger-btn .btn-text { display: none; }
+  .ai-trigger-btn { padding: 12px; border-radius: 50%; }
+}
           </div>
         </div>
       </div> <div id="company-view" style="display:none;">
@@ -473,18 +548,20 @@ textarea.f-input{resize:vertical;min-height:80px}
   </div>
   <div class="ai-fab" onclick="toggleAI()">
     <div class="ai-ping"></div>
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+    </svg>
   </div>
-</div>
 
-<div class="modal-bd" id="modal-bd" onclick="if(event.target===this) closeModal()">
-  <div class="modal-box">
-    <div id="modal-content"></div>
+  <div class="modal-bd" id="modal-bd" onclick="if(event.target===this) closeModal()">
+    <div class="modal-box">
+      <div id="modal-content"></div>
+    </div>
   </div>
-</div>
 
-<div class="toast-wrap" id="toasts"></div>
+  <div class="toast-wrap" id="toasts"></div>
 
-<script src="scripts.js"></script>
+  <script src="script.js"></script>
+
 </body>
 </html>
