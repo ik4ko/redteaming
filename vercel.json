@@ -1,7 +1,6 @@
-{ "rewrites": [{ "source": "/app", "destination": "/app.html" }] }
-{ 
+{
   "rewrites": [
     { "source": "/app", "destination": "/app.html" },
     { "source": "/freelancer-portal", "destination": "/freelancer-portal.html" }
-  ] 
+  ]
 }
