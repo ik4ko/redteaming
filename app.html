@@ -421,10 +421,14 @@ textarea.inp{resize:vertical;min-height:80px}
           <!-- Left: preview + dossier -->
           <div style="display:flex;flex-direction:column;gap:12px">
             <div class="card cp">
-              <div style="height:52px;background:linear-gradient(135deg,rgba(232,56,47,.14),rgba(232,56,47,.02));border-radius:7px;margin:-18px -20px 0;position:relative">
-                <div id="prof-av" style="position:absolute;bottom:-20px;left:16px;width:42px;height:42px;border-radius:10px;background:rgba(232,56,47,.12);border:2px solid var(--bg2);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-weight:500;font-size:15px;color:var(--red2)">??</div>
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--b)">
+                <div id="prof-av" style="width:42px;height:42px;border-radius:10px;background:rgba(232,56,47,.12);border:1px solid rgba(232,56,47,.25);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-weight:500;font-size:15px;color:var(--red2)">??</div>
+                <div>
+                  <div id="prof-name" style="font-weight:700;font-size:15px;color:var(--txt)">—</div>
+                  <div id="prof-handle" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--dim)">@—</div>
+                </div>
               </div>
-              <div style="margin-top:28px">
+              <div>
                 <div style="display:flex;align-items:center;gap:7px">
                   <div id="prof-name" style="font-weight:700;font-size:17px;color:var(--txt)">—</div>
                   <span id="prof-verified-badge" style="display:none;background:var(--grn);color:#000;font-size:9px;font-weight:900;padding:2px 7px;border-radius:20px">✓ VERIFIED</span>
@@ -441,17 +445,14 @@ textarea.inp{resize:vertical;min-height:80px}
 
             <!-- Dossier upload -->
             <div class="card cp">
-              <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--mut);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">
-                Technical Dossier
-                <span style="color:var(--amb)">→ Unlocks L2</span>
-              </div>
-              <label class="upload-zone" id="dossier-zone" for="dossier-file">
-                <input type="file" id="dossier-file" accept=".pdf,.doc,.docx" onchange="handleDossier(event)">
-                <div id="dossier-label" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--mut);cursor:pointer">
+              <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--mut);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">Technical Dossier <span style="color:var(--amb);font-size:9px">→ Unlocks L2</span></div>
+              <div id="dossier-zone" class="upload-zone" onclick="elById('dossier-file').click()" style="cursor:pointer">
+                <input type="file" id="dossier-file" accept=".pdf,.doc,.docx" onchange="handleDossier(event)" style="display:none">
+                <div id="dossier-label" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--mut);pointer-events:none;line-height:1.6">
                   📄 Upload Technical Dossier<br>
                   <span style="font-size:10px;opacity:.6">PDF, DOC, DOCX · Max 5MB</span>
                 </div>
-              </label>
+              </div>
               <div id="dossier-status" style="margin-top:8px;font-size:11px;color:var(--dim)"></div>
             </div>
           </div>
@@ -996,8 +997,8 @@ async function handleDossier(event) {
 ═══════════════════════════════════════════════════ */
 async function loadGigs() {
   const [mRes, eRes] = await Promise.all([
-    S.db.from('mercor_jobs').select('*').order('created_at',{ascending:false}).limit(30).catch(()=>({data:[]})),
-    S.db.from('external_gigs').select('*').order('created_at',{ascending:false}).limit(30).catch(()=>({data:[]})),
+    S.db.from('mercor_jobs').select('*').order('posted_at',{ascending:false}).limit(30).catch(()=>({data:[]})),
+    S.db.from('external_gigs').select('*').order('posted_at',{ascending:false}).limit(30).catch(()=>({data:[]})),
   ]);
   const mercor   = (mRes.data||[]).map(g=>({...g,_ext:true,_aff:'mercor',_src:'Mercor'}));
   const external = (eRes.data||[]).map(g=>({...g,_ext:true,_src:g.external_source||g.source||'Partner',_aff:detectAff(g)}));
