@@ -11,31 +11,36 @@
   --bg:#08090d;--bg2:#0d1018;--bg3:#141923;--bg4:#1a2030;
   --b:rgba(255,255,255,.07);--b2:rgba(255,255,255,.12);
   --red:#e8382f;--red2:#ff5f56;--grn:#17c97e;--amb:#f0a317;
-  --blu:#3b82f6;--pur:#a855f7;
+  --blu:#3b82f6;--pur:#a855f7;--gold:#f5c542;
   --dim:#4e5a6e;--mut:#8892a4;--txt:#dde3ef;
   --r:10px;--rs:7px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
 body{background:var(--bg);color:var(--txt);font-family:'Cabinet Grotesk',sans-serif;font-size:14px;overflow-x:hidden}
-::-webkit-scrollbar{width:3px;height:3px}
-::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+::-webkit-scrollbar{width:3px;height:3px}::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
 
-/* ── Layout ─────────────────────────────── */
+/* Layout */
 #app{display:flex;min-height:100vh}
 .sb{width:214px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--b);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:20}
 .main{flex:1;min-width:0;display:flex;flex-direction:column}
 .topbar{height:50px;padding:0 22px;border-bottom:1px solid var(--b);background:var(--bg2);display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10;flex-shrink:0}
 .page{flex:1;overflow-y:auto;padding:22px}
 
-/* ── Sidebar ────────────────────────────── */
+/* Sidebar */
 .sb-logo{padding:16px 15px 12px;border-bottom:1px solid var(--b);display:flex;align-items:center;gap:8px}
 .sb-mark{width:27px;height:27px;background:var(--red);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .sb-word{font-weight:800;font-size:14px;color:var(--txt);letter-spacing:-.02em}
 .sb-user{padding:12px 14px;border-bottom:1px solid var(--b)}
 .sb-av{width:32px;height:32px;border-radius:8px;background:rgba(232,56,47,.14);border:1px solid rgba(232,56,47,.22);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:12px;color:var(--red2);margin-bottom:6px}
+.sb-name-row{display:flex;align-items:center;gap:6px}
 .sb-name{font-weight:700;font-size:13px;color:var(--txt)}
+.verified-check{background:var(--grn);color:#000;font-size:9px;font-weight:900;padding:1px 5px;border-radius:10px;display:none}
 .sb-tag{display:inline-block;margin-top:3px;padding:2px 8px;border-radius:3px;background:rgba(232,56,47,.1);border:1px solid rgba(232,56,47,.2);font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.07em;text-transform:uppercase;color:var(--red2)}
+.vetting-row{display:flex;align-items:center;gap:6px;margin-top:8px}
+.vdot{width:8px;height:8px;border-radius:50%;background:var(--bg3);border:1px solid var(--b2);transition:all .3s}
+.vdot.on{background:var(--grn);border-color:var(--grn);box-shadow:0 0 6px rgba(23,201,126,.4)}
+.vl-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:.06em;text-transform:uppercase}
 .scores{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:9px}
 .sc-b{background:var(--bg3);border:1px solid var(--b);border-radius:6px;padding:5px 7px;text-align:center}
 .sc-n{font-family:'DM Mono',monospace;font-size:13px;color:var(--grn);line-height:1}
@@ -53,7 +58,7 @@ body{background:var(--bg);color:var(--txt);font-family:'Cabinet Grotesk',sans-se
 @keyframes pu{0%,100%{opacity:1}50%{opacity:.4}}
 .odot{width:5px;height:5px;border-radius:50%;background:var(--grn);display:inline-block;margin-right:5px;animation:pu 2s infinite}
 
-/* ── Topbar ──────────────────────────────── */
+/* Topbar */
 .tb-t{font-weight:700;font-size:15px;color:var(--txt)}
 .srch-w{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--b);border-radius:var(--rs);padding:5px 10px;transition:border-color .2s}
 .srch-w:focus-within{border-color:rgba(232,56,47,.4)}
@@ -62,46 +67,49 @@ body{background:var(--bg);color:var(--txt);font-family:'Cabinet Grotesk',sans-se
 .fb{padding:5px 10px;border-radius:6px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.05em;text-transform:uppercase;border:1px solid var(--b2);background:none;color:var(--mut);cursor:pointer;transition:all .15s}
 .fb:hover{color:var(--txt)}.fb.fa{border-color:var(--red)!important;color:var(--red2)!important}
 
-/* ── Views ───────────────────────────────── */
+/* Views */
 .view{display:none}.view.on{display:block}
 @keyframes sp{to{transform:rotate(360deg)}}
 @keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @keyframes sh{0%{background-position:-200% 0}100%{background-position:200% 0}}
 
-/* ── Stats ───────────────────────────────── */
+/* Stats */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:22px}
 @media(max-width:1100px){.stats{grid-template-columns:repeat(2,1fr)}}
 .stc{background:var(--bg2);border:1px solid var(--b);border-radius:var(--r);padding:15px 17px;position:relative;overflow:hidden}
 .stc::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--red);opacity:.5}
 .stv{font-family:'DM Mono',monospace;font-size:26px;font-weight:500;line-height:1;margin-bottom:4px}
 .stl{font-size:12px;color:var(--mut)}.std{font-family:'DM Mono',monospace;font-size:10px;color:var(--grn);margin-top:4px}
-.c-g{color:var(--grn)}.c-a{color:var(--amb)}.c-p{color:var(--pur)}
+.c-g{color:var(--grn)}.c-a{color:var(--amb)}.c-p{color:var(--pur)}.c-gold{color:var(--gold)}
 
-/* ── Section header ──────────────────────── */
+/* Section header */
 .sh{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:14px}
 .sh-t{font-weight:700;font-size:17px;color:var(--txt);letter-spacing:-.01em}
 .sh-s{font-size:12px;color:var(--dim);margin-top:2px}
 
-/* ── Tab bar (bounties) ──────────────────── */
+/* Tab bar */
 .tab-bar{display:flex;gap:2px;background:var(--bg3);border:1px solid var(--b);border-radius:var(--rs);padding:3px;margin-bottom:18px;width:fit-content}
 .tab{padding:6px 14px;border-radius:5px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);cursor:pointer;border:none;background:none;transition:all .15s}
 .tab:hover{color:var(--txt)}.tab.on{background:var(--bg2);color:var(--txt);border:1px solid var(--b2)}
 
-/* ── Gig / bounty cards ──────────────────── */
+/* Gig/bounty grid */
 .gg{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}
 @media(max-width:960px){.gg{grid-template-columns:1fr}}
 .gc{background:var(--bg2);border:1px solid var(--b);border-radius:var(--r);padding:15px 17px;cursor:pointer;transition:all .18s;display:flex;flex-direction:column;gap:10px;animation:fu .25s ease}
 .gc:hover{border-color:rgba(232,56,47,.28);transform:translateY(-1px);box-shadow:0 5px 22px rgba(0,0,0,.45)}
+.gc.affiliate{border-color:rgba(245,197,66,.22);position:relative;overflow:hidden}
+.gc.affiliate::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold);opacity:.7}
+.gc.affiliate:hover{border-color:rgba(245,197,66,.5);box-shadow:0 5px 22px rgba(245,197,66,.07)}
 .gc.bc{border-color:rgba(168,85,247,.2);position:relative;overflow:hidden}
-.gc.bc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--pur);opacity:.6;border-radius:var(--r) var(--r) 0 0}
-.gc.bc:hover{border-color:rgba(168,85,247,.45);box-shadow:0 5px 22px rgba(168,85,247,.12)}
+.gc.bc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--pur);opacity:.6}
+.gc.bc:hover{border-color:rgba(168,85,247,.45);box-shadow:0 5px 22px rgba(168,85,247,.1)}
 .gig-head{display:flex;gap:10px;align-items:flex-start}
 .gig-icon{width:33px;height:33px;border-radius:var(--rs);background:var(--bg3);border:1px solid var(--b);display:flex;align-items:center;justify-content:center;font-size:14px;font-family:'DM Mono',monospace;font-weight:500;color:var(--mut);flex-shrink:0}
 .gig-head-text{flex:1;min-width:0}
 .gig-badges{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:4px}
 .gig-title{font-weight:600;font-size:13px;color:var(--txt);line-height:1.4}
 .gig-pay{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:var(--grn)}
-.gig-pay.pur{color:var(--pur)}
+.gig-pay.pur{color:var(--pur)}.gig-pay.gold{color:var(--gold)}
 .gig-source{font-family:'DM Mono',monospace;font-size:9px;color:var(--dim)}
 .gig-tags{display:flex;flex-wrap:wrap;gap:4px}
 .gig-tag{font-family:'DM Mono',monospace;font-size:9px;padding:2px 7px;border-radius:3px;background:rgba(255,255,255,.04);border:1px solid var(--b);color:var(--mut)}
@@ -111,16 +119,17 @@ body{background:var(--bg);color:var(--txt);font-family:'Cabinet Grotesk',sans-se
 .fit-track{width:48px;height:3px;background:var(--bg3);border-radius:2px;overflow:hidden}
 .fit-fill{height:100%;border-radius:2px;transition:width .8s ease}
 
-/* ── Badges ──────────────────────────────── */
-.badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:3px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.07em;text-transform:uppercase}
+/* Badges */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:3px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.07em;text-transform:uppercase}
 .br{background:rgba(232,56,47,.1);color:var(--red2);border:1px solid rgba(232,56,47,.2)}
 .bg{background:rgba(23,201,126,.08);color:var(--grn);border:1px solid rgba(23,201,126,.15)}
 .ba{background:rgba(240,163,23,.08);color:var(--amb);border:1px solid rgba(240,163,23,.15)}
 .bb{background:rgba(59,130,246,.08);color:var(--blu);border:1px solid rgba(59,130,246,.15)}
 .bp{background:rgba(168,85,247,.1);color:var(--pur);border:1px solid rgba(168,85,247,.2)}
+.bgold{background:rgba(245,197,66,.1);color:var(--gold);border:1px solid rgba(245,197,66,.2)}
 .bd{background:rgba(255,255,255,.04);color:var(--mut);border:1px solid var(--b)}
 
-/* ── Table ───────────────────────────────── */
+/* Table */
 .tbl{width:100%;border-collapse:collapse}
 .tbl th{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);padding:0 13px 9px;text-align:left;border-bottom:1px solid var(--b)}
 .tbl td{padding:12px 13px;border-bottom:1px solid var(--b);vertical-align:middle}
@@ -129,15 +138,14 @@ body{background:var(--bg);color:var(--txt);font-family:'Cabinet Grotesk',sans-se
 .tav{width:29px;height:29px;border-radius:6px;background:var(--bg3);border:1px solid var(--b);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:10px;color:var(--mut);flex-shrink:0}
 .nm-c{display:flex;align-items:center;gap:9px}
 
-/* ── Buttons ─────────────────────────────── */
+/* Buttons */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 18px;border-radius:var(--rs);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;border:none;transition:all .18s;font-weight:500}
 .btn:active{transform:scale(.97)}.btn:disabled{opacity:.5;cursor:not-allowed}
 .btn-r{background:var(--red);color:#fff}.btn-r:hover{background:var(--red2);box-shadow:0 0 18px rgba(232,56,47,.3)}
-.btn-g{background:var(--grn);color:#000;font-weight:700}.btn-g:hover{opacity:.9}
 .btn-gh{background:none;color:var(--mut);border:1px solid var(--b2)}.btn-gh:hover{color:var(--txt);background:rgba(255,255,255,.04)}
 .btn-sm{padding:5px 12px;font-size:10px}.btn-fw{width:100%}
 
-/* ── Inputs ──────────────────────────────── */
+/* Inputs */
 .inp{width:100%;background:var(--bg3);border:1px solid var(--b2);border-radius:var(--rs);padding:10px 13px;color:var(--txt);font-size:14px;font-family:inherit;outline:none;transition:border-color .18s,box-shadow .18s}
 .inp:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(232,56,47,.1)}
 .inp::placeholder{color:var(--dim)}
@@ -145,39 +153,63 @@ select.inp{cursor:pointer}
 textarea.inp{resize:vertical;min-height:80px}
 .lbl{display:block;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
 
-/* ── Card ────────────────────────────────── */
+/* Card */
 .card{background:var(--bg2);border:1px solid var(--b);border-radius:var(--r)}
 .cp{padding:18px 20px}
 
-/* ── Skeleton ────────────────────────────── */
+/* Skeleton */
 .sk{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 50%,var(--bg3) 75%);background-size:200% 100%;animation:sh 1.4s infinite;border-radius:5px}
 .sk-gc{height:150px;border-radius:var(--r)}
 
-/* ── Toast ───────────────────────────────── */
+/* Toast */
 #toasts{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:9998;display:flex;flex-direction:column;gap:6px;align-items:center;pointer-events:none}
 .toast{padding:8px 18px;border-radius:var(--rs);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.06em;animation:fu .3s ease;box-shadow:0 5px 20px rgba(0,0,0,.55)}
 .t-ok{background:var(--grn);color:#000}.t-err{background:var(--red);color:#fff}.t-inf{background:var(--bg3);color:var(--txt);border:1px solid var(--b2)}
 
-/* ── Spinner ─────────────────────────────── */
+/* Spinner */
 .spin{display:inline-block;width:13px;height:13px;border-radius:50%;border:2px solid rgba(255,255,255,.25);border-top-color:currentColor;animation:sp .6s linear infinite;vertical-align:middle}
 
-/* ── Empty state ─────────────────────────── */
+/* Empty */
 .empty{text-align:center;padding:44px 20px;color:var(--dim)}
 .empty-ic{font-size:32px;margin-bottom:10px;opacity:.5}
 .empty-t{font-size:16px;color:var(--mut);margin-bottom:5px;font-weight:700}
 
-/* ── AI widget ───────────────────────────── */
+/* Dossier upload */
+.upload-zone{border:2px dashed var(--b2);border-radius:var(--rs);padding:18px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg3)}
+.upload-zone:hover{border-color:var(--red);background:rgba(232,56,47,.04)}
+.upload-zone.has-file{border-color:var(--grn);background:rgba(23,201,126,.04)}
+.upload-zone input{display:none}
+
+/* Vetting level cards */
+.vl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.vl-card{padding:14px;border-radius:var(--rs);border:1px solid var(--b);background:var(--bg3);text-align:center}
+.vl-card.active{border-color:var(--grn);background:rgba(23,201,126,.06)}
+.vl-card.locked{opacity:.45}
+.vl-num{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:var(--grn);line-height:1;margin-bottom:4px}
+.vl-card.locked .vl-num{color:var(--dim)}
+.vl-name{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin-bottom:4px}
+.vl-desc{font-size:11px;color:var(--dim)}
+
+/* PoW section */
+.pow-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pow-item{background:var(--bg3);border:1px solid var(--b);border-radius:var(--rs);padding:12px 14px;display:flex;align-items:center;gap:10px}
+.pow-icon{font-size:18px;flex-shrink:0}
+.pow-info{flex:1;min-width:0}
+.pow-name{font-family:'DM Mono',monospace;font-size:10px;color:var(--mut);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+.pow-val{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* AI widget */
 .ai-wrap{position:fixed;bottom:20px;right:20px;z-index:80}
 .ai-fab{width:48px;height:48px;border-radius:13px;background:var(--bg2);border:1px solid rgba(232,56,47,.35);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;box-shadow:0 4px 16px rgba(232,56,47,.15);position:relative}
 .ai-fab:hover{border-color:var(--red);transform:scale(1.06);box-shadow:0 4px 24px rgba(232,56,47,.28)}
 .ai-ping{position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--red);border:2px solid var(--bg);animation:pu 2s infinite}
-.ai-box{position:absolute;bottom:58px;right:0;width:330px;background:var(--bg2);border:1px solid var(--b2);border-radius:14px;box-shadow:0 20px 50px rgba(0,0,0,.7);display:none;flex-direction:column;overflow:hidden;animation:fu .2s ease}
+.ai-box{position:absolute;bottom:58px;right:0;width:340px;background:var(--bg2);border:1px solid var(--b2);border-radius:14px;box-shadow:0 20px 50px rgba(0,0,0,.7);display:none;flex-direction:column;overflow:hidden;animation:fu .2s ease}
 .ai-box.open{display:flex}
 .ai-hd{padding:11px 13px;background:var(--bg3);border-bottom:1px solid var(--b);display:flex;align-items:center;gap:8px}
 .ai-hd-ic{width:25px;height:25px;border-radius:6px;background:rgba(232,56,47,.1);border:1px solid rgba(232,56,47,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .ai-hd-t{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--txt)}
 .ai-hd-s{font-size:10px;color:var(--grn);margin-top:1px}
-.ai-msgs{flex:1;overflow-y:auto;padding:11px;display:flex;flex-direction:column;gap:8px;max-height:260px;min-height:150px}
+.ai-msgs{flex:1;overflow-y:auto;padding:11px;display:flex;flex-direction:column;gap:8px;max-height:280px;min-height:160px}
 .aim{display:flex;gap:6px;animation:fu .2s ease}
 .aim.u{flex-direction:row-reverse}
 .aim-av{width:21px;height:21px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:8px;flex-shrink:0;margin-top:2px}
@@ -197,7 +229,7 @@ textarea.inp{resize:vertical;min-height:80px}
 .dots span{display:inline-block;width:4px;height:4px;border-radius:50%;background:var(--dim);margin:0 1px;animation:pu 1s infinite}
 .dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
 
-/* ── Apply modal ─────────────────────────── */
+/* Modal */
 .modal{position:fixed;inset:0;background:rgba(4,5,9,.82);backdrop-filter:blur(6px);z-index:80;display:none;align-items:center;justify-content:center;padding:16px}
 .modal.open{display:flex}
 .modal-box{background:var(--bg2);border:1px solid var(--b2);border-radius:14px;width:100%;max-width:430px;overflow:hidden;animation:fu .2s ease}
@@ -206,7 +238,7 @@ textarea.inp{resize:vertical;min-height:80px}
 .modal-x{background:rgba(255,255,255,.06);border:none;border-radius:6px;width:26px;height:26px;color:var(--mut);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center}
 .modal-c{padding:17px 20px;display:flex;flex-direction:column;gap:13px}
 
-/* ── Misc ────────────────────────────────── */
+/* Misc */
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px}
 .frow{display:flex;flex-direction:column;gap:6px}
@@ -218,17 +250,17 @@ textarea.inp{resize:vertical;min-height:80px}
 .a-fill{height:100%;border-radius:2px;background:var(--red);transition:width .8s ease}
 .tag-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:4px;font-family:'DM Mono',monospace;font-size:10px;background:rgba(232,56,47,.1);border:1px solid rgba(232,56,47,.25);color:var(--red2)}
 .tag-x{background:none;border:none;color:rgba(232,56,47,.5);cursor:pointer;font-size:12px;padding:0;line-height:1}
+.divider{height:1px;background:var(--b);margin:16px 0}
 </style>
 </head>
 <body>
 
-<!-- LOADING — hidden by boot() once auth confirmed -->
+<!-- LOADING — always hidden in finally{} -->
 <div id="loading-screen" style="position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;z-index:100">
   <div style="width:34px;height:34px;border:2px solid rgba(232,56,47,.2);border-top-color:var(--red);border-radius:50%;animation:sp .7s linear infinite"></div>
   <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:.1em">AUTHENTICATING...</div>
 </div>
 
-<!-- APP — revealed by boot() -->
 <div id="app" style="display:none">
 
   <!-- SIDEBAR -->
@@ -241,18 +273,28 @@ textarea.inp{resize:vertical;min-height:80px}
       </div>
       <span class="sb-word">RedTeamGig</span>
     </div>
-
     <div class="sb-user">
       <div class="sb-av" id="sb-av">??</div>
-      <div class="sb-name" id="sb-name">—</div>
+      <div class="sb-name-row">
+        <span class="sb-name" id="sb-name">—</span>
+        <span class="verified-check" id="sb-verified">✓</span>
+      </div>
       <div class="sb-tag" id="sb-tag">Red Teamer</div>
+      <div class="vetting-row" id="sb-vetting" style="display:none">
+        <div style="display:flex;gap:3px">
+          <div class="vdot" id="vd1"></div>
+          <div class="vdot" id="vd2"></div>
+          <div class="vdot" id="vd3"></div>
+        </div>
+        <span class="vl-label" id="vl-lbl">L1</span>
+      </div>
       <div class="scores" id="sb-scores" style="display:none">
         <div class="sc-b"><div class="sc-n" id="sb-rely">—</div><div class="sc-l">Rely</div></div>
         <div class="sc-b"><div class="sc-n" id="sb-effic">—</div><div class="sc-l">Effic</div></div>
       </div>
     </div>
 
-    <!-- FREELANCER NAV -->
+    <!-- Freelancer nav -->
     <div class="sb-nav" id="fl-nav" style="display:none">
       <div class="nsec">Work</div>
       <button class="ni on" id="ni-hub"      onclick="goView('hub')">     <span class="ni-ic">⚡</span>Mission Hub    <span class="ni-bd" id="bd-hub">0</span></button>
@@ -263,11 +305,11 @@ textarea.inp{resize:vertical;min-height:80px}
       <button class="ni"    id="ni-res"      onclick="goView('res')">      <span class="ni-ic">📚</span>Resources</button>
     </div>
 
-    <!-- COMPANY NAV -->
+    <!-- Company nav -->
     <div class="sb-nav" id="co-nav" style="display:none">
       <div class="nsec">Talent</div>
       <button class="ni on" id="ni-cov"    onclick="goView('cov')">    <span class="ni-ic">📊</span>Overview</button>
-      <button class="ni"    id="ni-cpool"  onclick="goView('cpool')">  <span class="ni-ic">🛡</span>Talent Pool      <span class="ni-bd" id="bd-pool">0</span></button>
+      <button class="ni"    id="ni-cpool"  onclick="goView('cpool')">  <span class="ni-ic">🛡</span>Talent Pool  <span class="ni-bd" id="bd-pool">0</span></button>
       <button class="ni"    id="ni-cscout" onclick="goView('cscout')"> <span class="ni-ic">🤖</span>AI Scout</button>
       <div class="nsec">Manage</div>
       <button class="ni"    id="ni-cpost"  onclick="goView('cpost')">  <span class="ni-ic">✦</span>Post a Gig</button>
@@ -282,8 +324,6 @@ textarea.inp{resize:vertical;min-height:80px}
 
   <!-- MAIN -->
   <div class="main">
-
-    <!-- Topbar -->
     <div class="topbar">
       <div class="tb-t" id="tb-title">Dashboard</div>
       <div style="flex:1"></div>
@@ -300,9 +340,7 @@ textarea.inp{resize:vertical;min-height:80px}
 
     <div class="page">
 
-      <!-- ═══════════ FREELANCER VIEWS ═════════════════ -->
-
-      <!-- MISSION HUB -->
+      <!-- ══════ FREELANCER: MISSION HUB ══════ -->
       <div class="view on" id="v-hub">
         <div class="stats">
           <div class="stc"><div class="stv" id="st-total">—</div><div class="stl">Live gigs</div><div class="std">↑ Updated continuously</div></div>
@@ -317,14 +355,14 @@ textarea.inp{resize:vertical;min-height:80px}
         </div>
       </div>
 
-      <!-- BOUNTIES -->
+      <!-- ══════ FREELANCER: BOUNTIES ══════ -->
       <div class="view" id="v-bounties">
         <div class="stats" style="grid-template-columns:repeat(3,1fr)">
           <div class="stc"><div class="stv c-p" id="bn-count">—</div><div class="stl">Active programs</div><div class="std">Immunefi, HackerOne &amp; more</div></div>
           <div class="stc"><div class="stv c-g" id="bn-max">$—</div><div class="stl">Max single payout</div><div class="std">Critical severity</div></div>
-          <div class="stc"><div class="stv c-a" id="bn-pool">$—</div><div class="stl">Total pool value</div><div class="std">Across all programs</div></div>
+          <div class="stc"><div class="stv c-a" id="bn-pool">$—</div><div class="stl">Total pool</div><div class="std">Across all programs</div></div>
         </div>
-        <div class="tab-bar" id="bounty-tabs">
+        <div class="tab-bar">
           <button class="tab on" data-bt="all"       onclick="setBountyFilter('all')">All</button>
           <button class="tab"    data-bt="immunefi"  onclick="setBountyFilter('immunefi')">Immunefi</button>
           <button class="tab"    data-bt="hackerone" onclick="setBountyFilter('hackerone')">HackerOne</button>
@@ -338,7 +376,7 @@ textarea.inp{resize:vertical;min-height:80px}
         </div>
       </div>
 
-      <!-- APPLICATIONS -->
+      <!-- ══════ FREELANCER: APPLICATIONS ══════ -->
       <div class="view" id="v-apps">
         <div class="sh"><div><div class="sh-t">My Applications</div><div class="sh-s">Every mission you've applied to</div></div></div>
         <div class="card" style="padding:0;overflow:hidden">
@@ -349,31 +387,75 @@ textarea.inp{resize:vertical;min-height:80px}
         </div>
       </div>
 
-      <!-- MISSION PROFILE -->
+      <!-- ══════ FREELANCER: MISSION PROFILE ══════ -->
       <div class="view" id="v-prof">
-        <div class="sh" style="max-width:680px">
-          <div><div class="sh-t">Mission Profile</div><div class="sh-s">Visible to hiring companies when you apply</div></div>
+        <div class="sh" style="max-width:860px">
+          <div><div class="sh-t">Mission Profile</div><div class="sh-s">Your vetting status and public profile</div></div>
           <button class="btn btn-r btn-sm" id="save-prof-btn" onclick="saveProfile()">
             <span class="spin" id="save-spin" style="display:none"></span>Save Profile
           </button>
         </div>
-        <div style="display:grid;grid-template-columns:240px 1fr;gap:18px;max-width:940px">
-          <!-- Preview card -->
-          <div class="card cp">
-            <div style="height:52px;background:linear-gradient(135deg,rgba(232,56,47,.14),rgba(232,56,47,.02));border-radius:7px;margin:-18px -20px 0;position:relative">
-              <div id="prof-av-card" style="position:absolute;bottom:-20px;left:16px;width:42px;height:42px;border-radius:10px;background:rgba(232,56,47,.12);border:2px solid var(--bg2);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-weight:500;font-size:15px;color:var(--red2)">??</div>
+
+        <!-- Vetting cards -->
+        <div style="max-width:860px;margin-bottom:18px">
+          <div class="vl-grid">
+            <div class="vl-card active" id="vl-card-1">
+              <div class="vl-num">L1</div>
+              <div class="vl-name">Registered</div>
+              <div class="vl-desc">Email verified &amp; profile created</div>
             </div>
-            <div style="margin-top:28px">
-              <div id="prof-card-name" style="font-weight:700;font-size:17px;color:var(--txt)">—</div>
-              <div id="prof-card-handle" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--dim);margin-top:2px">@—</div>
-              <div id="prof-card-badges" style="display:flex;gap:5px;flex-wrap:wrap;margin-top:9px"></div>
-              <div class="scores" style="margin-top:12px">
-                <div class="sc-b"><div class="sc-n" id="prof-rely">—%</div><div class="sc-l">Reliability</div></div>
-                <div class="sc-b"><div class="sc-n" id="prof-effic">—%</div><div class="sc-l">Efficiency</div></div>
-              </div>
-              <div id="prof-card-skills" style="margin-top:14px;display:flex;flex-wrap:wrap;gap:5px"></div>
+            <div class="vl-card locked" id="vl-card-2">
+              <div class="vl-num">L2</div>
+              <div class="vl-name">Dossier</div>
+              <div class="vl-desc">Upload your technical resume</div>
+            </div>
+            <div class="vl-card locked" id="vl-card-3">
+              <div class="vl-num">L3</div>
+              <div class="vl-name">Verified ✓</div>
+              <div class="vl-desc">Identity confirmed by RTG team</div>
             </div>
           </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:260px 1fr;gap:18px;max-width:860px">
+          <!-- Left: preview + dossier -->
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div class="card cp">
+              <div style="height:52px;background:linear-gradient(135deg,rgba(232,56,47,.14),rgba(232,56,47,.02));border-radius:7px;margin:-18px -20px 0;position:relative">
+                <div id="prof-av" style="position:absolute;bottom:-20px;left:16px;width:42px;height:42px;border-radius:10px;background:rgba(232,56,47,.12);border:2px solid var(--bg2);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-weight:500;font-size:15px;color:var(--red2)">??</div>
+              </div>
+              <div style="margin-top:28px">
+                <div style="display:flex;align-items:center;gap:7px">
+                  <div id="prof-name" style="font-weight:700;font-size:17px;color:var(--txt)">—</div>
+                  <span id="prof-verified-badge" style="display:none;background:var(--grn);color:#000;font-size:9px;font-weight:900;padding:2px 7px;border-radius:20px">✓ VERIFIED</span>
+                </div>
+                <div id="prof-handle" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--dim);margin-top:2px">@—</div>
+                <div id="prof-badges" style="display:flex;gap:5px;flex-wrap:wrap;margin-top:9px"></div>
+                <div class="scores" style="margin-top:12px">
+                  <div class="sc-b"><div class="sc-n" id="prof-rely">—%</div><div class="sc-l">Reliability</div></div>
+                  <div class="sc-b"><div class="sc-n" id="prof-effic">—%</div><div class="sc-l">Efficiency</div></div>
+                </div>
+                <div id="prof-skills" style="margin-top:14px;display:flex;flex-wrap:wrap;gap:5px"></div>
+              </div>
+            </div>
+
+            <!-- Dossier upload -->
+            <div class="card cp">
+              <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--mut);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">
+                Technical Dossier
+                <span style="color:var(--amb)">→ Unlocks L2</span>
+              </div>
+              <label class="upload-zone" id="dossier-zone" for="dossier-file">
+                <input type="file" id="dossier-file" accept=".pdf,.doc,.docx" onchange="handleDossier(event)">
+                <div id="dossier-label" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--mut);cursor:pointer">
+                  📄 Upload Technical Dossier<br>
+                  <span style="font-size:10px;opacity:.6">PDF, DOC, DOCX · Max 5MB</span>
+                </div>
+              </label>
+              <div id="dossier-status" style="margin-top:8px;font-size:11px;color:var(--dim)"></div>
+            </div>
+          </div>
+
           <!-- Edit form -->
           <div class="card cp">
             <div class="gap">
@@ -382,14 +464,17 @@ textarea.inp{resize:vertical;min-height:80px}
                 <div class="frow"><label class="lbl">Location</label><input class="inp" id="p-location" placeholder="New Jersey, USA"></div>
               </div>
               <div class="frow"><label class="lbl">Bio</label><textarea class="inp" id="p-bio" rows="3" placeholder="Expert in prompt injection and agentic system attacks…"></textarea></div>
+              <div class="divider" style="margin:4px 0"></div>
+              <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--mut);letter-spacing:.08em;text-transform:uppercase">🔗 Proof of Work</div>
               <div class="grid2">
-                <div class="frow"><label class="lbl">GitHub URL</label><input class="inp" id="p-github" placeholder="https://github.com/you"></div>
-                <div class="frow"><label class="lbl">HackerOne / Portfolio</label><input class="inp" id="p-portfolio" placeholder="https://hackerone.com/you"></div>
+                <div class="frow"><label class="lbl">GitHub</label><input class="inp" id="p-github" placeholder="https://github.com/you"></div>
+                <div class="frow"><label class="lbl">HackerOne</label><input class="inp" id="p-hackerone" placeholder="https://hackerone.com/you"></div>
               </div>
               <div class="grid2">
-                <div class="frow"><label class="lbl">Immunefi Profile</label><input class="inp" id="p-immunefi" placeholder="https://immunefi.com/..."></div>
-                <div class="frow"><label class="lbl">Bugcrowd Profile</label><input class="inp" id="p-bugcrowd" placeholder="https://bugcrowd.com/you"></div>
+                <div class="frow"><label class="lbl">Bugcrowd</label><input class="inp" id="p-bugcrowd" placeholder="https://bugcrowd.com/you"></div>
+                <div class="frow"><label class="lbl">Immunefi</label><input class="inp" id="p-immunefi" placeholder="https://immunefi.com/..."></div>
               </div>
+              <div class="divider" style="margin:4px 0"></div>
               <div class="grid2">
                 <div class="frow"><label class="lbl">Rate Min ($/hr)</label><input type="number" class="inp" id="p-rate-min" placeholder="40"></div>
                 <div class="frow"><label class="lbl">Rate Max ($/hr)</label><input type="number" class="inp" id="p-rate-max" placeholder="120"></div>
@@ -402,14 +487,25 @@ textarea.inp{resize:vertical;min-height:80px}
                   <select class="inp" id="p-nda"><option value="false" selected>No</option><option value="true">Yes — I can sign NDAs</option></select>
                 </div>
               </div>
-              <div class="frow"><label class="lbl">Skills / Specialties <span style="color:var(--dim);font-size:9px">(comma separated)</span></label><input class="inp" id="p-skills" placeholder="Prompt Injection, Jailbreaking, RAG Exploitation"></div>
+              <div class="frow"><label class="lbl">Skills <span style="color:var(--dim);font-size:9px">(comma separated)</span></label><input class="inp" id="p-skills" placeholder="Prompt Injection, Jailbreaking, RAG Exploitation"></div>
               <div class="frow"><label class="lbl">Certifications <span style="color:var(--dim);font-size:9px">(comma separated)</span></label><input class="inp" id="p-certs" placeholder="OWASP LLM Top 10, CEH, OSCP…"></div>
             </div>
           </div>
         </div>
+
+        <!-- Proof of Work display -->
+        <div style="max-width:860px;margin-top:18px">
+          <div style="font-weight:700;font-size:17px;color:var(--txt);margin-bottom:14px">Verified Stats</div>
+          <div class="pow-grid" id="pow-grid">
+            <div class="pow-item"><div class="pow-icon">🐙</div><div class="pow-info"><div class="pow-name">GitHub</div><div class="pow-val" id="pow-github" style="color:var(--dim)">Not linked</div></div></div>
+            <div class="pow-item"><div class="pow-icon">🎯</div><div class="pow-info"><div class="pow-name">HackerOne</div><div class="pow-val" id="pow-hackerone" style="color:var(--dim)">Not linked</div></div></div>
+            <div class="pow-item"><div class="pow-icon">🐛</div><div class="pow-info"><div class="pow-name">Bugcrowd</div><div class="pow-val" id="pow-bugcrowd" style="color:var(--dim)">Not linked</div></div></div>
+            <div class="pow-item"><div class="pow-icon">🔐</div><div class="pow-info"><div class="pow-name">Immunefi</div><div class="pow-val" id="pow-immunefi" style="color:var(--dim)">Not linked</div></div></div>
+          </div>
+        </div>
       </div>
 
-      <!-- RESOURCES -->
+      <!-- ══════ FREELANCER: RESOURCES ══════ -->
       <div class="view" id="v-res">
         <div class="sh"><div class="sh-t">Resources</div><div class="sh-s">Click any card — AI answers instantly</div></div>
         <div class="grid3">
@@ -418,85 +514,78 @@ textarea.inp{resize:vertical;min-height:80px}
           <div class="gc" onclick="aiAsk('Current market rates for AI red teaming and bug bounty work by experience tier')"><div style="font-size:24px">💰</div><div style="font-weight:700;margin-top:6px">Market Rates Guide</div><div style="font-size:12px;color:var(--dim);margin-top:3px">Pay rates by tier.</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--red2);margin-top:10px;letter-spacing:.06em">ASK AI →</div></div>
           <div class="gc" onclick="aiAsk('How do I write a strong cover note for an AI red teaming gig application?')"><div style="font-size:24px">✍️</div><div style="font-weight:700;margin-top:6px">Cover Note Templates</div><div style="font-size:12px;color:var(--dim);margin-top:3px">Notes that convert.</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--red2);margin-top:10px;letter-spacing:.06em">ASK AI →</div></div>
           <div class="gc" onclick="aiAsk('Best practices for prompt injection testing in LLM systems')"><div style="font-size:24px">💉</div><div style="font-weight:700;margin-top:6px">Prompt Injection 101</div><div style="font-size:12px;color:var(--dim);margin-top:3px">Testing methodology.</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--red2);margin-top:10px;letter-spacing:.06em">ASK AI →</div></div>
-          <div class="gc" onclick="aiAsk('Compare Immunefi, HackerOne, Bugcrowd, Mercor, Scale AI, Surge AI — what each pays and what they look for')"><div style="font-size:24px">🌐</div><div style="font-weight:700;margin-top:6px">Platform Comparison</div><div style="font-size:12px;color:var(--dim);margin-top:3px">Immunefi vs HackerOne vs Mercor.</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--red2);margin-top:10px;letter-spacing:.06em">ASK AI →</div></div>
+          <div class="gc" onclick="aiAsk('Compare Immunefi, HackerOne, Bugcrowd, Mercor, Micro1, Scale AI — what each pays and what they look for')"><div style="font-size:24px">🌐</div><div style="font-weight:700;margin-top:6px">Platform Comparison</div><div style="font-size:12px;color:var(--dim);margin-top:3px">Immunefi vs Mercor vs Micro1.</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--red2);margin-top:10px;letter-spacing:.06em">ASK AI →</div></div>
         </div>
       </div>
 
-      <!-- ═══════════ COMPANY VIEWS ═════════════════════ -->
-
-      <!-- OVERVIEW -->
+      <!-- ══════ COMPANY: OVERVIEW ══════ -->
       <div class="view" id="v-cov">
         <div class="stats" style="grid-template-columns:repeat(3,1fr);max-width:700px">
           <div class="stc"><div class="stv c-g" id="co-talent-n">—</div><div class="stl">Red Teamers in pool</div><div class="std">Available for hire</div></div>
-          <div class="stc"><div class="stv c-a" id="co-expert-n">—</div><div class="stl">Expert-tier testers</div><div class="std">3+ years experience</div></div>
-          <div class="stc"><div class="stv c-p" id="co-nda-n">—</div><div class="stl">NDA-ready testers</div><div class="std">For confidential work</div></div>
+          <div class="stc"><div class="stv c-gold" id="co-verified-n">—</div><div class="stl">L3 Verified</div><div class="std">Identity confirmed</div></div>
+          <div class="stc"><div class="stv c-a" id="co-expert-n">—</div><div class="stl">Expert-tier testers</div><div class="std">3+ years</div></div>
         </div>
         <div class="grid2" style="max-width:940px">
           <div class="card cp">
-            <div class="sh"><div><div class="sh-t" style="font-size:15px">Recent Talent</div></div><button class="btn btn-gh btn-sm" onclick="goView('cpool')">View all →</button></div>
-            <div id="ov-recent">
-              <div class="sk" style="height:38px;border-radius:7px;margin-bottom:7px"></div>
-              <div class="sk" style="height:38px;border-radius:7px;margin-bottom:7px"></div>
-              <div class="sk" style="height:38px;border-radius:7px"></div>
-            </div>
+            <div class="sh"><div><div class="sh-t" style="font-size:15px">Top Verified Talent</div></div><button class="btn btn-gh btn-sm" onclick="goView('cpool')">View all →</button></div>
+            <div id="ov-recent"><div class="sk" style="height:38px;border-radius:7px;margin-bottom:7px"></div><div class="sk" style="height:38px;border-radius:7px;margin-bottom:7px"></div><div class="sk" style="height:38px;border-radius:7px"></div></div>
           </div>
           <div class="card cp">
             <div class="sh"><div class="sh-t" style="font-size:15px">Quick AI Scout</div></div>
-            <p style="font-size:12px;color:var(--dim);margin-bottom:10px">Describe your need — AI finds the best matches from the talent pool.</p>
-            <textarea class="inp" id="qs-inp" rows="3" placeholder="Expert jailbreak tester, Claude API experience, NDA-ready, US-based…"></textarea>
-            <button class="btn btn-r btn-fw" style="margin-top:10px" onclick="runQuickScout()">
-              <span class="spin" id="qs-spin" style="display:none"></span>✦ Scout Now
-            </button>
+            <p style="font-size:12px;color:var(--dim);margin-bottom:10px">Describe your need — AI finds verified candidates first.</p>
+            <textarea class="inp" id="qs-inp" rows="3" placeholder="Expert jailbreak tester, Claude API, NDA-ready, US-based…"></textarea>
+            <button class="btn btn-r btn-fw" style="margin-top:10px" onclick="runQuickScout()"><span class="spin" id="qs-spin" style="display:none"></span>✦ Scout Now</button>
             <div id="qs-res" style="margin-top:10px"></div>
           </div>
         </div>
       </div>
 
-      <!-- TALENT POOL -->
+      <!-- ══════ COMPANY: TALENT POOL ══════ -->
       <div class="view" id="v-cpool">
         <div class="sh">
-          <div><div class="sh-t">Talent Pool</div><div class="sh-s">All registered red teamers — click Scout to AI-analyze any candidate</div></div>
+          <div><div class="sh-t">Talent Pool</div><div class="sh-s">L3 verified shown first</div></div>
           <div style="display:flex;gap:8px">
             <input type="text" class="inp" id="talent-search" placeholder="Search…" oninput="filterTalent()" style="width:170px;padding:6px 11px">
             <select class="inp" id="talent-tier" onchange="filterTalent()" style="width:130px;padding:6px 10px;font-size:12px">
               <option value="">All tiers</option><option value="entry">Entry</option><option value="intermediate">Intermediate</option><option value="expert">Expert</option>
             </select>
+            <select class="inp" id="talent-vl" onchange="filterTalent()" style="width:120px;padding:6px 10px;font-size:12px">
+              <option value="">All levels</option><option value="3">L3 Verified</option><option value="2">L2 Dossier</option><option value="1">L1 Basic</option>
+            </select>
           </div>
         </div>
         <div class="card" style="padding:0;overflow:hidden">
           <table class="tbl">
-            <thead><tr><th>Name</th><th>Specialty</th><th>Tier</th><th>NDA</th><th>GitHub</th><th>Joined</th><th>Action</th></tr></thead>
+            <thead><tr><th>Name</th><th>Specialty</th><th>Tier</th><th>Vetting</th><th>NDA</th><th>PoW Links</th><th>Action</th></tr></thead>
             <tbody id="pool-tbody"><tr><td colspan="7"><div class="empty"><div class="empty-ic">🛡</div><div class="empty-t">Loading talent pool…</div></div></td></tr></tbody>
           </table>
         </div>
       </div>
 
-      <!-- AI SCOUT -->
+      <!-- ══════ COMPANY: AI SCOUT ══════ -->
       <div class="view" id="v-cscout">
         <div style="max-width:640px">
-          <div class="sh"><div><div class="sh-t">AI Scout</div><div class="sh-s">Describe your ideal candidate — Claude analyzes the full talent pool</div></div></div>
+          <div class="sh"><div><div class="sh-t">AI Scout</div><div class="sh-s">Prioritizes L3 verified candidates</div></div></div>
           <div class="card cp" style="margin-bottom:14px">
-            <label class="lbl">What kind of red teamer do you need?</label>
-            <textarea class="inp" id="scout-query" rows="4" placeholder="Expert in agentic system attacks, familiar with Claude API tool-use, US-based, NDA-ready, available immediately…"></textarea>
+            <label class="lbl">Describe your ideal red teamer</label>
+            <textarea class="inp" id="scout-query" rows="4" placeholder="Expert in agentic attacks, Claude API, US-based, NDA-ready…"></textarea>
             <div style="display:flex;gap:10px;margin-top:12px">
-              <button class="btn btn-r" id="scout-btn" style="flex:1" onclick="runScout()">
-                <span class="spin" id="scout-spin" style="display:none"></span>✦ Run AI Scout
-              </button>
-              <button class="btn btn-gh" onclick="document.getElementById('scout-query').value='';document.getElementById('scout-result').innerHTML=''">Clear</button>
+              <button class="btn btn-r" id="scout-btn" style="flex:1" onclick="runScout()"><span class="spin" id="scout-spin" style="display:none"></span>✦ Run AI Scout</button>
+              <button class="btn btn-gh" onclick="elById('scout-query').value='';elById('scout-result').innerHTML=''">Clear</button>
             </div>
           </div>
           <div id="scout-result"></div>
         </div>
       </div>
 
-      <!-- POST A GIG -->
+      <!-- ══════ COMPANY: POST A GIG ══════ -->
       <div class="view" id="v-cpost">
         <div style="max-width:540px">
-          <div class="sh"><div class="sh-t">Post a Gig</div><div class="sh-s">Visible to all registered red teamers immediately</div></div>
+          <div class="sh"><div class="sh-t">Post a Gig</div><div class="sh-s">Visible to all red teamers immediately</div></div>
           <div class="card cp">
             <div class="gap">
-              <div class="frow"><label class="lbl">Gig Title *</label><input class="inp" id="pg-title" placeholder="e.g. Multi-turn jailbreak tester for Claude 4 + agentic tools"></div>
-              <div class="frow"><label class="lbl">Description *</label><textarea class="inp" id="pg-desc" rows="5" placeholder="Describe scope, target system, deliverables, rules of engagement…"></textarea></div>
+              <div class="frow"><label class="lbl">Gig Title *</label><input class="inp" id="pg-title" placeholder="e.g. Multi-turn jailbreak tester for Claude 4"></div>
+              <div class="frow"><label class="lbl">Description *</label><textarea class="inp" id="pg-desc" rows="5" placeholder="Scope, deliverables, rules of engagement…"></textarea></div>
               <div style="display:flex;align-items:center;justify-content:space-between">
                 <label class="lbl" style="margin:0">Tags</label>
                 <button class="btn btn-gh btn-sm" id="tag-btn" onclick="genTags()"><span class="spin" id="tag-spin" style="display:none"></span>✦ AI Generate</button>
@@ -507,7 +596,7 @@ textarea.inp{resize:vertical;min-height:80px}
               <div class="grid3">
                 <div class="frow"><label class="lbl">Pay Min ($)</label><input type="number" class="inp" id="pg-min" placeholder="50"></div>
                 <div class="frow"><label class="lbl">Pay Max ($)</label><input type="number" class="inp" id="pg-max" placeholder="150"></div>
-                <div class="frow"><label class="lbl">Pay Type</label><select class="inp" id="pg-type"><option value="per_task">Per Task</option><option value="hourly">Hourly</option><option value="fixed">Fixed</option><option value="bounty">Bounty</option></select></div>
+                <div class="frow"><label class="lbl">Pay Type</label><select class="inp" id="pg-type"><option value="per_task">Per Task</option><option value="hourly">Hourly</option><option value="fixed">Fixed</option></select></div>
               </div>
               <div class="grid2">
                 <div class="frow"><label class="lbl">Skill Level</label><select class="inp" id="pg-tier"><option value="entry">Entry</option><option value="intermediate" selected>Intermediate</option><option value="expert">Expert</option></select></div>
@@ -519,17 +608,17 @@ textarea.inp{resize:vertical;min-height:80px}
         </div>
       </div>
 
-      <!-- ANALYTICS -->
+      <!-- ══════ COMPANY: ANALYTICS ══════ -->
       <div class="view" id="v-can">
-        <div class="sh"><div class="sh-t">Market Analytics</div><div class="sh-s">Live data from the talent pool</div></div>
+        <div class="sh"><div class="sh-t">Market Analytics</div><div class="sh-s">Live from the talent pool</div></div>
         <div class="grid3" style="max-width:940px">
           <div class="card cp"><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Total Testers</div><div style="font-family:'DM Mono',monospace;font-size:30px;font-weight:500;color:var(--txt)" id="an-total">—</div></div>
           <div class="card cp"><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">By Tier</div><div id="an-tiers"></div></div>
           <div class="card cp"><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">Top Specialties</div><div id="an-specs"></div></div>
         </div>
         <div class="grid2" style="max-width:640px;margin-top:14px">
+          <div class="card cp"><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">Vetting Levels</div><div id="an-vetting"></div></div>
           <div class="card cp"><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">NDA Availability</div><div id="an-nda"></div></div>
-          <div class="card cp"><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">Registrations by Month</div><div id="an-month"></div></div>
         </div>
       </div>
 
@@ -537,7 +626,7 @@ textarea.inp{resize:vertical;min-height:80px}
   </div><!-- /main -->
 </div><!-- /app -->
 
-<!-- AI WIDGET (freelancers only) -->
+<!-- AI WIDGET -->
 <div class="ai-wrap" id="ai-wrap" style="display:none">
   <div class="ai-box" id="ai-box">
     <div class="ai-hd">
@@ -546,24 +635,21 @@ textarea.inp{resize:vertical;min-height:80px}
       </div>
       <div>
         <div class="ai-hd-t">Mission Control</div>
-        <div class="ai-hd-s"><span class="odot" style="width:4px;height:4px;margin-right:2px"></span>Scoped to RedTeamGig only</div>
+        <div class="ai-hd-s"><span class="odot" style="width:4px;height:4px;margin-right:2px"></span>Talent Agent · RedTeamGig</div>
       </div>
       <button onclick="toggleAI()" style="margin-left:auto;background:rgba(255,255,255,.05);border:none;border-radius:5px;width:22px;height:22px;color:var(--mut);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center">✕</button>
     </div>
     <div class="ai-msgs" id="ai-msgs">
-      <div class="aim a">
-        <div class="aim-av">AI</div>
-        <div class="aim-b">Hey — I'm Mission Control. I can help you evaluate gigs and bounties, understand scope, optimize your profile, or explain any red teaming technique.</div>
-      </div>
+      <div class="aim a"><div class="aim-av">AI</div><div class="aim-b">Hey — I'm your Talent Agent. I know every gig and bounty on this platform. Ask me anything about missions, your vetting level, or how to earn more.</div></div>
     </div>
     <div class="ai-sgs" id="ai-sgs">
       <button class="ai-sg" onclick="aiAsk('Which gigs and bounties match my skills best?')">Best matches</button>
-      <button class="ai-sg" onclick="aiAsk('How can I improve my reliability score?')">Boost score</button>
+      <button class="ai-sg" onclick="aiAsk('How do I get to Vetting Level 2 or 3?')">Get verified</button>
+      <button class="ai-sg" onclick="aiAsk('Tell me about the Mercor and Micro1 affiliate missions on the platform')">Affiliate missions</button>
       <button class="ai-sg" onclick="aiAsk('OWASP LLM Top 10 quick reference')">OWASP LLM 10</button>
-      <button class="ai-sg" onclick="aiAsk('How do Immunefi bug bounties work for AI vulnerabilities?')">Immunefi guide</button>
     </div>
     <div class="ai-ir">
-      <input class="ai-in" id="ai-input" placeholder="Ask about gigs, bounties, scope…" onkeydown="if(event.key==='Enter')sendAI()">
+      <input class="ai-in" id="ai-input" placeholder="Ask about gigs, bounties, vetting…" onkeydown="if(event.key==='Enter')sendAI()">
       <button class="ai-snd" id="ai-send" onclick="sendAI()">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2L15 22 11 13 2 9l20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
@@ -594,744 +680,658 @@ textarea.inp{resize:vertical;min-height:80px}
 <div id="toasts"></div>
 
 <script>
-/* ═══════════════════════════════════════════════════════
-   CONFIG & STATE
-═══════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════
+   CONFIG
+═══════════════════════════════════════════════════ */
 const SUPA_URL = 'https://cnhmfxwyqtpbmjadlwty.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaG1meHd5cXRwYm1qYWRsd3R5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1MzA1NTksImV4cCI6MjA5MjEwNjU1OX0.bTTVehjz_LQLoTd0xW-FMqLdrB7nnKUlU163vLWcdrA';
 
-const AI_SYS = `You are Mission Control — the AI assistant inside RedTeamGig, a members-only marketplace for AI safety and bug bounty work.
-
-ONLY answer questions about:
-- RedTeamGig platform: gigs, bounties, profiles, applications, scores, navigation
-- AI red teaming: jailbreaking, prompt injection, bias auditing, agentic attacks, RAG exploitation, data poisoning
-- Bug bounties: Immunefi, HackerOne, Bugcrowd — scope evaluation, payouts, how to approach programs
-- Application advice: cover notes, rate negotiation, skill positioning
-- Partner platforms: Mercor, Scale AI, Surge AI, Appen, Immunefi, HackerOne, Bugcrowd
-- Career advice for AI safety professionals and bug hunters
-
-For anything else reply: "I'm scoped to RedTeamGig and AI safety topics only."
-
-When user profile context is provided, give personalized advice referencing their specific skills and experience.
-Be concise and direct. End every response with one concrete actionable next step.`;
-
-const S = {
-  db: null, user: null, profile: null, role: null,
-  gigs: [], bounties: [], allBounties: [], talent: [], apps: [],
-  gigFilter: 'all', bountyFilter: 'all',
-  applyId: null, applyTitle: null, applyType: 'gig',
-  pendingTags: [], aiOpen: false,
+/* Affiliate referral URLs — hardcoded */
+const AFF = {
+  mercor: 'https://t.mercor.com/cCbCp',
+  micro1:  'https://refer.micro1.ai/referral/jobs?referralCode=6c649b0f-c9e6-459e-a1a3-dbd1f5ec48ab&utm_source=referral&utm_medium=share&utm_campaign=job_referral',
 };
 
-/* ═══════════════════════════════════════════════════════
-   HELPERS
-═══════════════════════════════════════════════════════ */
-const el   = id => document.getElementById(id);
-const set  = (id, v) => { const e = el(id); if (e) e.textContent = v; };
-const val  = id => el(id)?.value || '';
-const setv = (id, v) => { const e = el(id); if (e) e.value = v; };
-const esc  = s => s == null ? '' : String(s)
-  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-  .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+/* AI system prompt */
+const AI_SYS = `You are Mission Control — the AI Talent Agent inside RedTeamGig, a high-trust marketplace for AI safety red teamers.
 
-function toast(msg, type = 'inf') {
+SCOPE (only answer these topics):
+- RedTeamGig platform: gigs, bounties, vetting levels (L1/L2/L3), profiles, applications, scoring
+- AI red teaming: jailbreaking, prompt injection, bias auditing, agentic attacks, RAG exploitation, data poisoning, model extraction
+- Bug bounties: Immunefi, HackerOne, Bugcrowd — scope evaluation, payouts, strategy
+- Affiliate partners: Mercor (https://t.mercor.com/cCbCp) and Micro1 — what they pay and what they look for
+- Application advice: cover notes, rate negotiation, skill positioning
+- Career guidance for AI safety professionals
+
+VETTING SYSTEM:
+- L1: Basic registration (everyone starts here)
+- L2: Technical dossier uploaded — unlocks higher-paying gigs
+- L3: Identity verified by RTG team — required for NDA work, shown first to employers
+
+When given user profile context, give highly personalized advice.
+For anything outside scope: "I'm scoped to RedTeamGig and AI safety topics only."
+Be concise. End every response with one concrete next step.`;
+
+/* ═══════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════ */
+const S = {
+  db:null, user:null, profile:null, role:null,
+  gigs:[], bounties:[], allBounties:[], talent:[], apps:[],
+  gigFilter:'all', bountyFilter:'all',
+  applyId:null, applyTitle:null, applyType:'gig',
+  pendingTags:[], aiOpen:false, aiSys:'',
+};
+
+/* ═══════════════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════════════ */
+const elById = id => document.getElementById(id);
+const set = (id,v) => { const e=elById(id); if(e) e.textContent=v; };
+const val = id => elById(id)?.value || '';
+const setv = (id,v) => { const e=elById(id); if(e) e.value=v; };
+const esc = s => s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+
+function toast(msg, type='inf') {
   const t = document.createElement('div');
-  t.className = `toast t-${type}`;
-  t.textContent = msg;
-  el('toasts').appendChild(t);
+  t.className = `toast t-${type}`; t.textContent = msg;
+  elById('toasts').appendChild(t);
   setTimeout(() => t.remove(), 3500);
 }
-
 function setSpin(btnId, spinId, on) {
-  const b = el(btnId), s = el(spinId);
-  if (b) b.disabled = on;
-  if (s) s.style.display = on ? 'inline-block' : 'none';
+  const b=elById(btnId), s=elById(spinId);
+  if(b) b.disabled=on; if(s) s.style.display=on?'inline-block':'none';
 }
-
 function fmtPay(g) {
-  const mn = g.pay_min_usd || g.hourly_min || g.rate_min;
-  const mx = g.pay_max_usd || g.hourly_max || g.rate_max;
-  const pt = g.pay_type || 'hourly';
-  if (!mn && !mx) return g.pay_range || 'Rate TBD';
-  const u = pt === 'hourly' ? '/hr' : pt === 'per_task' ? '/task' : '';
-  return (mn && mx) ? `$${mn}–$${mx}${u}` : mx ? `Up to $${mx}${u}` : `$${mn}+${u}`;
+  const mn=g.pay_min_usd||g.hourly_min||g.rate_min, mx=g.pay_max_usd||g.hourly_max||g.rate_max, pt=g.pay_type||'hourly';
+  if(!mn&&!mx) return g.pay_range||'Rate TBD';
+  const u=pt==='hourly'?'/hr':pt==='per_task'?'/task':'';
+  return (mn&&mx)?`$${mn}–$${mx}${u}`:mx?`Up to $${mx}${u}`:`$${mn}+${u}`;
 }
-
 function parseTags(g) {
-  const raw = g.tags || g.skills || g.required_skills || g.category || '';
-  if (Array.isArray(raw)) return raw;
-  try { return JSON.parse(raw); }
-  catch { return raw ? String(raw).split(',').map(s => s.trim()).filter(Boolean) : []; }
+  const raw=g.tags||g.skills||g.required_skills||g.category||'';
+  if(Array.isArray(raw)) return raw;
+  try{return JSON.parse(raw);}catch{return raw?String(raw).split(',').map(s=>s.trim()).filter(Boolean):[];}
 }
-
 function calcFit(g) {
-  const skills = S.profile?.verified_skills || [];
-  const tier   = S.profile?.skill_level || 'entry';
-  const tags   = parseTags(g);
-  if (!skills.length || !tags.length) return 35 + Math.floor(Math.random() * 40);
-  const hits = tags.filter(t =>
-    skills.some(s => s.toLowerCase().includes(t.toLowerCase()) || t.toLowerCase().includes(s.toLowerCase()))
-  );
-  return Math.min(99, Math.round((hits.length / tags.length) * 65) + (g.skill_level === tier ? 15 : 0) + 10);
+  const skills=S.profile?.verified_skills||[], tier=S.profile?.skill_level||'entry', tags=parseTags(g);
+  if(!skills.length||!tags.length) return 35+Math.floor(Math.random()*40);
+  const hits=tags.filter(t=>skills.some(s=>s.toLowerCase().includes(t.toLowerCase())||t.toLowerCase().includes(s.toLowerCase())));
+  return Math.min(99,Math.round((hits.length/tags.length)*65)+(g.skill_level===tier?15:0)+10);
+}
+function tierBadge(t){return{entry:'bg',intermediate:'ba',expert:'br',elite:'br'}[t]||'bd';}
+function vettingBadge(l){
+  const n=parseInt(l)||1;
+  if(n>=3) return '<span class="badge bgold">✓ L3</span>';
+  if(n===2) return '<span class="badge bg">L2</span>';
+  return '<span class="badge bd">L1</span>';
 }
 
-function tierBadge(t) {
-  return { entry:'bg', intermediate:'ba', expert:'br', elite:'br' }[t] || 'bd';
-}
-
-/* ═══════════════════════════════════════════════════════
-   CLAUDE — calls /api/claude proxy (reads ANTHROPIC_API_KEY server-side)
-═══════════════════════════════════════════════════════ */
-async function callClaude(userMsg, system, maxTokens = 700) {
+/* ═══════════════════════════════════════════════════
+   CLAUDE PROXY
+═══════════════════════════════════════════════════ */
+async function callClaude(userMsg, system, maxTokens=700) {
   const res = await fetch('/api/claude', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: maxTokens,
-      system,
-      messages: [{ role: 'user', content: userMsg }],
-    }),
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:maxTokens, system, messages:[{role:'user',content:userMsg}] }),
   });
   const data = await res.json();
-  if (data.error) throw new Error(data.error);
-  return data.content?.find(b => b.type === 'text')?.text || '';
+  if(data.error) throw new Error(data.error);
+  return data.content?.find(b=>b.type==='text')?.text || '';
 }
 
-/* ═══════════════════════════════════════════════════════
-   BOOT — single IIFE, runs once, no loops
-═══════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════
+   BOOT — single IIFE, finally{} guarantees spinner stops
+═══════════════════════════════════════════════════ */
 (async function boot() {
   S.db = window.supabase.createClient(SUPA_URL, SUPA_KEY);
-
-  /* Step 1: check session */
-  let session = null;
   try {
+    /* 1. Session */
     const { data, error } = await S.db.auth.getSession();
-    if (error) throw error;
-    session = data?.session;
-  } catch (e) {
-    el('loading-screen').innerHTML = `
-      <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--red);text-align:center;max-width:320px;padding:20px">
-        Auth error: ${esc(e.message)}<br><br>
-        <a href="index.html" style="color:var(--mut)">← Back to home</a>
-      </div>`;
-    return;
-  }
+    if(error) throw error;
+    const session = data?.session;
+    if(!session?.user){ window.location.replace('index.html'); return; }
+    S.user = session.user;
 
-  /* Step 2: no session → go to landing, STOP */
-  if (!session?.user) {
-    window.location.replace('index.html');
-    return;
-  }
-
-  S.user = session.user;
-
-  /* Step 3: load profile */
-  let prof = null;
-  try {
-    const { data } = await S.db.from('profiles').select('*').eq('id', S.user.id).single();
-    prof = data;
-  } catch (_) { /* profile missing, will create below */ }
-
-  /* Step 4: create profile if first-time user */
-  if (!prof) {
-    const meta = S.user.user_metadata || {};
-    try {
-      const { data } = await S.db.from('profiles').upsert({
-        id:           S.user.id,
+    /* 2. Profile */
+    const { data: prof } = await S.db.from('profiles').select('*').eq('id', S.user.id).single().catch(()=>({data:null}));
+    if(prof) {
+      S.profile = prof;
+    } else {
+      const meta = S.user.user_metadata||{};
+      const { data: created } = await S.db.from('profiles').upsert({
+        id: S.user.id,
         display_name: meta.display_name || S.user.email?.split('@')[0] || 'User',
-        role:         meta.role         || 'red_teamer',
-      }, { onConflict: 'id' }).select().single();
-      prof = data;
-    } catch (_) {}
-    prof = prof || { id: S.user.id, display_name: S.user.email?.split('@')[0] || 'User', role: 'red_teamer' };
+        role: meta.role || 'red_teamer',
+        vetting_level: 1,
+      },{onConflict:'id'}).select().single().catch(()=>({data:null}));
+      S.profile = created || {id:S.user.id, display_name:'User', role:'red_teamer', vetting_level:1};
+    }
+    S.role = S.profile.role || 'red_teamer';
+
+    /* 3. Show app */
+    elById('loading-screen').style.display = 'none';
+    elById('app').style.display = 'flex';
+    paintSidebar();
+
+    if(S.role==='company_client'||S.role==='admin') {
+      elById('co-nav').style.display = '';
+      /* Security: remove freelancer views from DOM */
+      ['v-hub','v-bounties','v-apps','v-prof','v-res'].forEach(id=>{ const e=elById(id); if(e)e.remove(); });
+      goView('cov'); loadTalent();
+    } else {
+      elById('fl-nav').style.display = '';
+      elById('ai-wrap').style.display = '';
+      elById('sb-vetting').style.display = '';
+      elById('sb-scores').style.display = 'grid';
+      /* Security: remove company views from DOM */
+      ['v-cov','v-cpool','v-cscout','v-cpost','v-can'].forEach(id=>{ const e=elById(id); if(e)e.remove(); });
+      updateVettingUI();
+      goView('hub'); loadGigs(); loadBounties(); loadApps();
+    }
+
+    /* 4. Sign-out only */
+    S.db.auth.onAuthStateChange(event=>{ if(event==='SIGNED_OUT') window.location.replace('index.html'); });
+
+  } catch(err) {
+    elById('loading-screen').innerHTML = `<div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--red);text-align:center;padding:20px">Error: ${esc(String(err.message||err))}<br><br><a href="index.html" style="color:var(--mut)">← Back to home</a></div>`;
+  } finally {
+    /* FAILSAFE — loading screen always hidden */
+    const ls = elById('loading-screen');
+    if(ls && ls.style.display !== 'none') ls.style.display = 'none';
   }
-
-  S.profile = prof;
-  S.role    = prof.role || 'red_teamer';
-
-  /* Step 5: show app — DONE with auth, no more redirects */
-  el('loading-screen').style.display = 'none';
-  el('app').style.display = 'flex';
-
-  paintSidebar();
-
-  if (S.role === 'company_client' || S.role === 'admin') {
-    el('co-nav').style.display = '';
-    goView('cov');
-    loadTalent();
-  } else {
-    el('fl-nav').style.display = '';
-    el('ai-wrap').style.display = '';
-    goView('hub');
-    loadGigs();
-    loadBounties();
-    loadApps();
-  }
-
-  /* Step 6: only listen for sign-out */
-  S.db.auth.onAuthStateChange(event => {
-    if (event === 'SIGNED_OUT') window.location.replace('index.html');
-  });
 })();
 
-/* ═══════════════════════════════════════════════════════
-   VIEW SWITCHER — pure show/hide, no reloads
-═══════════════════════════════════════════════════════ */
-const VIEW_CFG = {
-  hub:      { v:'v-hub',      t:'Mission Hub',       n:'ni-hub',      ctrl:true  },
-  bounties: { v:'v-bounties', t:'Bounties',           n:'ni-bounties', ctrl:false },
-  apps:     { v:'v-apps',     t:'My Applications',   n:'ni-apps',     ctrl:false },
-  prof:     { v:'v-prof',     t:'Mission Profile',   n:'ni-prof',     ctrl:false },
-  res:      { v:'v-res',      t:'Resources',          n:'ni-res',      ctrl:false },
-  cov:      { v:'v-cov',      t:'Overview',           n:'ni-cov',      ctrl:false },
-  cpool:    { v:'v-cpool',    t:'Talent Pool',        n:'ni-cpool',    ctrl:false },
-  cscout:   { v:'v-cscout',   t:'AI Scout',           n:'ni-cscout',   ctrl:false },
-  cpost:    { v:'v-cpost',    t:'Post a Gig',         n:'ni-cpost',    ctrl:false },
-  can:      { v:'v-can',      t:'Analytics',          n:'ni-can',      ctrl:false },
+/* ═══════════════════════════════════════════════════
+   VIEW SWITCHER — with role security
+═══════════════════════════════════════════════════ */
+const VC = {
+  hub:    {v:'v-hub',     t:'Mission Hub',     n:'ni-hub',     ctrl:true,  role:'red_teamer'},
+  bounties:{v:'v-bounties',t:'Bounties',        n:'ni-bounties',ctrl:false, role:'red_teamer'},
+  apps:   {v:'v-apps',    t:'My Applications', n:'ni-apps',    ctrl:false, role:'red_teamer'},
+  prof:   {v:'v-prof',    t:'Mission Profile', n:'ni-prof',    ctrl:false, role:'red_teamer'},
+  res:    {v:'v-res',     t:'Resources',       n:'ni-res',     ctrl:false, role:'red_teamer'},
+  cov:    {v:'v-cov',     t:'Overview',        n:'ni-cov',     ctrl:false, role:'company_client'},
+  cpool:  {v:'v-cpool',   t:'Talent Pool',     n:'ni-cpool',   ctrl:false, role:'company_client'},
+  cscout: {v:'v-cscout',  t:'AI Scout',        n:'ni-cscout',  ctrl:false, role:'company_client'},
+  cpost:  {v:'v-cpost',   t:'Post a Gig',      n:'ni-cpost',   ctrl:false, role:'company_client'},
+  can:    {v:'v-can',     t:'Analytics',       n:'ni-can',     ctrl:false, role:'company_client'},
 };
 
 function goView(key) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('on'));
-  document.querySelectorAll('.ni').forEach(b => b.classList.remove('on'));
-  const cfg = VIEW_CFG[key];
-  if (!cfg) return;
-  el(cfg.v)?.classList.add('on');
-  el(cfg.n)?.classList.add('on');
+  const cfg = VC[key]; if(!cfg) return;
+  /* Hard security block */
+  if(cfg.role==='company_client' && S.role==='red_teamer') return goView('hub');
+  if(cfg.role==='red_teamer' && (S.role==='company_client'||S.role==='admin')) return goView('cov');
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+  document.querySelectorAll('.ni').forEach(b=>b.classList.remove('on'));
+  elById(cfg.v)?.classList.add('on');
+  elById(cfg.n)?.classList.add('on');
   set('tb-title', cfg.t);
-  el('hub-ctrl').style.display = cfg.ctrl ? 'flex' : 'none';
-  if (key === 'prof') fillProfileForm();
-  if (key === 'can')  loadAnalytics();
+  elById('hub-ctrl').style.display = cfg.ctrl?'flex':'none';
+  if(key==='prof') fillProfileForm();
+  if(key==='can')  loadAnalytics();
 }
 
-/* ═══════════════════════════════════════════════════════
-   GIGS — mercor_jobs + external_gigs
-═══════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════
+   SIDEBAR + VETTING UI
+═══════════════════════════════════════════════════ */
+function paintSidebar() {
+  const p=S.profile||{};
+  const ini=(p.display_name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  set('sb-av',ini); set('sb-name',p.display_name||'User');
+  set('sb-tag',S.role==='red_teamer'?'Red Teamer':'Company');
+  if(S.role==='red_teamer') {
+    set('sb-rely', p.reliability_score?Math.round(p.reliability_score)+'%':'—');
+    set('sb-effic', p.efficiency_score?Math.round(p.efficiency_score)+'%':'—');
+  }
+}
+
+function updateVettingUI() {
+  const level = parseInt(S.profile?.vetting_level)||1;
+  for(let i=1;i<=3;i++) elById(`vd${i}`)?.classList.toggle('on', i<=level);
+  const labels={1:'L1 · Basic',2:'L2 · Dossier',3:'L3 · Verified ✓'};
+  set('vl-lbl', labels[level]||'L1');
+  const sbv = elById('sb-verified');
+  if(sbv) sbv.style.display = level>=3?'inline':'none';
+  for(let i=1;i<=3;i++) {
+    const c=elById(`vl-card-${i}`);
+    if(!c) continue;
+    c.classList.remove('active','locked');
+    c.classList.add(i<=level?'active':'locked');
+  }
+  const pvb=elById('prof-verified-badge');
+  if(pvb) pvb.style.display=level>=3?'inline-flex':'none';
+  if(level>=2) {
+    elById('dossier-zone')?.classList.add('has-file');
+    const ds=elById('dossier-status');
+    if(ds) ds.textContent='✓ Dossier on file — Level 2 unlocked';
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   DOSSIER UPLOAD
+═══════════════════════════════════════════════════ */
+async function handleDossier(event) {
+  const file = event.target.files?.[0]; if(!file) return;
+  if(file.size > 5*1024*1024) { toast('File too large — max 5MB','err'); return; }
+  const statusEl = elById('dossier-status');
+  if(statusEl) statusEl.textContent = 'Uploading…';
+  try {
+    const path = `${S.user.id}/${Date.now()}_${file.name.replace(/\s+/g,'_')}`;
+    const { error: upErr } = await S.db.storage.from('dossiers').upload(path, file, {upsert:true});
+    if(upErr) throw upErr;
+    const curr = parseInt(S.profile?.vetting_level)||1;
+    if(curr<2) {
+      await S.db.from('profiles').update({vetting_level:2,dossier_path:path}).eq('id',S.user.id);
+      S.profile.vetting_level=2; S.profile.dossier_path=path;
+    }
+    elById('dossier-zone')?.classList.add('has-file');
+    elById('dossier-label').innerHTML=`📄 ${esc(file.name)}<br><span style="font-size:10px;opacity:.6">Uploaded successfully</span>`;
+    if(statusEl) statusEl.textContent='✓ Dossier uploaded — Level 2 unlocked!';
+    updateVettingUI();
+    toast('Dossier uploaded — L2 unlocked! ✓','ok');
+  } catch(err) {
+    if(statusEl) statusEl.textContent='Upload failed: '+err.message;
+    toast('Upload failed','err');
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   GIGS — real DB + affiliate injection
+═══════════════════════════════════════════════════ */
 async function loadGigs() {
   const [mRes, eRes] = await Promise.all([
-    S.db.from('mercor_jobs').select('*').order('created_at', { ascending: false }).limit(30),
-    S.db.from('external_gigs').select('*').order('created_at', { ascending: false }).limit(30),
+    S.db.from('mercor_jobs').select('*').order('created_at',{ascending:false}).limit(30).catch(()=>({data:[]})),
+    S.db.from('external_gigs').select('*').order('created_at',{ascending:false}).limit(30).catch(()=>({data:[]})),
   ]);
-  const mercor   = (mRes.data || []).map(g => ({ ...g, _ext:true, _src: g.source || 'Mercor' }));
-  const external = (eRes.data || []).map(g => ({ ...g, _ext:true, _src: g.external_source || g.source || 'Partner' }));
-  S.gigs = [...mercor, ...external];
-  if (!S.gigs.length) S.gigs = demoGigs();
+  const mercor   = (mRes.data||[]).map(g=>({...g,_ext:true,_aff:'mercor',_src:'Mercor'}));
+  const external = (eRes.data||[]).map(g=>({...g,_ext:true,_src:g.external_source||g.source||'Partner',_aff:detectAff(g)}));
+
+  /* Always inject Micro1 affiliate card at the top */
+  const micro1Card = {
+    id:'aff-micro1', _ext:true, _aff:'micro1', _src:'Micro1',
+    title:'AI Safety Evaluator — Micro1 Platform',
+    description:'Micro1 is actively hiring AI safety evaluators for LLM testing. Flexible hours, remote, all tiers welcome.',
+    tags:['Bias Auditing','RLHF','Content Safety','Entry-Expert'],
+    skill_level:'entry', pay_min_usd:15, pay_max_usd:60, pay_type:'hourly', apply_count:92,
+  };
+
+  S.gigs = [micro1Card, ...mercor, ...external];
+  if(S.gigs.length<=1) S.gigs = [...S.gigs, ...demoGigs()];
   renderGigs(S.gigs);
   updateStats();
 }
 
+function detectAff(g) {
+  const u=(g.referral_url||g.apply_url||g.external_url||'').toLowerCase();
+  if(u.includes('mercor.com')) return 'mercor';
+  if(u.includes('micro1.ai')) return 'micro1';
+  return null;
+}
+
 function renderGigs(list) {
-  const grid = el('gig-grid');
-  if (!grid) return;
-  set('gig-count-lbl', `${list.length} mission${list.length !== 1 ? 's' : ''} available`);
-  set('bd-hub', list.length);
-  if (!list.length) {
-    grid.innerHTML = `<div style="grid-column:span 2"><div class="empty"><div class="empty-ic">🔍</div><div class="empty-t">No missions match</div></div></div>`;
-    return;
-  }
-  grid.innerHTML = list.map(g => {
-    const pay = fmtPay(g), tags = parseTags(g), fit = calcFit(g);
-    const fc  = fit >= 75 ? '#17c97e' : fit >= 50 ? '#f0a317' : '#e8382f';
-    const tier = g.skill_level || 'intermediate';
-    const src  = g._src || g.source || 'Partner';
-    const ico  = { Mercor:'M', 'Scale AI':'S', 'Surge AI':'⚡', Appen:'A', Anthropic:'An' }[src] || src.slice(0,1).toUpperCase();
-    const extUrl = g.referral_url || g.apply_url || g.external_url || '';
-    return `<div class="gc" onclick="handleGigClick('${esc(g.id)}','${esc(g.title||'')}',${!!extUrl},'${esc(extUrl)}')">
+  const grid=elById('gig-grid'); if(!grid) return;
+  set('gig-count-lbl',`${list.length} mission${list.length!==1?'s':''} available`);
+  set('bd-hub',list.length);
+  if(!list.length){grid.innerHTML=`<div style="grid-column:span 2"><div class="empty"><div class="empty-ic">🔍</div><div class="empty-t">No missions match</div></div></div>`;return;}
+  grid.innerHTML=list.map(g=>{
+    const pay=fmtPay(g),tags=parseTags(g),fit=calcFit(g);
+    const fc=fit>=75?'#17c97e':fit>=50?'#f0a317':'#e8382f';
+    const tier=g.skill_level||'intermediate',src=g._src||g.source||'Partner';
+    const ico={Mercor:'M',Micro1:'μ','Scale AI':'S','Surge AI':'⚡',Appen:'A',Anthropic:'An'}[src]||src.slice(0,1).toUpperCase();
+    const isAff=!!g._aff;
+    const affUrl=AFF[g._aff]||g.referral_url||g.apply_url||g.external_url||'';
+    const isExt=isAff||!!affUrl;
+    const cardCls=isAff?'gc affiliate':'gc';
+    const srcBadge=isAff?`<span class="badge bgold">⭐ ${esc(src)} Partner</span>`:g._ext?'<span class="badge bb">↗ Partner</span>':'<span class="badge bg">Internal</span>';
+    return `<div class="${cardCls}" onclick="handleGigClick('${esc(g.id)}','${esc(g.title||'')}','${esc(g._aff||'')}','${esc(affUrl)}')">
       <div class="gig-head">
         <div class="gig-icon">${ico}</div>
         <div class="gig-head-text">
-          <div class="gig-badges">${g._ext ? '<span class="badge bb">↗ Partner</span>' : '<span class="badge bg">Internal</span>'}<span class="badge ${tierBadge(tier)}">${tier}</span></div>
-          <div class="gig-title">${esc(g.title || 'Untitled')}</div>
+          <div class="gig-badges">${srcBadge}<span class="badge ${tierBadge(tier)}">${tier}</span></div>
+          <div class="gig-title">${esc(g.title||'Untitled')}</div>
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:8px"><span class="gig-pay">${pay}</span><span class="gig-source">${esc(src)}</span></div>
-      ${tags.length ? `<div class="gig-tags">${tags.slice(0,4).map(t=>`<span class="gig-tag">${esc(t)}</span>`).join('')}</div>` : ''}
+      ${g.description?`<div style="font-size:11px;color:var(--mut);line-height:1.5">${esc(g.description.slice(0,100))}${g.description.length>100?'…':''}</div>`:''}
+      <div style="display:flex;align-items:center;gap:8px"><span class="gig-pay ${isAff?'gold':''}">${pay}</span><span class="gig-source">${esc(src)}</span></div>
+      ${tags.length?`<div class="gig-tags">${tags.slice(0,4).map(t=>`<span class="gig-tag">${esc(t)}</span>`).join('')}</div>`:''}
       <div class="gig-foot">
-        <span class="gig-meta">${g.apply_count || 0} applied</span>
+        <span class="gig-meta">${g.apply_count||0} applied</span>
         <div class="fit-row"><span>Fit</span><div class="fit-track"><div class="fit-fill" style="width:${fit}%;background:${fc}"></div></div><span style="color:${fc}">${fit}%</span></div>
       </div>
     </div>`;
   }).join('');
 }
 
-function handleGigClick(id, title, isExt, extUrl) {
-  if (isExt && extUrl) { recordClick(id, extUrl); window.open(extUrl, '_blank'); return; }
-  S.applyType = 'gig'; openApply(id, title);
+function handleGigClick(id, title, affKey, extUrl) {
+  if(affKey && AFF[affKey]) {
+    recordClick(id, AFF[affKey], affKey);
+    window.open(AFF[affKey],'_blank','noopener,noreferrer');
+    return;
+  }
+  if(extUrl) { recordClick(id,extUrl,''); window.open(extUrl,'_blank','noopener,noreferrer'); return; }
+  S.applyType='gig'; openApply(id,title);
 }
 
-function setFilter(f) {
-  S.gigFilter = f;
-  document.querySelectorAll('[data-f]').forEach(b => b.classList.toggle('fa', b.dataset.f === f));
-  filterGigs();
-}
-
-function filterGigs() {
-  const q = val('gig-search').toLowerCase();
-  renderGigs(S.gigs.filter(g => {
-    const ok = S.gigFilter === 'all' || (S.gigFilter === 'internal' && !g._ext) || (S.gigFilter === 'partner' && g._ext);
-    const tx = (g.title + ' ' + parseTags(g).join(' ')).toLowerCase();
-    return ok && (!q || tx.includes(q));
+function setFilter(f){S.gigFilter=f;document.querySelectorAll('[data-f]').forEach(b=>b.classList.toggle('fa',b.dataset.f===f));filterGigs();}
+function filterGigs(){
+  const q=val('gig-search').toLowerCase();
+  renderGigs(S.gigs.filter(g=>{
+    const ok=S.gigFilter==='all'||(S.gigFilter==='internal'&&!g._ext)||(S.gigFilter==='partner'&&g._ext);
+    const tx=(g.title+' '+parseTags(g).join(' ')).toLowerCase();
+    return ok&&(!q||tx.includes(q));
   }));
 }
-
-function updateStats() {
-  set('st-total', S.gigs.length);
-  set('st-match', S.gigs.filter(g => calcFit(g) >= 65).length);
-  set('st-pay', '$' + (Math.max(0, ...S.gigs.map(g => g.pay_max_usd || g.hourly_max || 0)) || 80) + '+');
-  set('st-apps', S.apps.length);
+function updateStats(){
+  set('st-total',S.gigs.length);
+  set('st-match',S.gigs.filter(g=>calcFit(g)>=65).length);
+  set('st-pay','$'+(Math.max(0,...S.gigs.map(g=>g.pay_max_usd||g.hourly_max||0))||80)+'+');
+  set('st-apps',S.apps.length);
 }
 
-/* ═══════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════
    BOUNTIES
-═══════════════════════════════════════════════════════ */
-async function loadBounties() {
-  const { data } = await S.db.from('bounties').select('*').order('created_at', { ascending: false }).limit(30)
-    .catch(() => ({ data: null }));
-  S.allBounties = data?.length ? data : demoBounties();
-  S.bounties = S.allBounties;
+═══════════════════════════════════════════════════ */
+async function loadBounties(){
+  const {data}=await S.db.from('bounties').select('*').order('created_at',{ascending:false}).limit(30).catch(()=>({data:null}));
+  S.allBounties=data?.length?data:demoBounties();
+  S.bounties=S.allBounties;
   renderBounties(S.bounties);
-  updateBountyStats();
+  set('bn-count',S.allBounties.length);
+  set('bn-max','$'+(Math.max(0,...S.allBounties.map(b=>b.max_payout||0))||0).toLocaleString());
+  set('bn-pool','$'+(S.allBounties.reduce((a,b)=>a+(b.total_pool||b.max_payout||0),0)).toLocaleString());
+  set('bd-bounties',S.allBounties.length);
 }
-
-function updateBountyStats() {
-  set('bn-count', S.allBounties.length);
-  const mx  = Math.max(0, ...S.allBounties.map(b => b.max_payout || 0));
-  const tot = S.allBounties.reduce((a, b) => a + (b.total_pool || b.max_payout || 0), 0);
-  set('bn-max',  mx  > 0 ? '$' + mx.toLocaleString()  : '$—');
-  set('bn-pool', tot > 0 ? '$' + tot.toLocaleString() : '$—');
-  set('bd-bounties', S.allBounties.length);
+function setBountyFilter(f){
+  S.bountyFilter=f;
+  document.querySelectorAll('[data-bt]').forEach(b=>b.classList.toggle('on',b.dataset.bt===f));
+  renderBounties(f==='all'?S.allBounties:S.allBounties.filter(b=>(b.platform||'').toLowerCase()===f));
 }
-
-function setBountyFilter(f) {
-  S.bountyFilter = f;
-  document.querySelectorAll('[data-bt]').forEach(b => b.classList.toggle('on', b.dataset.bt === f));
-  renderBounties(f === 'all' ? S.allBounties : S.allBounties.filter(b => (b.platform || '').toLowerCase() === f));
-}
-
-function renderBounties(list) {
-  const grid = el('bounty-grid');
-  if (!grid) return;
-  set('bn-lbl', `${list.length} active program${list.length !== 1 ? 's' : ''}`);
-  if (!list.length) { grid.innerHTML = `<div style="grid-column:span 2"><div class="empty"><div class="empty-ic">💎</div><div class="empty-t">No programs match</div></div></div>`; return; }
-  const platIco = { immunefi:'🔐', hackerone:'🎯', bugcrowd:'🐛', custom:'⚡' };
-  grid.innerHTML = list.map(b => {
-    const plat = (b.platform || 'custom').toLowerCase();
-    const mn   = b.min_payout || 0, mx = b.max_payout || 0;
-    const tags = parseTags(b);
-    const url  = b.apply_url || b.referral_url || b.url || '#';
-    return `<div class="gc bc" onclick="window.open('${esc(url)}','_blank');recordClick('${esc(b.id||'')}','${esc(url)}')">
-      <div class="gig-head">
-        <div class="gig-icon">${platIco[plat] || '💎'}</div>
-        <div class="gig-head-text">
-          <div class="gig-badges">
-            <span class="badge bp">💎 Bounty</span>
-            <span class="badge ${plat==='immunefi'?'bp':plat==='hackerone'?'br':'bd'}">${b.platform || 'Custom'}</span>
-          </div>
-          <div class="gig-title">${esc(b.title || b.program_name || 'Bounty Program')}</div>
-        </div>
-      </div>
-      ${b.description ? `<div style="font-size:12px;color:var(--mut);line-height:1.5">${esc(b.description.slice(0,110))}${b.description.length > 110 ? '…' : ''}</div>` : ''}
-      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <span class="gig-pay pur">${mn && mx ? `$${mn.toLocaleString()}–$${mx.toLocaleString()}` : mx ? `Up to $${mx.toLocaleString()}` : 'Competitive'}</span>
-        ${b.total_pool ? `<span class="gig-source">Pool: $${b.total_pool.toLocaleString()}</span>` : ''}
-      </div>
-      ${tags.length ? `<div class="gig-tags">${tags.slice(0,4).map(t=>`<span class="gig-tag">${esc(t)}</span>`).join('')}</div>` : ''}
-      <div class="gig-foot">
-        <span class="gig-meta">${b.scope_count ? `${b.scope_count} in scope` : 'Open program'}</span>
-        <span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--pur);letter-spacing:.04em">View Program →</span>
-      </div>
+function renderBounties(list){
+  const grid=elById('bounty-grid'); if(!grid) return;
+  set('bn-lbl',`${list.length} active program${list.length!==1?'s':''}`);
+  if(!list.length){grid.innerHTML=`<div style="grid-column:span 2"><div class="empty"><div class="empty-ic">💎</div><div class="empty-t">No programs match</div></div></div>`;return;}
+  const pi={immunefi:'🔐',hackerone:'🎯',bugcrowd:'🐛',custom:'⚡'};
+  grid.innerHTML=list.map(b=>{
+    const plat=(b.platform||'custom').toLowerCase();
+    const mn=b.min_payout||0,mx=b.max_payout||0,tags=parseTags(b);
+    const url=b.apply_url||b.referral_url||'#';
+    return `<div class="gc bc" onclick="window.open('${esc(url)}','_blank','noopener,noreferrer');recordClick('${esc(b.id||'')}','${esc(url)}','')">
+      <div class="gig-head"><div class="gig-icon">${pi[plat]||'💎'}</div>
+      <div class="gig-head-text"><div class="gig-badges"><span class="badge bp">💎 Bounty</span><span class="badge ${plat==='immunefi'?'bp':plat==='hackerone'?'br':'bd'}">${esc(b.platform||'Custom')}</span></div>
+      <div class="gig-title">${esc(b.title||'Bounty Program')}</div></div></div>
+      ${b.description?`<div style="font-size:11px;color:var(--mut);line-height:1.5">${esc(b.description.slice(0,100))}…</div>`:''}
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span class="gig-pay pur">${mn&&mx?`$${mn.toLocaleString()}–$${mx.toLocaleString()}`:mx?`Up to $${mx.toLocaleString()}`:'Competitive'}</span>${b.total_pool?`<span class="gig-source">Pool: $${b.total_pool.toLocaleString()}</span>`:''}</div>
+      ${tags.length?`<div class="gig-tags">${tags.slice(0,4).map(t=>`<span class="gig-tag">${esc(t)}</span>`).join('')}</div>`:''}
+      <div class="gig-foot"><span class="gig-meta">${b.scope_count?`${b.scope_count} in scope`:'Open program'}</span><span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--pur);letter-spacing:.04em">View Program →</span></div>
     </div>`;
   }).join('');
 }
 
-/* ═══════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════
    APPLICATIONS
-═══════════════════════════════════════════════════════ */
-async function loadApps() {
-  const { data } = await S.db.from('gig_applications').select('*').eq('applicant_id', S.user.id).order('created_at', { ascending: false });
-  S.apps = data || [];
-  set('bd-apps', S.apps.length);
-  set('st-apps', S.apps.length);
-  renderApps();
+═══════════════════════════════════════════════════ */
+async function loadApps(){
+  const {data}=await S.db.from('gig_applications').select('*').eq('applicant_id',S.user.id).order('created_at',{ascending:false}).catch(()=>({data:[]}));
+  S.apps=data||[]; set('bd-apps',S.apps.length); set('st-apps',S.apps.length); renderApps();
 }
-
-function renderApps() {
-  const tb = el('apps-tbody');
-  if (!tb) return;
-  if (!S.apps.length) {
-    tb.innerHTML = `<tr><td colspan="6"><div class="empty"><div class="empty-ic">📋</div><div class="empty-t">No applications yet</div><p>Apply from Mission Hub or Bounties.</p></div></td></tr>`;
-    return;
-  }
-  const SC = { pending:'bd', shortlisted:'bg', hired:'bb', rejected:'br', withdrawn:'bd' };
-  tb.innerHTML = S.apps.map(a => `<tr>
-    <td style="font-weight:600;font-size:13px;color:var(--txt)">${esc(a.gig_title || a.gig_id || '—')}</td>
-    <td><span class="badge ${a.apply_type === 'bounty' ? 'bp' : 'bd'}">${a.apply_type === 'bounty' ? 'Bounty' : 'Gig'}</span></td>
-    <td><span class="badge bd">${esc(a.source || 'Internal')}</span></td>
+function renderApps(){
+  const tb=elById('apps-tbody'); if(!tb) return;
+  if(!S.apps.length){tb.innerHTML=`<tr><td colspan="6"><div class="empty"><div class="empty-ic">📋</div><div class="empty-t">No applications yet</div></div></td></tr>`;return;}
+  const SC={pending:'bd',shortlisted:'bg',hired:'bb',rejected:'br',withdrawn:'bd'};
+  tb.innerHTML=S.apps.map(a=>`<tr>
+    <td style="font-weight:600;font-size:13px;color:var(--txt)">${esc(a.gig_title||'—')}</td>
+    <td><span class="badge ${a.apply_type==='bounty'?'bp':'bd'}">${a.apply_type==='bounty'?'Bounty':'Gig'}</span></td>
+    <td><span class="badge bd">${esc(a.source||'Internal')}</span></td>
     <td style="font-family:'DM Mono',monospace;font-size:10px;color:var(--dim)">${new Date(a.created_at).toLocaleDateString()}</td>
-    <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--grn)">${a.proposed_rate ? '$' + a.proposed_rate : '—'}</td>
-    <td><span class="badge ${SC[a.status] || 'bd'}">${a.status || 'pending'}</span></td>
+    <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--grn)">${a.proposed_rate?'$'+a.proposed_rate:'—'}</td>
+    <td><span class="badge ${SC[a.status]||'bd'}">${a.status||'pending'}</span></td>
   </tr>`).join('');
 }
-
-function openApply(id, title) {
-  S.applyId = id; S.applyTitle = title;
-  set('apply-gig-name', title);
-  el('apply-modal').classList.add('open');
+function openApply(id,title){S.applyId=id;S.applyTitle=title;set('apply-gig-name',title);elById('apply-modal').classList.add('open');}
+function closeApply(){elById('apply-modal').classList.remove('open');setv('apply-cover','');setv('apply-rate','');}
+async function submitApply(){
+  const cover=val('apply-cover').trim(),rate=parseFloat(val('apply-rate'))||null;
+  if(!cover){toast('Please write a cover note.','err');return;}
+  setSpin('apply-btn','apply-spin',true);
+  const {error}=await S.db.from('gig_applications').insert({gig_id:S.applyId,applicant_id:S.user.id,cover_note:cover,proposed_rate:rate,status:'pending',gig_title:S.applyTitle,source:'internal',apply_type:S.applyType}).catch(e=>({error:e}));
+  setSpin('apply-btn','apply-spin',false);
+  if(error&&error.code!=='23505'){toast('Error: '+error.message,'err');return;}
+  S.apps.unshift({gig_id:S.applyId,gig_title:S.applyTitle,status:'pending',proposed_rate:rate,created_at:new Date().toISOString(),source:'internal',apply_type:S.applyType});
+  set('bd-apps',S.apps.length);set('st-apps',S.apps.length);closeApply();toast('Application submitted! 🎯','ok');renderApps();
 }
-function closeApply() {
-  el('apply-modal').classList.remove('open');
-  setv('apply-cover', ''); setv('apply-rate', '');
-}
-async function submitApply() {
-  const cover = val('apply-cover').trim();
-  const rate  = parseFloat(val('apply-rate')) || null;
-  if (!cover) { toast('Please write a cover note.', 'err'); return; }
-  setSpin('apply-btn', 'apply-spin', true);
-  const { error } = await S.db.from('gig_applications').insert({
-    gig_id: S.applyId, applicant_id: S.user.id,
-    cover_note: cover, proposed_rate: rate,
-    status: 'pending', gig_title: S.applyTitle,
-    source: 'internal', apply_type: S.applyType,
-  });
-  setSpin('apply-btn', 'apply-spin', false);
-  if (error && error.code !== '23505') { toast('Error: ' + error.message, 'err'); return; }
-  S.apps.unshift({ gig_id:S.applyId, gig_title:S.applyTitle, status:'pending', proposed_rate:rate, created_at:new Date().toISOString(), source:'internal', apply_type:S.applyType });
-  set('bd-apps', S.apps.length); set('st-apps', S.apps.length);
-  closeApply(); toast('Application submitted! 🎯', 'ok'); renderApps();
+async function recordClick(gigId,url,affKey){
+  const sid=sessionStorage.getItem('rtg_s')||(()=>{const s=Math.random().toString(36).slice(2);sessionStorage.setItem('rtg_s',s);return s;})();
+  S.db.from('referral_tracking').insert({gig_id:gigId||null,user_id:S.user?.id||null,external_url:url,session_id:sid,affiliate_key:affKey||null}).catch(()=>{});
 }
 
-async function recordClick(gigId, url) {
-  const sid = sessionStorage.getItem('rtg_s') || (() => { const s = Math.random().toString(36).slice(2); sessionStorage.setItem('rtg_s', s); return s; })();
-  S.db.from('referral_tracking').insert({ gig_id: gigId, user_id: S.user?.id || null, external_url: url, session_id: sid }).catch(() => {});
-}
-
-/* ═══════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════
    PROFILE
-═══════════════════════════════════════════════════════ */
-function paintSidebar() {
-  const p = S.profile || {};
-  const ini = (p.display_name || '?').split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
-  set('sb-av', ini); set('sb-name', p.display_name || 'User');
-  set('sb-tag', S.role === 'red_teamer' ? 'Red Teamer' : 'Company');
-  if (S.role === 'red_teamer') {
-    el('sb-scores').style.display = 'grid';
-    set('sb-rely',  p.reliability_score ? Math.round(p.reliability_score) + '%' : '—');
-    set('sb-effic', p.efficiency_score  ? Math.round(p.efficiency_score)  + '%' : '—');
+═══════════════════════════════════════════════════ */
+function fillProfileForm(){
+  const p=S.profile||{};
+  const ini=(p.display_name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  set('prof-av',ini); set('prof-name',p.display_name||'—');
+  set('prof-handle','@'+(p.display_name||'user').toLowerCase().replace(/\s+/g,''));
+  set('prof-rely',p.reliability_score?Math.round(p.reliability_score)+'%':'—%');
+  set('prof-effic',p.efficiency_score?Math.round(p.efficiency_score)+'%':'—%');
+  const pb=elById('prof-badges');
+  if(pb) pb.innerHTML=`<span class="badge ${tierBadge(p.skill_level)}">${p.skill_level||'entry'}</span>`+(p.is_nda_ready?'<span class="badge bg">NDA Ready</span>':'')+vettingBadge(p.vetting_level);
+  const ps=elById('prof-skills');
+  if(ps) ps.innerHTML=(p.verified_skills||[]).slice(0,4).map(s=>`<span class="badge bd">${esc(s)}</span>`).join('');
+  setv('p-name',p.display_name||'');setv('p-location',p.location||'');setv('p-bio',p.bio||'');
+  setv('p-github',p.github_url||'');setv('p-hackerone',p.hackerone_url||p.portfolio_url||'');
+  setv('p-bugcrowd',p.bugcrowd_url||'');setv('p-immunefi',p.immunefi_url||'');
+  setv('p-rate-min',p.hourly_rate_min||'');setv('p-rate-max',p.hourly_rate_max||'');
+  setv('p-tier',p.skill_level||'intermediate');setv('p-nda',p.is_nda_ready?'true':'false');
+  setv('p-skills',(p.verified_skills||[]).join(', '));setv('p-certs',(p.certifications||[]).join(', '));
+  /* PoW display */
+  const links={'pow-github':p.github_url||'','pow-hackerone':p.hackerone_url||p.portfolio_url||'','pow-bugcrowd':p.bugcrowd_url||'','pow-immunefi':p.immunefi_url||''};
+  for(const [id,url] of Object.entries(links)){
+    const e=elById(id); if(!e) continue;
+    if(url){e.innerHTML=`<a href="${esc(url)}" target="_blank" class="link-b">${esc(url.replace(/^https?:\/\//,'').slice(0,30))}↗</a>`;e.style.color='';}
+    else{e.textContent='Not linked';e.style.color='var(--dim)';}
   }
+  updateVettingUI();
 }
-
-function fillProfileForm() {
-  const p = S.profile || {};
-  const ini = (p.display_name || '?').split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
-  set('prof-av-card', ini);
-  set('prof-card-name', p.display_name || '—');
-  set('prof-card-handle', '@' + (p.display_name || 'user').toLowerCase().replace(/\s+/g, ''));
-  set('prof-rely', p.reliability_score ? Math.round(p.reliability_score) + '%' : '—%');
-  set('prof-effic', p.efficiency_score  ? Math.round(p.efficiency_score)  + '%' : '—%');
-  const pb = el('prof-card-badges');
-  if (pb) pb.innerHTML = `<span class="badge ${tierBadge(p.skill_level)}">${p.skill_level || 'entry'}</span>` + (p.is_nda_ready ? '<span class="badge bg">NDA Ready</span>' : '');
-  const ps = el('prof-card-skills');
-  if (ps) ps.innerHTML = (p.verified_skills || []).slice(0,4).map(s => `<span class="badge bd">${esc(s)}</span>`).join('');
-  setv('p-name',     p.display_name      || '');
-  setv('p-location', p.location          || '');
-  setv('p-bio',      p.bio               || '');
-  setv('p-github',   p.github_url        || '');
-  setv('p-portfolio',p.portfolio_url     || '');
-  setv('p-immunefi', p.immunefi_url      || '');
-  setv('p-bugcrowd', p.bugcrowd_url      || '');
-  setv('p-rate-min', p.hourly_rate_min   || '');
-  setv('p-rate-max', p.hourly_rate_max   || '');
-  setv('p-tier',     p.skill_level       || 'intermediate');
-  setv('p-nda',      p.is_nda_ready ? 'true' : 'false');
-  setv('p-skills',   (p.verified_skills  || []).join(', '));
-  setv('p-certs',    (p.certifications   || []).join(', '));
-}
-
-async function saveProfile() {
-  setSpin('save-prof-btn', 'save-spin', true);
-  const payload = {
-    display_name:   val('p-name').trim(),
-    location:       val('p-location').trim(),
-    bio:            val('p-bio').trim(),
-    github_url:     val('p-github').trim(),
-    portfolio_url:  val('p-portfolio').trim(),
-    immunefi_url:   val('p-immunefi').trim(),
-    bugcrowd_url:   val('p-bugcrowd').trim(),
-    hourly_rate_min:parseFloat(val('p-rate-min')) || null,
-    hourly_rate_max:parseFloat(val('p-rate-max')) || null,
-    skill_level:    val('p-tier'),
-    is_nda_ready:   val('p-nda') === 'true',
-    verified_skills:val('p-skills').split(',').map(s => s.trim()).filter(Boolean),
-    certifications: val('p-certs').split(',').map(s => s.trim()).filter(Boolean),
+async function saveProfile(){
+  setSpin('save-prof-btn','save-spin',true);
+  const payload={
+    display_name:val('p-name').trim(),location:val('p-location').trim(),bio:val('p-bio').trim(),
+    github_url:val('p-github').trim(),hackerone_url:val('p-hackerone').trim(),portfolio_url:val('p-hackerone').trim(),
+    bugcrowd_url:val('p-bugcrowd').trim(),immunefi_url:val('p-immunefi').trim(),
+    hourly_rate_min:parseFloat(val('p-rate-min'))||null,hourly_rate_max:parseFloat(val('p-rate-max'))||null,
+    skill_level:val('p-tier'),is_nda_ready:val('p-nda')==='true',
+    verified_skills:val('p-skills').split(',').map(s=>s.trim()).filter(Boolean),
+    certifications:val('p-certs').split(',').map(s=>s.trim()).filter(Boolean),
   };
-  const { error } = await S.db.from('profiles').update(payload).eq('id', S.user.id);
-  setSpin('save-prof-btn', 'save-spin', false);
-  if (error) { toast('Save failed: ' + error.message, 'err'); return; }
-  Object.assign(S.profile, payload);
-  paintSidebar(); fillProfileForm();
-  toast('Profile synced! ✓', 'ok');
+  const {error}=await S.db.from('profiles').update(payload).eq('id',S.user.id).catch(e=>({error:e}));
+  setSpin('save-prof-btn','save-spin',false);
+  if(error){toast('Save failed: '+error.message,'err');return;}
+  Object.assign(S.profile,payload);
+  paintSidebar();fillProfileForm();
+  toast('Profile synced! ✓','ok');
 }
 
-/* ═══════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════
    COMPANY — TALENT POOL
-═══════════════════════════════════════════════════════ */
-async function loadTalent() {
-  const { data } = await S.db.from('talent_pool').select('*').order('created_at', { ascending: false });
-  S.talent = data || [];
-  set('bd-pool',      S.talent.length);
-  set('co-talent-n',  S.talent.length);
-  set('co-expert-n',  S.talent.filter(t => t.tier === 'expert').length);
-  set('co-nda-n',     S.talent.filter(t => t.is_nda_ready || t.nda_ready).length);
-  renderPool(S.talent);
-  renderOvRecent();
+═══════════════════════════════════════════════════ */
+async function loadTalent(){
+  const {data}=await S.db.from('talent_pool').select('*').order('vetting_level',{ascending:false}).order('created_at',{ascending:false}).catch(()=>({data:[]}));
+  S.talent=data||[];
+  /* Build AI system with top 5 verified */
+  const top5=S.talent.filter(t=>(t.vetting_level||1)>=2).slice(0,5);
+  S.aiSys=buildAISys(top5);
+  set('bd-pool',S.talent.length);set('co-talent-n',S.talent.length);
+  set('co-verified-n',S.talent.filter(t=>(t.vetting_level||1)>=3).length);
+  set('co-expert-n',S.talent.filter(t=>t.tier==='expert').length);
+  renderPool(S.talent);renderOvRecent();
 }
-
-function renderPool(rows) {
-  const tb = el('pool-tbody');
-  if (!tb) return;
-  if (!rows.length) { tb.innerHTML = `<tr><td colspan="7"><div class="empty"><div class="empty-ic">🛡</div><div class="empty-t">No talent registered yet</div></div></td></tr>`; return; }
-  tb.innerHTML = rows.map(t => `<tr>
-    <td><div class="nm-c"><div class="tav">${(t.full_name || '?').slice(0,2).toUpperCase()}</div>
-    <div><div style="font-weight:600;font-size:13px;color:var(--txt)">${esc(t.full_name || 'Anonymous')}</div>
-    <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--dim)">${esc(t.email || '')}</div></div></div></td>
-    <td style="font-size:12px;color:var(--mut)">${esc(t.specialty || '—')}</td>
-    <td><span class="badge ${tierBadge(t.tier)}">${t.tier || 'entry'}</span></td>
-    <td>${(t.is_nda_ready || t.nda_ready) ? '<span class="badge bg">Ready</span>' : '<span class="badge bd">No</span>'}</td>
-    <td>${t.github ? `<a href="${esc(t.github)}" target="_blank" class="link-b">GitHub ↗</a>` : '<span style="color:var(--dim)">—</span>'}</td>
-    <td style="font-family:'DM Mono',monospace;font-size:9px;color:var(--dim)">${new Date(t.created_at).toLocaleDateString()}</td>
-    <td><button class="btn btn-gh btn-sm" onclick="preloadScout('${esc(t.full_name||'')}','${esc(t.specialty||'')}')">Scout</button></td>
-  </tr>`).join('');
+function buildAISys(top5){
+  const block=top5.length?top5.map((t,i)=>`${i+1}. ${t.full_name||'?'} | L${t.vetting_level||1}${(t.vetting_level||1)>=3?' ✓VERIFIED':''} | ${t.specialty||'?'} | ${t.tier||'?'} | NDA:${t.is_nda_ready?'yes':'no'}`).join('\n'):'No verified talent yet.';
+  return AI_SYS+`\n\nTOP VERIFIED CANDIDATES:\n${block}`;
 }
-
-function renderOvRecent() {
-  const e = el('ov-recent');
-  if (!e) return;
-  const rows = S.talent.slice(0, 4);
-  if (!rows.length) { e.innerHTML = '<p style="font-size:12px;color:var(--dim)">No talent registered yet.</p>'; return; }
-  e.innerHTML = rows.map(t => `<div style="display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--b)">
+function renderPool(rows){
+  const tb=elById('pool-tbody'); if(!tb) return;
+  if(!rows.length){tb.innerHTML=`<tr><td colspan="7"><div class="empty"><div class="empty-ic">🛡</div><div class="empty-t">No talent registered yet</div></div></td></tr>`;return;}
+  tb.innerHTML=rows.map(t=>{
+    const lv=parseInt(t.vetting_level)||1;
+    const pow=[t.github?`<a href="${esc(t.github)}" target="_blank" class="link-b">GH</a>`:'',t.hackerone?`<a href="${esc(t.hackerone)}" target="_blank" class="link-b">H1</a>`:'',t.bugcrowd?`<a href="${esc(t.bugcrowd)}" target="_blank" class="link-b">BC</a>`:'',t.immunefi?`<a href="${esc(t.immunefi)}" target="_blank" class="link-b">IF</a>`:''].filter(Boolean).join(' ')||'<span style="color:var(--dim)">—</span>';
+    return `<tr>
+      <td><div class="nm-c"><div class="tav">${(t.full_name||'?').slice(0,2).toUpperCase()}</div>
+      <div><div style="font-weight:600;font-size:13px;color:var(--txt);display:flex;align-items:center;gap:5px">${esc(t.full_name||'Anonymous')}${lv>=3?'<span style="background:var(--grn);color:#000;font-size:8px;font-weight:900;padding:1px 5px;border-radius:3px">✓</span>':''}</div>
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--dim)">${esc(t.email||'')}</div></div></div></td>
+      <td style="font-size:12px;color:var(--mut)">${esc(t.specialty||'—')}</td>
+      <td><span class="badge ${tierBadge(t.tier)}">${t.tier||'entry'}</span></td>
+      <td>${vettingBadge(lv)}</td>
+      <td>${(t.is_nda_ready||t.nda_ready)?'<span class="badge bg">Ready</span>':'<span class="badge bd">No</span>'}</td>
+      <td style="font-size:11px">${pow}</td>
+      <td><button class="btn btn-gh btn-sm" onclick="preloadScout('${esc(t.full_name||'')}','${esc(t.specialty||'')}',${lv})">Scout</button></td>
+    </tr>`;
+  }).join('');
+}
+function renderOvRecent(){
+  const e=elById('ov-recent'); if(!e) return;
+  const rows=[...S.talent].sort((a,b)=>(b.vetting_level||1)-(a.vetting_level||1)).slice(0,4);
+  if(!rows.length){e.innerHTML='<p style="font-size:12px;color:var(--dim)">No talent registered yet.</p>';return;}
+  e.innerHTML=rows.map(t=>{const lv=parseInt(t.vetting_level)||1;return`<div style="display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--b)">
     <div class="tav">${(t.full_name||'?').slice(0,2).toUpperCase()}</div>
-    <div style="flex:1;min-width:0">
-      <div style="font-weight:600;font-size:12px;color:var(--txt)">${esc(t.full_name||'?')}</div>
-      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--dim)">${esc(t.specialty||'—')} · ${esc(t.tier||'entry')}</div>
-    </div>
-    <span class="badge ${tierBadge(t.tier)}">${t.tier||'entry'}</span>
-  </div>`).join('');
+    <div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:5px;font-weight:600;font-size:12px;color:var(--txt)">${esc(t.full_name||'?')}${lv>=3?'<span style="background:var(--grn);color:#000;font-size:8px;font-weight:900;padding:1px 4px;border-radius:3px">✓</span>':''}</div>
+    <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--dim)">${esc(t.specialty||'—')} · ${esc(t.tier||'entry')}</div></div>
+    ${vettingBadge(lv)}</div>`;}).join('');
+}
+function filterTalent(){
+  const q=val('talent-search').toLowerCase(),ti=val('talent-tier'),vl=val('talent-vl');
+  renderPool(S.talent.filter(t=>(!q||(t.full_name||'').toLowerCase().includes(q)||(t.specialty||'').toLowerCase().includes(q))&&(!ti||t.tier===ti)&&(!vl||String(t.vetting_level||1)===vl)));
 }
 
-function filterTalent() {
-  const q = val('talent-search').toLowerCase(), ti = val('talent-tier');
-  renderPool(S.talent.filter(t =>
-    (!q  || (t.full_name||'').toLowerCase().includes(q) || (t.specialty||'').toLowerCase().includes(q)) &&
-    (!ti || t.tier === ti)
-  ));
+/* ═══════════════════════════════════════════════════
+   AI SCOUT (company)
+═══════════════════════════════════════════════════ */
+async function runScout(){
+  const q=val('scout-query').trim(); if(!q){toast('Describe what you need.','err');return;}
+  setSpin('scout-btn','scout-spin',true);
+  elById('scout-result').innerHTML='<div class="sk" style="height:90px;border-radius:var(--rs)"></div>';
+  const ctx=[...S.talent].sort((a,b)=>(b.vetting_level||1)-(a.vetting_level||1)).slice(0,25).map(t=>`- ${t.full_name||'?'} | L${t.vetting_level||1}${(t.vetting_level||1)>=3?' VERIFIED':''} | ${t.specialty||'?'} | ${t.tier||'?'} | NDA:${t.is_nda_ready?'yes':'no'}`).join('\n')||'No talent yet.';
+  try{
+    const raw=await callClaude(`Talent scout request: "${q}"\n\nAvailable (sorted by vetting level):\n${ctx}\n\nReturn ONLY valid JSON:\n{"matches":[{"name":"...","level":3,"reason":"..."}],"criteria":["..."],"recommendation":"...","missing_skills":["..."]}`,
+      'Return only valid JSON. No markdown. Prioritize L3 verified candidates.',800);
+    const d=JSON.parse(raw.replace(/```json|```/g,'').trim());
+    elById('scout-result').innerHTML=`<div style="background:var(--bg3);border:1px solid var(--b);border-radius:var(--rs);padding:14px 15px;animation:fu .3s ease">
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--red2);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">Scout Results — Verified First</div>
+      ${(d.matches||[]).map(m=>`<div style="display:flex;gap:7px;margin-bottom:7px;padding:8px 10px;background:rgba(23,201,126,.05);border:1px solid rgba(23,201,126,.12);border-radius:var(--rs);font-size:12px;color:var(--mut)">
+        <span style="color:var(--grn);flex-shrink:0">${(m.level||1)>=3?'✓':'○'}</span>
+        <span><strong style="color:var(--txt)">${esc(m.name)}</strong> ${(m.level||1)>=3?'<span style="background:var(--grn);color:#000;font-size:8px;font-weight:900;padding:1px 5px;border-radius:3px;margin-left:4px">L3</span>':''} — ${esc(m.reason)}</span>
+      </div>`).join('')}
+      ${d.criteria?.length?`<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:10px">${d.criteria.map(c=>`<span class="badge bd">${esc(c)}</span>`).join('')}</div>`:''}
+      ${d.recommendation?`<div style="margin-top:10px;padding:10px 12px;background:var(--bg3);border:1px solid var(--b);border-radius:var(--rs);font-size:12px;color:var(--mut)">${esc(d.recommendation)}</div>`:''}
+      ${d.missing_skills?.length?`<div style="margin-top:10px;padding:9px 11px;background:rgba(232,56,47,.06);border:1px solid rgba(232,56,47,.15);border-radius:var(--rs);font-size:11px;color:var(--red2)">Skills not in pool: ${d.missing_skills.join(', ')}</div>`:''}
+    </div>`;
+  }catch(e){elById('scout-result').innerHTML=`<div style="color:var(--red2);font-size:12px;padding:10px">Scout error: ${esc(e.message)}</div>`;}
+  setSpin('scout-btn','scout-spin',false);
+}
+function preloadScout(name,spec,level){setv('scout-query',`Assess ${name} (L${level}) who specializes in ${spec}. Rate their fit and suggest 3 technical interview questions.`);goView('cscout');setTimeout(runScout,100);}
+async function runQuickScout(){
+  const q=val('qs-inp').trim(); if(!q) return;
+  setSpin(null,'qs-spin',true);
+  try{const r=await callClaude(q,'You are a talent scout. Prioritize L3 verified candidates. Give a 2-3 sentence recommendation on what candidate profile to target.',250);
+  elById('qs-res').innerHTML=`<div style="background:var(--bg3);border:1px solid var(--b);border-radius:var(--rs);padding:12px 13px;font-size:12px;color:var(--mut);margin-top:8px">${r.replace(/\n/g,'<br>')}</div>`;}
+  finally{setSpin(null,'qs-spin',false);}
 }
 
-/* ═══════════════════════════════════════════════════════
-   AI SCOUT
-═══════════════════════════════════════════════════════ */
-async function runScout() {
-  const q = val('scout-query').trim();
-  if (!q) { toast('Describe what you need.', 'err'); return; }
-  setSpin('scout-btn', 'scout-spin', true);
-  el('scout-result').innerHTML = '<div class="sk" style="height:90px;border-radius:var(--rs)"></div>';
-  const ctx = S.talent.slice(0,25).map(t =>
-    `- ${t.full_name||'?'} | ${t.specialty||'?'} | ${t.tier||'?'} | NDA:${t.is_nda_ready?'yes':'no'} | github:${t.github||'none'}`
-  ).join('\n') || 'No talent registered yet.';
-  const prompt = `You are a talent scout for an AI safety marketplace.\nCompany needs: "${q}"\n\nAvailable testers:\n${ctx}\n\nReturn ONLY valid JSON:\n{"matches":[{"name":"...","reason":"..."}],"criteria":["..."],"recommendation":"...","missing_skills":["..."]}`;
-  try {
-    const raw = await callClaude(prompt, 'Return only valid JSON. No markdown fences. No explanation outside the JSON.', 800);
-    const d   = JSON.parse(raw.replace(/```json|```/g, '').trim());
-    el('scout-result').innerHTML = `
-      <div style="background:var(--bg3);border:1px solid var(--b);border-radius:var(--rs);padding:14px 15px;animation:fu .3s ease">
-        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--red2);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">Scout Results</div>
-        ${(d.matches||[]).map(m=>`<div style="display:flex;gap:7px;margin-bottom:7px;padding:8px 10px;background:rgba(23,201,126,.05);border:1px solid rgba(23,201,126,.12);border-radius:var(--rs);font-size:12px;color:var(--mut)"><span style="color:var(--grn);flex-shrink:0">✓</span><span><strong style="color:var(--txt)">${esc(m.name)}</strong> — ${esc(m.reason)}</span></div>`).join('')}
-        ${d.criteria?.length?`<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:10px">${d.criteria.map(c=>`<span class="badge bd">${esc(c)}</span>`).join('')}</div>`:''}
-        ${d.recommendation?`<div style="margin-top:10px;padding:10px 12px;background:var(--bg3);border:1px solid var(--b);border-radius:var(--rs);font-size:12px;color:var(--mut)">${esc(d.recommendation)}</div>`:''}
-        ${d.missing_skills?.length?`<div style="margin-top:10px;padding:9px 11px;background:rgba(232,56,47,.06);border:1px solid rgba(232,56,47,.15);border-radius:var(--rs);font-size:11px;color:var(--red2)">Skills not in pool: ${d.missing_skills.join(', ')}</div>`:''}
-      </div>`;
-  } catch(e) {
-    el('scout-result').innerHTML = `<div style="color:var(--red2);font-size:12px;padding:10px">Scout error: ${esc(e.message)}</div>`;
-  }
-  setSpin('scout-btn', 'scout-spin', false);
-}
-
-function preloadScout(name, spec) {
-  setv('scout-query', `Assess ${name} who specializes in ${spec}. Rate their fit for AI red teaming gigs and suggest 3 technical interview questions.`);
-  goView('cscout');
-  setTimeout(runScout, 100);
-}
-
-async function runQuickScout() {
-  const q = val('qs-inp').trim();
-  if (!q) return;
-  setSpin(null, 'qs-spin', true);
-  try {
-    const r = await callClaude(q, 'You are a talent scout. Give a 2-3 sentence recommendation on what candidate profile to target based on this brief.', 250);
-    el('qs-res').innerHTML = `<div style="background:var(--bg3);border:1px solid var(--b);border-radius:var(--rs);padding:12px 13px;font-size:12px;color:var(--mut);margin-top:8px">${r.replace(/\n/g,'<br>')}</div>`;
-  } finally { setSpin(null, 'qs-spin', false); }
-}
-
-/* ═══════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════
    ANALYTICS
-═══════════════════════════════════════════════════════ */
-async function loadAnalytics() {
-  const rows = S.talent.length ? S.talent
-    : (await S.db.from('talent_pool').select('tier,specialty,is_nda_ready,created_at').then(r => r.data || []));
-  const total = rows.length || 1;
-  const byT = { entry:0, intermediate:0, expert:0 };
-  const byS = {};
-  rows.forEach(r => {
-    if (r.tier in byT) byT[r.tier]++;
-    if (r.specialty) byS[r.specialty] = (byS[r.specialty] || 0) + 1;
-  });
-  set('an-total', rows.length);
-  el('an-tiers').innerHTML = Object.entries(byT).map(([k,v]) => `
-    <div class="a-row"><span class="a-lbl">${k}</span><div class="a-track"><div class="a-fill" style="width:${Math.round(v/total*100)}%"></div></div><span>${v}</span></div>`
-  ).join('');
-  const top5 = Object.entries(byS).sort((a,b) => b[1]-a[1]).slice(0,5);
-  el('an-specs').innerHTML = top5.length
-    ? top5.map(([k,v]) => `<div class="a-row"><span class="a-lbl" style="width:120px">${esc(k)}</span><div class="a-track"><div class="a-fill" style="width:${Math.round(v/total*100)}%"></div></div><span>${v}</span></div>`).join('')
-    : '<span style="font-size:12px;color:var(--dim)">No data yet.</span>';
-  const ndaY = rows.filter(r => r.is_nda_ready).length, ndaN = rows.length - ndaY;
-  el('an-nda').innerHTML = [['NDA ready', ndaY, 'var(--grn)'], ['No NDA', ndaN, 'var(--red)']].map(([l,v,c]) =>
-    `<div class="a-row"><span class="a-lbl">${l}</span><div class="a-track"><div class="a-fill" style="width:${Math.round(v/total*100)}%;background:${c}"></div></div><span>${v}</span></div>`
-  ).join('');
-  const mc = {};
-  rows.forEach(r => { const m = new Date(r.created_at).toLocaleDateString('en',{month:'short',year:'2-digit'}); mc[m]=(mc[m]||0)+1; });
-  const months = Object.entries(mc).slice(-4), mMax = Math.max(...months.map(([,v])=>v),1);
-  el('an-month').innerHTML = months.length
-    ? months.map(([k,v]) => `<div class="a-row"><span class="a-lbl" style="width:60px">${k}</span><div class="a-track"><div class="a-fill" style="width:${Math.round(v/mMax*100)}%;background:var(--grn)"></div></div><span>${v}</span></div>`).join('')
-    : '<span style="font-size:12px;color:var(--dim)">No data yet.</span>';
+═══════════════════════════════════════════════════ */
+async function loadAnalytics(){
+  const rows=S.talent.length?S.talent:(await S.db.from('talent_pool').select('tier,specialty,is_nda_ready,vetting_level,created_at').then(r=>r.data||[]).catch(()=>[]));
+  const total=rows.length||1,byT={entry:0,intermediate:0,expert:0},byS={},byVL={1:0,2:0,3:0};
+  rows.forEach(r=>{if(r.tier in byT)byT[r.tier]++;if(r.specialty)byS[r.specialty]=(byS[r.specialty]||0)+1;const vl=parseInt(r.vetting_level)||1;if(vl in byVL)byVL[vl]++;});
+  set('an-total',rows.length);
+  elById('an-tiers').innerHTML=Object.entries(byT).map(([k,v])=>`<div class="a-row"><span class="a-lbl">${k}</span><div class="a-track"><div class="a-fill" style="width:${Math.round(v/total*100)}%"></div></div><span>${v}</span></div>`).join('');
+  const top5=Object.entries(byS).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  elById('an-specs').innerHTML=top5.length?top5.map(([k,v])=>`<div class="a-row"><span class="a-lbl" style="width:120px">${esc(k)}</span><div class="a-track"><div class="a-fill" style="width:${Math.round(v/total*100)}%"></div></div><span>${v}</span></div>`).join(''):'<span style="font-size:12px;color:var(--dim)">No data yet.</span>';
+  const vlC={1:'var(--dim)',2:'var(--amb)',3:'var(--grn)'},vlL={1:'L1 Basic',2:'L2 Dossier',3:'L3 Verified'};
+  elById('an-vetting').innerHTML=Object.entries(byVL).map(([k,v])=>`<div class="a-row"><span class="a-lbl">${vlL[k]}</span><div class="a-track"><div class="a-fill" style="width:${Math.round(v/total*100)}%;background:${vlC[k]}"></div></div><span>${v}</span></div>`).join('');
+  const ndaY=rows.filter(r=>r.is_nda_ready).length,ndaN=rows.length-ndaY;
+  elById('an-nda').innerHTML=[['NDA ready',ndaY,'var(--grn)'],['No NDA',ndaN,'var(--red)']].map(([l,v,c])=>`<div class="a-row"><span class="a-lbl">${l}</span><div class="a-track"><div class="a-fill" style="width:${Math.round(v/total*100)}%;background:${c}"></div></div><span>${v}</span></div>`).join('');
 }
 
-/* ═══════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════
    POST A GIG
-═══════════════════════════════════════════════════════ */
-async function genTags() {
-  const t = val('pg-title'), d = val('pg-desc');
-  if (!t && !d) { toast('Add title or description first.', 'err'); return; }
-  setSpin('tag-btn', 'tag-spin', true);
-  try {
-    const raw = await callClaude(`Title: ${t}\nDesc: ${d}`, 'Return ONLY a JSON array of 4-6 concise AI red teaming skill/topic tags. Example: ["Prompt Injection","Expert","Claude API"]. No markdown, nothing else.', 150);
-    S.pendingTags = JSON.parse(raw.replace(/```json|```/g,'').trim());
-  } catch { S.pendingTags = ['LLM Red Teaming', 'AI Safety']; }
-  renderTagsBox();
-  setSpin('tag-btn', 'tag-spin', false);
+═══════════════════════════════════════════════════ */
+async function genTags(){
+  const t=val('pg-title'),d=val('pg-desc'); if(!t&&!d){toast('Add title or description first.','err');return;}
+  setSpin('tag-btn','tag-spin',true);
+  try{const raw=await callClaude(`Title: ${t}\nDesc: ${d}`,'Return ONLY a JSON array of 4-6 concise AI red teaming skill/topic tags. No markdown, nothing else.',150);S.pendingTags=JSON.parse(raw.replace(/```json|```/g,'').trim());}
+  catch{S.pendingTags=['LLM Red Teaming','AI Safety'];}
+  renderTagsBox();setSpin('tag-btn','tag-spin',false);
+}
+function rmTag(i){S.pendingTags.splice(i,1);renderTagsBox();}
+function renderTagsBox(){
+  const e=elById('tags-box'); if(!e) return;
+  e.innerHTML=S.pendingTags.length?S.pendingTags.map((t,i)=>`<span class="tag-chip">${esc(t)}<button class="tag-x" onclick="rmTag(${i})">×</button></span>`).join(''):'<span style="font-family:\'DM Mono\',monospace;font-size:10px;color:var(--dim)">Fill title & description then click AI Generate</span>';
+}
+async function postGig(){
+  const title=val('pg-title').trim(),desc=val('pg-desc').trim();
+  if(!title||!desc){toast('Title and description required.','err');return;}
+  setSpin('post-btn','post-spin',true);
+  const {error}=await S.db.from('gigs').insert({source_type:'internal',status:'active',title,description:desc,tags:S.pendingTags,skill_level:val('pg-tier'),pay_min_usd:parseFloat(val('pg-min'))||null,pay_max_usd:parseFloat(val('pg-max'))||null,pay_type:val('pg-type'),posted_by:S.user.id}).catch(e=>({error:e}));
+  setSpin('post-btn','post-spin',false);
+  if(error){toast('Post failed: '+error.message,'err');return;}
+  toast('Gig posted! Red teamers can see it now.','ok');S.pendingTags=[];renderTagsBox();
 }
 
-function rmTag(i) { S.pendingTags.splice(i, 1); renderTagsBox(); }
-
-function renderTagsBox() {
-  const e = el('tags-box');
-  if (!e) return;
-  e.innerHTML = S.pendingTags.length
-    ? S.pendingTags.map((t,i) => `<span class="tag-chip">${esc(t)}<button class="tag-x" onclick="rmTag(${i})">×</button></span>`).join('')
-    : '<span style="font-family:\'DM Mono\',monospace;font-size:10px;color:var(--dim)">Fill title & description then click AI Generate</span>';
-}
-
-async function postGig() {
-  const title = val('pg-title').trim(), desc = val('pg-desc').trim();
-  if (!title || !desc) { toast('Title and description required.', 'err'); return; }
-  setSpin('post-btn', 'post-spin', true);
-  const { error } = await S.db.from('gigs').insert({
-    source_type:'internal', status:'active', title, description:desc,
-    tags: S.pendingTags, skill_level: val('pg-tier'),
-    pay_min_usd: parseFloat(val('pg-min')) || null,
-    pay_max_usd: parseFloat(val('pg-max')) || null,
-    pay_type: val('pg-type'), posted_by: S.user.id,
-  });
-  setSpin('post-btn', 'post-spin', false);
-  if (error) { toast('Post failed: ' + error.message, 'err'); return; }
-  toast('Gig posted! Red teamers can see it now.', 'ok');
-  S.pendingTags = []; renderTagsBox();
-}
-
-/* ═══════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════
    AI MISSION CONTROL
-═══════════════════════════════════════════════════════ */
-function toggleAI() {
-  S.aiOpen = !S.aiOpen;
-  el('ai-box').classList.toggle('open', S.aiOpen);
-  if (S.aiOpen) setTimeout(() => el('ai-input')?.focus(), 80);
-}
-
-function aiAsk(prompt) {
-  if (!S.aiOpen) toggleAI();
-  setv('ai-input', prompt);
-  sendAI();
-}
-
-function buildCtx() {
-  const p = S.profile;
-  if (!p) return '';
-  return `\n\n[USER PROFILE — use for personalized advice:
+═══════════════════════════════════════════════════ */
+function toggleAI(){S.aiOpen=!S.aiOpen;elById('ai-box').classList.toggle('open',S.aiOpen);if(S.aiOpen)setTimeout(()=>elById('ai-input')?.focus(),80);}
+function aiAsk(p){if(!S.aiOpen)toggleAI();setv('ai-input',p);sendAI();}
+function buildCtx(){
+  const p=S.profile; if(!p) return '';
+  return `\n\n[USER PROFILE:
 Name: ${p.display_name||'?'} | Tier: ${p.skill_level||'?'} | Location: ${p.location||'?'}
+Vetting Level: ${p.vetting_level||1}
 Skills: ${(p.verified_skills||[]).join(', ')||'none listed'}
-Certs: ${(p.certifications||[]).join(', ')||'none'}
-GitHub: ${p.github_url||'none'} | HackerOne: ${p.portfolio_url||'none'}
-Immunefi: ${p.immunefi_url||'none'} | Bugcrowd: ${p.bugcrowd_url||'none'}
+GitHub: ${p.github_url||'none'} | HackerOne: ${p.hackerone_url||p.portfolio_url||'none'}
+Bugcrowd: ${p.bugcrowd_url||'none'} | Immunefi: ${p.immunefi_url||'none'}
 Rate: $${p.hourly_rate_min||'?'}–$${p.hourly_rate_max||'?'}/hr | NDA: ${p.is_nda_ready?'yes':'no'}
-Applications: ${S.apps.length}]`;
+Applications submitted: ${S.apps.length}]`;
 }
-
-function addMsg(role, content, loading = false) {
-  const w = el('ai-msgs');
-  if (!w) return;
-  const d = document.createElement('div');
-  d.className = `aim ${role === 'user' ? 'u' : 'a'}`;
-  if (loading) d.id = 'ai-ld';
-  d.innerHTML = `<div class="aim-av">${role === 'user' ? 'YOU' : 'AI'}</div><div class="aim-b">${loading ? '<span class="dots"><span>.</span><span>.</span><span>.</span></span>' : esc(content).replace(/\n/g,'<br>')}</div>`;
-  w.appendChild(d);
-  w.scrollTop = w.scrollHeight;
+function addMsg(role,content,loading=false){
+  const w=elById('ai-msgs'); if(!w) return;
+  const d=document.createElement('div');d.className=`aim ${role==='user'?'u':'a'}`;if(loading)d.id='ai-ld';
+  d.innerHTML=`<div class="aim-av">${role==='user'?'YOU':'AI'}</div><div class="aim-b">${loading?'<span class="dots"><span>.</span><span>.</span><span>.</span></span>':esc(content).replace(/\n/g,'<br>')}</div>`;
+  w.appendChild(d);w.scrollTop=w.scrollHeight;
 }
-
-async function sendAI() {
-  const inp = el('ai-input'), text = inp?.value.trim();
-  if (!text) return;
-  inp.value = '';
-  el('ai-sgs').style.display = 'none';
-  addMsg('user', text);
-  addMsg('assistant', '', true);
-  el('ai-send').disabled = true;
-  try {
-    const reply = await callClaude(text + buildCtx(), AI_SYS, 600);
-    el('ai-ld')?.remove();
-    addMsg('assistant', reply);
-  } catch (e) {
-    el('ai-ld')?.remove();
-    addMsg('assistant', '⚠ AI error: ' + e.message + '. Make sure /api/claude.js is deployed to Vercel.');
-  } finally {
-    el('ai-send').disabled = false;
-  }
+async function sendAI(){
+  const inp=elById('ai-input'),text=inp?.value.trim(); if(!text) return;
+  inp.value='';elById('ai-sgs').style.display='none';
+  addMsg('user',text);addMsg('assistant','',true);elById('ai-send').disabled=true;
+  const sys=S.aiSys||AI_SYS;
+  try{const reply=await callClaude(text+buildCtx(),sys,700);elById('ai-ld')?.remove();addMsg('assistant',reply);}
+  catch(e){elById('ai-ld')?.remove();addMsg('assistant','⚠ AI error: '+e.message+'. Check /api/claude.js is deployed.');}
+  finally{elById('ai-send').disabled=false;}
 }
+async function signOut(){await S.db.auth.signOut();}
 
-async function signOut() { await S.db.auth.signOut(); }
-
-/* ═══════════════════════════════════════════════════════
-   DEMO DATA (shown when DB tables are empty)
-═══════════════════════════════════════════════════════ */
-function demoGigs() {
-  return [
-    { id:'d1', _ext:true,  _src:'Mercor',   title:'AI Red Teamer — Adversarial Testing (EN/JP)',       tags:['Jailbreaking','Multilingual'],      skill_level:'intermediate', pay_min_usd:20,  pay_max_usd:50,  pay_type:'hourly',   referral_url:'https://work.mercor.com', apply_count:14 },
-    { id:'d2', _ext:false,                  title:'Prompt Injection Tester — Production LLM System',   tags:['Prompt Injection','Expert'],       skill_level:'expert',       pay_min_usd:80,  pay_max_usd:150, pay_type:'hourly',   apply_count:3  },
-    { id:'d3', _ext:true,  _src:'Scale AI', title:'LLM Safety Evaluator — Bias & Harm Detection',      tags:['Bias Auditing','Content Safety'],   skill_level:'entry',        pay_min_usd:25,  pay_max_usd:40,  pay_type:'hourly',   referral_url:'https://scale.com/jobs', apply_count:28 },
-    { id:'d4', _ext:false,                  title:'Claude Agentic Pipeline — Tool-Call Attack Testing', tags:['Agentic Systems','Claude API'],     skill_level:'expert',       pay_min_usd:100, pay_max_usd:180, pay_type:'hourly',   apply_count:6  },
-    { id:'d5', _ext:true,  _src:'Surge AI', title:'RAG Pipeline Security Audit — Vector DB Poisoning',  tags:['RAG Exploitation','Data Poisoning'],skill_level:'expert',       pay_min_usd:120, pay_max_usd:200, pay_type:'per_task', referral_url:'https://surgehq.ai', apply_count:2 },
-    { id:'d6', _ext:true,  _src:'Mercor',   title:'Multi-turn Jailbreak Testing — GPT-4 & Claude 4',   tags:['Jailbreaking','Multi-turn'],        skill_level:'expert',       pay_min_usd:30,  pay_max_usd:80,  pay_type:'hourly',   referral_url:'https://work.mercor.com', apply_count:19 },
-  ];
-}
-
-function demoBounties() {
-  return [
-    { id:'b1', platform:'hackerone', title:'OpenAI Bug Bounty Program',                  description:'Security vulnerabilities in ChatGPT, the API, and infrastructure.',      tags:['API Security','LLM','Prompt Injection'],       min_payout:200,   max_payout:20000,   apply_url:'https://hackerone.com/openai',     scope_count:8  },
-    { id:'b2', platform:'hackerone', title:'Anthropic Claude Security Research',          description:'Vulnerabilities in Claude models, API, and constitutional AI mechanisms.',  tags:['LLM Safety','Model Extraction','Jailbreaking'], min_payout:500,   max_payout:50000,   apply_url:'https://hackerone.com/anthropic',  scope_count:6  },
-    { id:'b3', platform:'immunefi',  title:'Immunefi AI/ML Bug Bounty Program',           description:'Critical vulnerabilities in AI model serving and ML pipelines.',            tags:['AI Infrastructure','Smart Contracts','Critical'],min_payout:1000,  max_payout:150000,  total_pool:500000,  apply_url:'https://immunefi.com/explore/', scope_count:12 },
-    { id:'b4', platform:'immunefi',  title:'Chainlink AI Oracle Security',                description:'Attack the AI-powered oracle system. Smart contract + ML model in scope.',  tags:['Web3','Oracle','AI+Blockchain'],                 min_payout:5000,  max_payout:250000,  total_pool:1000000, apply_url:'https://immunefi.com/explore/', scope_count:5  },
-    { id:'b5', platform:'bugcrowd',  title:'Google DeepMind AI Safety Program',           description:'Safety-critical bugs in Gemini models and Google AI services.',              tags:['Gemini','AI Safety','Bias Detection'],          min_payout:100,   max_payout:15000,   apply_url:'https://bughunters.google.com',    scope_count:15 },
-    { id:'b6', platform:'custom',    title:'RedTeamGig Internal Audit — Claude API App',  description:'Agentic tool-use attacks on our own platform. NDA required. US-only.',      tags:['Agentic Systems','Internal','NDA Required'],    min_payout:500,   max_payout:5000,    total_pool:20000,   apply_url:'#', scope_count:4 },
-  ];
-}
+/* ═══════════════════════════════════════════════════
+   DEMO DATA (fallback when DB empty)
+═══════════════════════════════════════════════════ */
+function demoGigs(){return[
+  {id:'d1',_ext:false,title:'Prompt Injection Tester — Production LLM System',tags:['Prompt Injection','Expert'],skill_level:'expert',pay_min_usd:80,pay_max_usd:150,pay_type:'hourly',apply_count:3},
+  {id:'d2',_ext:false,title:'Claude Agentic Pipeline — Tool-Call Attack Testing',tags:['Agentic Systems','Claude API'],skill_level:'expert',pay_min_usd:100,pay_max_usd:180,pay_type:'hourly',apply_count:6},
+  {id:'d3',_ext:true,_src:'Scale AI',title:'LLM Safety Evaluator — Bias & Harm Detection',tags:['Bias Auditing','Content Safety'],skill_level:'entry',pay_min_usd:25,pay_max_usd:40,pay_type:'hourly',referral_url:'https://scale.com/jobs',apply_count:28},
+  {id:'d4',_ext:true,_src:'Surge AI',title:'RAG Pipeline Security Audit',tags:['RAG Exploitation','Data Poisoning'],skill_level:'expert',pay_min_usd:120,pay_max_usd:200,pay_type:'per_task',referral_url:'https://surgehq.ai',apply_count:2},
+];}
+function demoBounties(){return[
+  {id:'b1',platform:'hackerone',title:'OpenAI Bug Bounty Program',description:'Security vulnerabilities in ChatGPT, API, and infrastructure.',tags:['API Security','LLM','Prompt Injection'],min_payout:200,max_payout:20000,apply_url:'https://hackerone.com/openai',scope_count:8},
+  {id:'b2',platform:'hackerone',title:'Anthropic Claude Security Research',description:'Vulnerabilities in Claude models, API, and constitutional AI mechanisms.',tags:['LLM Safety','Model Extraction','Jailbreaking'],min_payout:500,max_payout:50000,apply_url:'https://hackerone.com/anthropic',scope_count:6},
+  {id:'b3',platform:'immunefi',title:'Immunefi AI/ML Bug Bounty Program',description:'Critical vulnerabilities in AI model serving and ML pipelines.',tags:['AI Infrastructure','Smart Contracts'],min_payout:1000,max_payout:150000,total_pool:500000,apply_url:'https://immunefi.com/explore/',scope_count:12},
+  {id:'b4',platform:'immunefi',title:'Chainlink AI Oracle Security',description:'Attack the AI-powered oracle — smart contract + ML model in scope.',tags:['Web3','Oracle','AI+Blockchain'],min_payout:5000,max_payout:250000,total_pool:1000000,apply_url:'https://immunefi.com/explore/',scope_count:5},
+  {id:'b5',platform:'bugcrowd',title:'Google DeepMind AI Safety Program',description:'Safety-critical bugs in Gemini models and Google AI services.',tags:['Gemini','AI Safety','Bias'],min_payout:100,max_payout:15000,apply_url:'https://bughunters.google.com',scope_count:15},
+  {id:'b6',platform:'custom',title:'RedTeamGig Internal Audit',description:'Agentic tool-use attacks on our own platform. NDA required.',tags:['Agentic Systems','Internal','NDA'],min_payout:500,max_payout:5000,total_pool:20000,apply_url:'#',scope_count:4},
+];}
 </script>
 </body>
 </html>
