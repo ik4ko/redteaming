@@ -686,8 +686,6 @@ textarea.inp{resize:vertical;min-height:80px}
 const SUPA_URL = 'https://cnhmfxwyqtpbmjadlwty.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaG1meHd5cXRwYm1qYWRsd3R5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1MzA1NTksImV4cCI6MjA5MjEwNjU1OX0.bTTVehjz_LQLoTd0xW-FMqLdrB7nnKUlU163vLWcdrA';
 
-// This is the line that actually creates the connection:
-const db = window.supabase.createClient(SUPA_URL, SUPA_KEY);
 /* Affiliate referral URLs — hardcoded */
 const AFF = {
   mercor: 'https://t.mercor.com/cCbCp',
@@ -783,65 +781,119 @@ async function callClaude(userMsg, system, maxTokens=700) {
 }
 
 /* ═══════════════════════════════════════════════════
-   BOOT — single IIFE, finally{} guarantees spinner stops
+   BOOT — bulletproof, can never black-screen
+   Rules:
+   1. showApp() is the ONLY function that hides loading + shows app
+   2. showError() is the ONLY function that shows an error state
+   3. Neither is ever called from finally{} — they're called explicitly
+   4. .single() is never used — use .maybeSingle() or array[0] instead
 ═══════════════════════════════════════════════════ */
+function showApp() {
+  elById('loading-screen').style.display = 'none';
+  elById('app').style.display = 'flex';
+}
+
+function showError(msg) {
+  const ls = elById('loading-screen');
+  ls.innerHTML = `
+    <div style="font-family:'DM Mono',monospace;font-size:13px;color:var(--red);text-align:center;max-width:340px;padding:24px;line-height:1.8">
+      <div style="font-size:28px;margin-bottom:12px">⚠</div>
+      <div style="margin-bottom:16px">${esc(msg)}</div>
+      <a href="index.html" style="color:var(--mut);font-size:11px;letter-spacing:.06em">← BACK TO HOME</a>
+    </div>`;
+  ls.style.display = 'flex';
+  elById('app').style.display = 'none';
+}
+
 (async function boot() {
   S.db = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+
+  /* ── Step 1: Get session ─────────────────────── */
+  let session = null;
   try {
-    /* 1. Session */
     const { data, error } = await S.db.auth.getSession();
-    if(error) throw error;
-    const session = data?.session;
-    if(!session?.user){ window.location.replace('index.html'); return; }
-    S.user = session.user;
-
-    /* 2. Profile */
-    const { data: prof } = await S.db.from('profiles').select('*').eq('id', S.user.id).single().catch(()=>({data:null}));
-    if(prof) {
-      S.profile = prof;
-    } else {
-      const meta = S.user.user_metadata||{};
-      const { data: created } = await S.db.from('profiles').upsert({
-        id: S.user.id,
-        display_name: meta.display_name || S.user.email?.split('@')[0] || 'User',
-        role: meta.role || 'red_teamer',
-        vetting_level: 1,
-      },{onConflict:'id'}).select().single().catch(()=>({data:null}));
-      S.profile = created || {id:S.user.id, display_name:'User', role:'red_teamer', vetting_level:1};
-    }
-    S.role = S.profile.role || 'red_teamer';
-
-    /* 3. Show app */
-    elById('loading-screen').style.display = 'none';
-    elById('app').style.display = 'flex';
-    paintSidebar();
-
-    if(S.role==='company_client'||S.role==='admin') {
-      elById('co-nav').style.display = '';
-      /* Security: remove freelancer views from DOM */
-      ['v-hub','v-bounties','v-apps','v-prof','v-res'].forEach(id=>{ const e=elById(id); if(e)e.remove(); });
-      goView('cov'); loadTalent();
-    } else {
-      elById('fl-nav').style.display = '';
-      elById('ai-wrap').style.display = '';
-      elById('sb-vetting').style.display = '';
-      elById('sb-scores').style.display = 'grid';
-      /* Security: remove company views from DOM */
-      ['v-cov','v-cpool','v-cscout','v-cpost','v-can'].forEach(id=>{ const e=elById(id); if(e)e.remove(); });
-      updateVettingUI();
-      goView('hub'); loadGigs(); loadBounties(); loadApps();
-    }
-
-    /* 4. Sign-out only */
-    S.db.auth.onAuthStateChange(event=>{ if(event==='SIGNED_OUT') window.location.replace('index.html'); });
-
-  } catch(err) {
-    elById('loading-screen').innerHTML = `<div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--red);text-align:center;padding:20px">Error: ${esc(String(err.message||err))}<br><br><a href="index.html" style="color:var(--mut)">← Back to home</a></div>`;
-  } finally {
-    /* FAILSAFE — loading screen always hidden */
-    const ls = elById('loading-screen');
-    if(ls && ls.style.display !== 'none') ls.style.display = 'none';
+    if (error) { showError('Auth error: ' + error.message); return; }
+    session = data?.session;
+  } catch(e) {
+    showError('Cannot reach auth service. Check your connection.');
+    return;
   }
+
+  /* ── Step 2: No session → go to landing ──────── */
+  if (!session?.user) {
+    window.location.replace('index.html');
+    return;
+  }
+  S.user = session.user;
+
+  /* ── Step 3: Load profile (never throws) ─────── */
+  try {
+    // Use maybeSingle() — returns null instead of throwing when no row
+    const { data: rows } = await S.db
+      .from('profiles')
+      .select('*')
+      .eq('id', S.user.id)
+      .limit(1);
+    S.profile = rows?.[0] || null;
+  } catch(_) {
+    S.profile = null;
+  }
+
+  /* ── Step 4: Create profile if first login ────── */
+  if (!S.profile) {
+    const meta = S.user.user_metadata || {};
+    const newProf = {
+      id:            S.user.id,
+      display_name:  meta.display_name || S.user.email?.split('@')[0] || 'User',
+      role:          meta.role          || 'red_teamer',
+      vetting_level: 1,
+    };
+    try {
+      const { data: rows } = await S.db
+        .from('profiles')
+        .upsert(newProf, { onConflict: 'id' })
+        .select()
+        .limit(1);
+      S.profile = rows?.[0] || newProf;
+    } catch(_) {
+      S.profile = newProf; // use in-memory fallback, app still works
+    }
+  }
+
+  S.role = S.profile.role || 'red_teamer';
+
+  /* ── Step 5: Reveal app — THIS IS THE ONLY PLACE ─ */
+  showApp();
+  paintSidebar();
+
+  if (S.role === 'company_client' || S.role === 'admin') {
+    elById('co-nav').style.display = '';
+    // Hard security: remove freelancer views from DOM entirely
+    ['v-hub','v-bounties','v-apps','v-prof','v-res'].forEach(id => {
+      const e = elById(id); if (e) e.remove();
+    });
+    goView('cov');
+    loadTalent();
+  } else {
+    elById('fl-nav').style.display = '';
+    elById('ai-wrap').style.display = '';
+    elById('sb-vetting').style.display = '';
+    elById('sb-scores').style.display = 'grid';
+    // Hard security: remove company views from DOM entirely
+    ['v-cov','v-cpool','v-cscout','v-cpost','v-can'].forEach(id => {
+      const e = elById(id); if (e) e.remove();
+    });
+    updateVettingUI();
+    goView('hub');
+    loadGigs();
+    loadBounties();
+    loadApps();
+  }
+
+  /* ── Step 6: Sign-out listener only ──────────── */
+  S.db.auth.onAuthStateChange(event => {
+    if (event === 'SIGNED_OUT') window.location.replace('index.html');
+  });
 })();
 
 /* ═══════════════════════════════════════════════════
