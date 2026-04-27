@@ -1677,6 +1677,8 @@ textarea.input { resize: vertical; min-height: 80px; }
 // ── CONFIG ────────────────────────────────────────────────────
 const SUPA_URL = 'https://cnhmfxwyqtpbmjadlwty.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaG1meHd5cXRwYm1qYWRsd3R5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1MzA1NTksImV4cCI6MjA5MjEwNjU1OX0.bTTVehjz_LQLoTd0xW-FMqLdrB7nnKUlU163vLWcdrA';
+
+// This is the line that actually creates the connection:
 const db = window.supabase.createClient(SUPA_URL, SUPA_KEY);
 
 // ── AI SYSTEM PROMPT (strictly scoped) ───────────────────────
